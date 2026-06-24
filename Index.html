@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roleta de Desafios Ultra Pro</title>
+    <title>Roleta de Desafios Ultra Pro v3</title>
     <style>
         :root {
             --bg-principal: #121420;
@@ -31,7 +31,6 @@
             --secundaria: #00c6ff;
         }
 
-        /* --- TEMAS EM DEGRADÊ CORRIGIDOS --- */
         [data-theme="roxo-preto"] {
             --bg-principal: linear-gradient(135deg, #2e0854 0%, #000000 100%) !important;
             --bg-painel: rgba(255, 255, 255, 0.08);
@@ -51,7 +50,6 @@
             --texto: #ffffff; --primaria: #00f2fe; --secundaria: #4facfe;
         }
 
-        /* --- TEMAS SAZONAIS (INDIPENDENTES) --- */
         [data-sazonal="true"][data-event="sao-joao"] { --bg-principal: #361700 !important; --primaria: #ffaa00; --texto: #fff3e0; }
         [data-sazonal="true"][data-event="ano-novo"] { --bg-principal: #1c1a17 !important; --primaria: #d4af37; --texto: #ffffff; }
 
@@ -67,10 +65,24 @@
         .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; }
         .area-roleta { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
+        /* Layout Ajustado do Cronômetro */
+        .cronometro-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--bg-painel); padding: 15px 30px; border-radius: 20px; border: 1px solid var(--border-color); min-width: 200px; text-align: center; }
+        .cronometro-container { font-size: 36px; font-weight: 800; color: var(--primaria); font-family: monospace; letter-spacing: 1px; }
+        .cronometro-controles { display: flex; align-items: center; gap: 10px; font-size: 12px; justify-content: center; width: 100%; }
+        .cronometro-controles input[type="number"] { width: 55px; padding: 4px; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--texto); border-radius: 6px; }
+
+        .giros-contador { font-size: 14px; background: rgba(0,0,0,0.2); padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border-color); }
+        .giros-contador input { width: 45px; background: transparent; border: none; text-align: center; color: var(--primaria); font-weight: bold; font-size: 14px; }
+
         .roleta-wrapper { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
         .marcador-topo { position: absolute; top: -10px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid var(--botao-girar); z-index: 10; }
         canvas { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 3.5s cubic-bezier(0.1, 0.8, 0.1, 1); }
         .btn-centro-girar { position: absolute; width: 75px; height: 75px; background: var(--botao-girar); border: 4px solid #fff; border-radius: 50%; color: white; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 12; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        .painel-validacao { width: 100%; max-width: 500px; display: none; flex-direction: column; gap: 12px; text-align: center; background: var(--bg-painel); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; }
+        .btn-validar { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-validar.sucesso { background: #00f2fe; color: #121420; }
+        .btn-validar.falha { background: #ff2a5f; color: white; }
 
         .secao-configuracoes { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 768px) { .secao-configuracoes { grid-template-columns: 1fr; } }
@@ -94,13 +106,16 @@
         .jogador-item.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.1); }
         .jogador-item.lider { border-left: 4px solid #ffaa00; }
 
-        .item-badge { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .item-badge { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 5px; }
         .item-badge.bloqueado { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
         .item-badge.ativo { border-color: var(--primaria); background: rgba(0,242,254,0.1); }
 
         .botoes-dificuldade { display: flex; gap: 8px; }
         .btn-dif { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: var(--texto); cursor: pointer; font-size: 11px; }
         .btn-dif.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.15); }
+
+        .grid-cores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .cor-seletor-bloco { background: rgba(0,0,0,0.2); padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; font-size: 11px; }
 
         select, input { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); color: var(--texto); padding: 10px; border-radius: 8px; font-size: 13px; outline: none; width: 100%; }
         .input-add-grupo { display: flex; gap: 8px; width: 100%; }
@@ -110,7 +125,6 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
         .modal-card { background: #1a1d24; border: 1px solid var(--border-color); width: 100%; max-width: 420px; border-radius: 16px; padding: 22px; color: #f0f2f5; position: relative; max-height: 90vh; overflow-y: auto; }
         .modal-fechar { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; opacity: 0.7; }
-        .modal-fechar:hover { opacity: 1; }
         
         .modal-abas { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); }
         .modal-aba-btn { background: transparent; border: none; color: #f0f2f5; font-size: 14px; font-weight: bold; cursor: pointer; opacity: 0.5; padding-bottom: 6px; }
@@ -142,12 +156,12 @@
             <div class="cronometro-wrapper">
                 <div class="cronometro-container" id="cronometro">00:30</div>
                 <div class="cronometro-controles">
-                    <label>Tempo: <input type="number" id="tempoInput" value="30" style="width:50px; padding:2px;" onchange="atualizarDisplayTempo()"></label>
+                    <label>Tempo (s): <input type="number" id="tempoInput" value="30" min="5" max="300" onchange="atualizarDisplayTempo()"></label>
                     <label><input type="checkbox" id="ativarTempo" checked> Ativo</label>
                 </div>
             </div>
 
-            <div class="giros-contador">Giros: <input type="number" id="girosInput" value="5" style="width:40px;"></div>
+            <div class="giros-contador">Giros: <input type="number" id="girosInput" value="5"></div>
 
             <div class="roleta-wrapper">
                 <div class="marcador-topo"></div>
@@ -179,20 +193,24 @@
                             <span class="perfil-nivel-tag" id="perfNivel">Nível 1</span>
                         </div>
                     </div>
-                    <div class="xp-wrapper">
-                        <div style="display:flex; justify-content:space-between;"><span id="perfXpTexto">XP: 0/50</span><span id="perfXpLimite">0/25 XP Diário</span></div>
+                    <div class="xp-wrapper" style="margin-top: 8px;">
+                        <div style="display:flex; justify-content:space-between; font-size: 11px;"><span id="perfXpTexto">XP: 0/50</span><span id="perfXpLimite">0/25 XP Diário</span></div>
                         <div class="xp-barra-fundo"><div class="xp-barra-progresso" id="perfBarraProgresso"></div></div>
                     </div>
                 </div>
 
                 <div class="input-add-grupo">
-                    <button class="btn-acao" id="btnCriarSala" style="background:#ffaa00; display:none;" onclick="criarSalaOnline()">🌐 Criar Sala Online (Líder)</button>
+                    <button class="btn-acao" id="btnCriarSala" style="background:#ffaa00; display:none; width:100%;" onclick="criarSalaOnline()">🌐 Criar Sala Online (Líder)</button>
                 </div>
 
                 <div class="input-add-grupo">
                     <input type="text" id="nome-jogador" placeholder="Convidado Local...">
-                    <select id="emoji-jogador" style="width:70px;">
-                        <option value="🤍">🤍</option><option value="👑">👑</option><option value="⚔️">⚔️</option><option value="🔥">🔥</option><option value="💀">💀</option><option value="👻">👻</option><option value="😎">😎</option>
+                    <select id="emoji-jogador" style="width:75px;">
+                        <option value="🤍">🤍</option><option value="👑">👑</option><option value="⚔️">⚔️</option><option value="🔥">🔥</option>
+                        <option value="💀">💀</option><option value="👻">👻</option><option value="😎">😎</option><option value="👽">👽</option>
+                        <option value="🤖">🤖</option><option value="🎃">🎃</option><option value="🍀">🍀</option><option value="💎">💎</option>
+                        <option value="🦊">🦊</option><option value="🦁">🦁</option><option value="🦄">🦄</option><option value="🍕">🍕</option>
+                        <option value="🎮">🎮</option><option value="🚀">🚀</option><option value="✨">✨</option><option value="🎯">🎯</option>
                     </select>
                     <button class="btn-acao" onclick="adicionarJogador()">+ Add</button>
                 </div>
@@ -209,13 +227,13 @@
                 <div class="card-titulo">🎨 Customização & Fatias</div>
                 <div class="grid-cores">
                     <div class="cor-seletor-bloco"><span>Fácil 🟢</span>
-                        <select id="corFundoFacil" onchange="atualizarCoresCustomizadas()"><option value="#00f2fe">Ciano</option><option value="#ffffff">Branco</option><option value="#ffcc00">Amarelo</option></select>
+                        <select id="corFundoFacil" onchange="atualizarCoresCustomizadas()"><option value="#00f2fe">Ciano</option><option value="#ffffff">Branco</option><option value="#2ecc71">Verde</option></select>
                     </div>
                     <div class="cor-seletor-bloco"><span>Médio 🟡</span>
-                        <select id="corFundoMedio" onchange="atualizarCoresCustomizadas()"><option value="#ffcc00">Amarelo</option><option value="#ffaa00">Laranja</option><option value="#4facfe">Azul</option></select>
+                        <select id="corFundoMedio" onchange="atualizarCoresCustomizadas()"><option value="#ffcc00">Amarelo</option><option value="#ffaa00">Laranja</option><option value="#3498db">Azul</option></select>
                     </div>
                     <div class="cor-seletor-bloco"><span>Difícil 🔴</span>
-                        <select id="corFundoDificil" onchange="atualizarCoresCustomizadas()"><option value="#ff2a5f">Vermelho</option><option value="#121420">Preto</option><option value="#b800ff">Roxo</option></select>
+                        <select id="corFundoDificil" onchange="atualizarCoresCustomizadas()"><option value="#ff2a5f">Vermelho</option><option value="#121420">Preto</option><option value="#9b59b6">Roxo</option></select>
                     </div>
                 </div>
                 <div class="botoes-dificuldade">
@@ -231,8 +249,8 @@
                 <div class="input-add-grupo"><select id="seletor-remover"></select><button class="btn-acao apagar" onclick="removerDesafio()">Apagar</button></div>
                 
                 <div id="secaoSalvarRoleta" style="display:none; border-top:1px solid var(--border-color); padding-top:10px;">
-                    <span style="font-size:12px; font-weight:bold; opacity:0.7;">💾 Salvar Layout Atual da Roleta</span>
-                    <div class="input-add-grupo" style="margin-top:5px;" id="containerSlotsRoleta"></div>
+                    <span style="font-size:12px; font-weight:bold; opacity:0.7;">💾 Salvar/Carregar Layout da Roleta</span>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;" id="containerSlotsRoleta"></div>
                 </div>
             </div>
         </section>
@@ -254,7 +272,7 @@
                 <input type="text" id="cadNome" placeholder="Nome Completo" required>
                 <input type="text" id="cadUser" placeholder="Username" required>
                 <input type="email" id="cadEmail" placeholder="E-mail" required>
-                <input type="password" id="cadSenha" placeholder="Senha (max 8 caracteres)" maxlength="8" required>
+                <input type="password" id="cadSenha" placeholder="Senha (max 8 car.)" maxlength="8" required>
                 <button type="submit" class="modal-btn-submeter">Criar Conta e Jogar! 🚀</button>
             </form>
         </div>
@@ -270,8 +288,10 @@
 
             <div id="subPerfilEditar" class="modal-form">
                 <div class="input-add-grupo">
-                    <label style="font-size:12px; width:100px;">Emoji:</label>
-                    <select id="editEmoji" onchange="salvarEdicaoPerfil()"><option value="👑">👑</option><option value="⚡">⚡</option><option value="💎">💎</option><option value="🦊">🦊</option><option value="👽">👽</option></select>
+                    <label style="font-size:12px; width:100px;">Emoji Avatar:</label>
+                    <select id="editEmoji" onchange="salvarEdicaoPerfil()">
+                        <option value="👑">👑</option><option value="⚡">⚡</option><option value="💎">💎</option><option value="🦊">🦊</option><option value="👽">👽</option>
+                    </select>
                 </div>
                 <div class="input-add-grupo">
                     <label style="font-size:12px; width:100px;">Fundo Avatar:</label>
@@ -290,7 +310,7 @@
             <div id="subPerfilAmigos" class="modal-form">
                 <span style="font-size:12px; font-weight:bold;">🔍 Buscar por ID ou Username</span>
                 <div class="input-add-grupo">
-                    <input type="text" id="txtBuscaAmigo" placeholder="Ex: #1234567 ou bielzeiro...">
+                    <input type="text" id="txtBuscaAmigo" placeholder="Ex: #1234567 ou username...">
                     <button class="btn-acao" onclick="buscarEAdicionarAmigo()">Adicionar</button>
                 </div>
                 <div id="listaAmigosBox" style="display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; margin-top:10px;"></div>
@@ -303,7 +323,7 @@
             <button class="modal-fechar" onclick="fecharTutorial()">✕</button>
             <h2 style="color:var(--primaria); margin-bottom:10px;">✨ Bem-vindo à Roleta Pro!</h2>
             <p style="font-size:14px; line-height:1.5; margin-bottom:15px; opacity:0.9;">
-                Este é o melhor lugar para criar desafios com seus amigos! Gire a roleta, ganhe pontos e suba de nível para desbloquear fundos degradê incríveis e slots para salvar suas roletas.
+                Gire a roleta, ganhe pontos e suba de nível para desbloquear fundos degradê incríveis e novos slots de salvamento. Crie sua conta para salvar seu progresso automático!
             </p>
             <button class="modal-btn-submeter" style="width:100%;" onclick="fecharTutorial()">Vamos Começar! 🚀</button>
         </div>
@@ -317,6 +337,7 @@
         let usuarioLogado = null;
         let eventoAtivoChave = "";
         let salaOnlineCriada = false;
+        let cronometroInterval = null;
 
         let desafios = [
             { texto: "Equilibrar num pé só", dif: "Fácil" },
@@ -335,7 +356,6 @@
                 usuarioLogado = JSON.parse(logadoSalvo);
                 document.body.setAttribute('data-theme', usuarioLogado.temaAtivo || 'default');
             } else {
-                // Checa se é um visitante totalmente novo para exibir tutorial
                 if(!localStorage.getItem('roleta_visitado_antes')) {
                     document.getElementById('modalTutorial').style.display = 'flex';
                     localStorage.setItem('roleta_visitado_antes', 'true');
@@ -386,7 +406,7 @@
 
         function fecharTutorial() { document.getElementById('modalTutorial').style.display = 'none'; }
 
-        // --- BANCO LOCAL & CONTAS ---
+        // --- CONTAS ---
         function obterContas() { return JSON.parse(localStorage.getItem('roleta_contas')) || []; }
         function salvarUsuarioNoBanco(userObj) {
             let contas = obterContas();
@@ -414,13 +434,13 @@
             let email = document.getElementById('cadEmail').value.trim();
             let contas = obterContas();
 
-            if(contas.some(c => c.user === user || c.email === email)) { alert("Usuário ou Email existente!"); return; }
+            if(contas.some(c => c.user === user || c.email === email)) { alert("Dados indisponíveis!"); return; }
 
             let geradoID = "#" + Math.floor(1000000 + Math.random() * 9000000).toString();
             let novoUser = {
                 id: geradoID, nome: document.getElementById('cadNome').value.trim(), user, email,
                 senha: document.getElementById('cadSenha').value, emoji: "👑", fundoAvatar: "#4facfe",
-                nivel: 1, xp: 0, xpDiario: 0, ultimaData: "", temaAtivo: "default", 
+                nivel: 1, xp: 0, xpDiario: 0, temaAtivo: "default", 
                 codigoSala: Math.floor(100000 + Math.random() * 900000).toString(), amigos: [], roletasSalvas: []
             };
 
@@ -440,7 +460,7 @@
             let pass = document.getElementById('loginSenha').value;
             let conta = obterContas().find(c => (c.user === inp || c.email === inp) && c.senha === pass);
 
-            if(!conta) { alert("Credenciais incorretas!"); return; }
+            if(!conta) { alert("Incorreto!"); return; }
             usuarioLogado = conta;
             localStorage.setItem('roleta_logado', JSON.stringify(conta));
             document.body.setAttribute('data-theme', conta.temaAtivo || 'default');
@@ -449,7 +469,7 @@
             atualizarJogadores();
         }
 
-        function executarLogout() {
+        function ejecutarLogout() {
             usuarioLogado = null;
             localStorage.removeItem('roleta_logado');
             document.body.removeAttribute('data-theme');
@@ -480,7 +500,7 @@
 
                 let max = 50 + (usuarioLogado.nivel - 1) * 25;
                 document.getElementById('perfXpTexto').innerText = `XP: ${usuarioLogado.xp}/${max}`;
-                document.getElementById('perfXpLimite').innerText = `${usuarioLogado.xpDiario || 0}/25 XP Diário`;
+                document.getElementById('perfXpLimite').innerText = `${usuarioLogado.xpDiario || 0}/25 Diário`;
                 document.getElementById('perfBarraProgresso').style.width = `${(usuarioLogado.xp / max) * 100}%`;
 
                 renderizarSlotsRoleta();
@@ -493,12 +513,8 @@
             }
         }
 
-        // --- ABAS DO PERFIL & AMIGOS & BUSCA ---
-        function abrirModalEdicaoPerfil() {
-            if(!usuarioLogado) return;
-            mudarAbaPerfil('editar');
-            document.getElementById('modalEdicaoPerfil').style.display = 'flex';
-        }
+        // --- ABAS & AMIGOS ---
+        function abrirModalEdicaoPerfil() { if(!usuarioLogado) return; mudarAbaPerfil('editar'); document.getElementById('modalEdicaoPerfil').style.display = 'flex'; }
         function fecharModalEdicaoPerfil() { document.getElementById('modalEdicaoPerfil').style.display = 'none'; }
         
         function mudarAbaPerfil(aba) {
@@ -511,7 +527,6 @@
                 document.getElementById('editEmoji').value = usuarioLogado.emoji;
                 document.getElementById('editFundoAvatar').value = usuarioLogado.fundoAvatar || "#4facfe";
                 document.getElementById('lblCodigoSala').innerText = usuarioLogado.codigoSala || "------";
-                
                 let nv = usuarioLogado.nivel;
                 document.getElementById('editTemasItens').innerHTML = `
                     <div class="item-badge ${usuarioLogado.temaAtivo==='default'?'ativo':''}" onclick="mudarTemaPerfil('default')">Padrão Escuro</div>
@@ -520,9 +535,7 @@
                     <div class="item-badge ${nv < 7 ? 'bloqueado':''} ${usuarioLogado.temaAtivo==='rosa-preto'?'ativo':''}" onclick="mudarTemaPerfil('rosa-preto')">🌸 Rosa (Nv.7)</div>
                     <div class="item-badge ${nv < 11 ? 'bloqueado':''} ${usuarioLogado.temaAtivo==='azul-preto'?'ativo':''}" onclick="mudarTemaPerfil('azul-preto')">🔷 Azul (Nv.11)</div>
                 `;
-            } else {
-                atualizarListaAmigos();
-            }
+            } else { atualizarListaAmigos(); }
         }
 
         function salvarEdicaoPerfil() {
@@ -553,15 +566,14 @@
             let contas = obterContas();
             let encontrado = contas.find(c => c.user === busca.toLowerCase() || c.id === busca);
 
-            if(!encontrado) { alert("Usuário ou ID não localizado!"); return; }
-            if(encontrado.user === usuarioLogado.user) { alert("Você não pode adicionar a si mesmo!"); return; }
-            if(usuarioLogado.amigos.some(a => a.user === encontrado.user)) { alert("Este usuário já é seu amigo!"); return; }
+            if(!encontrado) { alert("Não localizado!"); return; }
+            if(encontrado.user === usuarioLogado.user) { alert("Não pode adicionar você mesmo!"); return; }
+            if(usuarioLogado.amigos.some(a => a.user === encontrado.user)) { alert("Já adicionado!"); return; }
 
             usuarioLogado.amigos.push({ nome: encontrado.nome, user: encontrado.user, id: encontrado.id, emoji: encontrado.emoji });
             salvarUsuarioNoBanco(usuarioLogado);
             document.getElementById('txtBuscaAmigo').value = '';
             atualizarListaAmigos();
-            alert(`Sucesso! ${encontrado.nome} adicionado.`);
         }
 
         function atualizarListaAmigos() {
@@ -573,72 +585,66 @@
                 container.innerHTML += `
                     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:6px 10px; border-radius:8px; font-size:12px;">
                         <span>${a.emoji} <strong>${a.nome}</strong> (${a.id})</span>
-                        <button class="btn-acao" style="padding:2px 6px; font-size:10px; background:#ff4a4a; color:#fff;" onclick="removerAmigo('${a.user}')">Remover</button>
+                        <button class="btn-acao" style="padding:2px 6px; font-size:10px; background:#ff4a4a;" onclick="removerAmigo('${a.user}')">Remover</button>
                     </div>`;
             });
         }
 
-        function removerAmigo(user) {
-            usuarioLogado.amigos = usuarioLogado.amigos.filter(a => a.user !== user);
-            salvarUsuarioNoBanco(usuarioLogado);
-            atualizarListaAmigos();
-        }
+        function removerAmigo(user) { usuarioLogado.amigos = usuarioLogado.amigos.filter(a => a.user !== user); salvarUsuarioNoBanco(usuarioLogado); atualizarListaAmigos(); }
 
-        // --- SISTEMA DE SLOTS DE ROLETA ---
+        // --- SISTEMA DE SLOTS (2 GRATUITOS INCLUÍDOS) ---
         function renderizarSlotsRoleta() {
             let container = document.getElementById('containerSlotsRoleta');
             container.innerHTML = '';
             let nv = usuarioLogado.nivel;
-            let indexSlot = 1;
 
-            for(let i=5; i<=30; i+=5) {
+            // 2 Slots Gratuitos Base
+            for(let i = 1; i <= 2; i++) {
+                let jaTem = usuarioLogado.roletasSalvas && usuarioLogado.roletasSalvas[i - 1];
+                let lbl = jaTem ? `Carregar Rlt ${i}` : `Salvar Slot ${i} (Grátis)`;
+                container.innerHTML += `<button class="btn-header" style="font-size:11px; padding:4px 8px; border-color:#2ecc71;" onclick="acaoSlotRoleta(${i - 1})">💾 ${lbl}</button>`;
+            }
+
+            // Slots Travados por Nível (A partir do Nível 5)
+            let slotIndexGlobal = 2;
+            for(let i = 5; i <= 30; i += 5) {
                 if(nv >= i) {
-                    let jaTem = usuarioLogado.roletasSalvas && usuarioLogado.roletasSalvas[indexSlot - 1];
-                    let label = jaTem ? `Carregar Rlt ${indexSlot}` : `Salvar no Slot ${indexSlot}`;
-                    container.innerHTML += `<button class="btn-header" style="font-size:11px; padding:4px 8px; border-color:var(--primaria);" onclick="acaoSlotRoleta(${indexSlot - 1})">💾 ${label}</button>`;
-                    indexSlot++;
+                    let jaTem = usuarioLogado.roletasSalvas && usuarioLogado.roletasSalvas[slotIndexGlobal];
+                    let lbl = jaTem ? `Carregar Rlt ${slotIndexGlobal + 1}` : `Salvar Slot ${slotIndexGlobal + 1}`;
+                    container.innerHTML += `<button class="btn-header" style="font-size:11px; padding:4px 8px; border-color:var(--primaria);" onclick="acaoSlotRoleta(${slotIndexGlobal})">💾 ${lbl}</button>`;
                 } else {
-                    container.innerHTML += `<span class="item-badge bloqueado" style="font-size:10px;">🔒 Slot Nv.${i}</span>`;
+                    container.innerHTML += `<span class="item-badge bloqueado" style="font-size:10px;">🔒 Nv.${i}</span>`;
                 }
+                slotIndexGlobal++;
             }
         }
 
         function acaoSlotRoleta(idx) {
             if(!usuarioLogado.roletasSalvas) usuarioLogado.roletasSalvas = [];
-            
             if(usuarioLogado.roletasSalvas[idx]) {
-                // Se já tem, carrega a roleta salva
                 desafios = usuarioLogado.roletasSalvas[idx];
                 atualizarSeletores();
                 desenharRoleta();
-                alert("Configuração de roleta carregada com sucesso!");
+                alert("Roleta carregada com sucesso!");
             } else {
-                // Se está vazio, salva o layout atual
                 usuarioLogado.roletasSalvas[idx] = JSON.parse(JSON.stringify(desafios));
                 salvarUsuarioNoBanco(usuarioLogado);
                 renderizarSlotsRoleta();
-                alert("Roleta atual salva neste slot!");
+                alert("Layout da roleta salvo neste slot!");
             }
         }
 
-        // --- SALA ONLINE & LÍDER ---
-        function criarSalaOnline() {
-            salaOnlineCriada = true;
-            atualizarJogadores();
-            alert(`Sala Online criada com Sucesso! Seu código da sala é: ${usuarioLogado.codigoSala}. Envie para seus convidados!`);
-        }
-
+        // --- ENGENHARIA DA SALA ---
+        function criarSalaOnline() { salaOnlineCriada = true; atualizarJogadores(); alert(`Sala Online Ativa! Código: ${usuarioLogado.codigoSala}`); }
         function entrarPorCodigo() {
             let cod = document.getElementById('codigoConviteInput').value.trim();
-            if(cod.length !== 6) { alert("Insira um código válido de 6 dígitos!"); return; }
+            if(cod.length !== 6) return;
             let sala = obterContas().find(c => c.codigoSala === cod);
-            if(!sala) { alert("Sala não encontrada!"); return; }
-
+            if(!sala) { alert("Não achou!"); return; }
             jogadoresLocais.push({ nome: sala.nome, avatar: sala.emoji, bg: sala.fundoAvatar, pontos: 0 });
             localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
             document.getElementById('codigoConviteInput').value = '';
             atualizarJogadores();
-            alert(`Conectado com sucesso à sala de ${sala.nome}!`);
         }
 
         function obterListaTotalJogadores() {
@@ -655,31 +661,25 @@
             let container = document.getElementById('listaJogadoresContainer');
             container.innerHTML = '';
             let listaCompleta = obterListaTotalJogadores();
-
             listaCompleta.forEach((j, idx) => {
                 let ativo = idx === jugadorAtualIndex ? 'ativo' : '';
                 let liderCls = j.lider ? 'lider' : '';
                 container.innerHTML += `
-                    <div class="jogador-item ${ativo} ${linterCls}">
+                    <div class="jogador-item ${ativo} ${liderCls}">
                         <div class="avatar-preview" style="background:${j.bg || 'rgba(255,255,255,0.1)'}">${j.avatar}</div>
-                        <div class="jogador-info">
-                            <span>${j.nome}</span>
-                            <span><strong>${j.pontos || 0} pts</strong></span>
-                        </div>
+                        <div class="jogador-info"><span>${j.nome}</span><span><strong>${j.pontos || 0} pts</strong></span></div>
                     </div>`;
             });
         }
 
         function adicionarJogador() {
-            let inp = document.getElementById('nome-jogador');
-            if(!inp.value.trim()) return;
+            let inp = document.getElementById('nome-jogador'); if(!inp.value.trim()) return;
             jogadoresLocais.push({ nome: inp.value.trim(), avatar: document.getElementById('emoji-jogador').value, bg: 'rgba(255,255,255,0.1)', pontos: 0 });
-            inp.value = '';
-            localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
+            inp.value = ''; localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
             atualizarJogadores();
         }
 
-        // --- ENGENHARIA DA ROLETA ---
+        // --- SISTEMA INTERNO DA ROLETA & CANVASES ---
         function obterDesafiosFiltrados() { return desafios.filter(d => filtrosAtivos[d.dif]); }
 
         function desenharRoleta() {
@@ -688,11 +688,17 @@
             if(lista.length === 0) return;
 
             let tamAng = (2 * Math.PI) / lista.length;
+            
+            // Puxa as cores corretas setadas nas variáveis do root
             let rStyle = getComputedStyle(document.documentElement);
 
             lista.forEach((d, i) => {
-                let bg = rStyle.getPropertyValue(d.dif === 'Fácil' ? '--cor-facil' : d.dif === 'Médio' ? '--cor-medio' : '--cor-dificil').trim();
-                let txtColor = rStyle.getPropertyValue(d.dif === 'Fácil' ? '--cor-txt-facil' : d.dif === 'Médio' ? '--cor-txt-medio' : '--cor-txt-dificil').trim();
+                let bg = "";
+                if(d.dif === 'Fácil') bg = rStyle.getPropertyValue('--cor-facil').trim() || "#00f2fe";
+                else if(d.dif === 'Médio') bg = rStyle.getPropertyValue('--cor-medio').trim() || "#ffcc00";
+                else bg = rStyle.getPropertyValue('--cor-dificil').trim() || "#ff2a5f";
+
+                let txtColor = (d.dif === 'Difícil' && bg === '#121420') ? '#ffffff' : '#121420';
 
                 ctx.beginPath(); ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, i * tamAng, (i + 1) * tamAng);
@@ -700,7 +706,7 @@
 
                 ctx.save(); ctx.translate(250, 250); ctx.rotate(i * tamAng + tamAng/2);
                 ctx.textAlign = "right"; ctx.fillStyle = txtColor; ctx.font = "bold 13px sans-serif";
-                ctx.fillText(d.texto.substring(0, 16), 220, 5); ctx.restore();
+                ctx.fillText(d.texto.substring(0, 16), 210, 5); ctx.restore();
             });
         }
 
@@ -708,6 +714,8 @@
             if(estaGirando) return;
             let lista = obterDesafiosFiltrados(); if(lista.length === 0) return;
             estaGirando = true;
+            
+            clearInterval(cronometroInterval); // Trava contador se estiver rodando
 
             let voltas = 6 + Math.floor(Math.random() * 5); let graus = Math.floor(Math.random() * 360);
             anguloAtual += (voltas * 360) + graus;
@@ -729,22 +737,45 @@
 
                 document.getElementById('desafioAtualTexto').innerText = `Missão: "${desafioSorteado.texto}" [${desafioSorteado.dif}]`;
                 document.getElementById('painelValidacao').style.display = 'flex';
+                
+                // Dispara o cronômetro assim que o desafio cai na tela
+                if(document.getElementById('ativarTempo').checked) iniciarCronometroRegressivo();
             }, 3500);
         }
 
+        function iniciarCronometroRegressivo() {
+            let tempoRestante = parseInt(document.getElementById('tempoInput').value) || 30;
+            document.getElementById('cronometro').innerText = `00:${tempoRestante < 10 ? '0' + tempoRestante : tempoRestante}`;
+            
+            cronometroInterval = setInterval(() => {
+                tempoRestante--;
+                if(tempoRestante <= 0) {
+                    clearInterval(cronometroInterval);
+                    document.getElementById('cronometro').innerText = "00:00";
+                    document.getElementById('historico').innerText = "💥 O tempo acabou para o desafio atual!";
+                } else {
+                    document.getElementById('cronometro').innerText = `00:${tempoRestante < 10 ? '0' + tempoRestante : tempoRestante}`;
+                }
+            }, 1000);
+        }
+
         function validarResultado(cumpriu) {
+            clearInterval(cronometroInterval);
             document.getElementById('painelValidacao').style.display = 'none';
             let listaCompleta = obterListaTotalJogadores();
             if(listaCompleta.length > 0) {
-                let p = listaCompleta[jugadorAtualIndex];
-                document.getElementById('historico').innerText = cumpriu ? `${p.nome} completou o desafio!` : `${p.nome} pulou/falhou.`;
+                let j = listaCompleta[jugadorAtualIndex];
+                if(cumpriu) j.pontos = (j.pontos || 0) + 10;
+                document.getElementById('historico').innerText = cumpriu ? `${j.nome} completou e ganhou 10 pts!` : `${j.nome} não cumpriu.`;
                 jugadorAtualIndex = (jugadorAtualIndex + 1) % listaCompleta.length;
                 atualizarJogadores();
+                atualizarDisplayTempo();
             }
         }
 
         function atualizarDisplayTempo() { let t = document.getElementById('tempoInput').value; document.getElementById('cronometro').innerText = `00:${t < 10 ? '0'+t : t}`; }
         function mudarFiltro(d) { filtrosAtivos[d] = !filtrosAtivos[d]; document.getElementById(`filtro-${d.toLowerCase()}`).classList.toggle('ativo', filtrosAtivos[d]); desenharRoleta(); }
+        
         function atualizarCoresCustomizadas() {
             let root = document.documentElement;
             root.style.setProperty('--cor-facil', document.getElementById('corFundoFacil').value);
