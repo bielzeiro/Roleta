@@ -3,9 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roleta de Desafios</title>
+    <title>Roleta Suprema de Desafios</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 { margin-bottom: 10px; color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.3); text-align: center; font-size: 24px; }
+        .canvas-container { position: relative; width: 100%; max-width: 340px; aspect-ratio: 1; margin: 15px 0; display: flex; justify-content: center; align-items: center; }
+        canvas { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 25px rgba(0,0,0,0.5), 0 0 5px #00ffcc; background: #fff; }
+        .arrow { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #ff3366; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); z-index: 10; }
+        .center-spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: #ff3366; border: 4px solid #fff; border-radius: 50%; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 5; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .center-spin-btn:active { background: #e02253; transform: translate(-50%, -50%) scale(0.95); }
+        .controls { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; max-width: 340px; }
+        button.action-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: all 0.2s; background: #00ffcc; color: #1e1e2f; box-shadow: 0 4px 15px rgba(0,255,204,0.2); }
+        button.action-btn:active { transform: scale(0.98); }
+        button#stop-btn { background: #ffcc00; color: #1e1e2f; display: none; }
+        #result-box { width: 100%; max-width: 340px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; text-align: center; box-sizing: border-box; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #result-text { font-size: 18px; font-weight: bold; color: #fff; margin: 0; }
+        #timer-text { font-size: 22px; font-weight: bold; color: #ffcc00; margin-top: 8px; display: none; font-family: monospace; }
+    </style>
 </head>
 <body>
-    <h1>A Roleta está a carregar...</h1>
+
+    <h1>Roleta de Desafios 🎡</h1>
+
+    <div class="controls">
+        <button id="spin-btn" class="action-btn">Girar Roleta</button>
+        <button id="stop-btn" class="action-btn">Parar!</button>
+    </div>
+
+    <div class="canvas-container">
+        <div class="arrow"></div>
+        <canvas id="wheel" width="400" height="400"></canvas>
+        <div id="center-btn" class="center-spin-btn">IR!</div>
+    </div>
+
+    <div id="result-box">
+        <p id="result-text">Clica em "Girar" ou no centro para começar!</p>
+        <div id="timer-text">00:30</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spin-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const centerBtn = document.getElementById('center-btn');
+        const resultText = document.getElementById('result-text');
+        const timerText = document.getElementById('timer-text');
+
+        const options = [
+            { text: "Imitar um Macaco", color: "#ff3366", time: 20 },
+            { text: "Fazer 10 Flexões", color: "#33ccff", time: 30 },
+            { text: "Cantar uma Música", color: "#ffcc00", time: 40 },
+            { text: "Contar uma Piada", color: "#33ff99", time: 30 },
+            { text: "Ficar Estátua", color: "#b84dff", time: 20 },
+            { text: "Dança Engraçada", color: "#ff9933", time: 30 },
+            { text: "Falar Sem Respirar", color: "#ff3399", time: 15 },
+            { text: "Equilibrar num Pé", color: "#00ffcc", time: 25 }
+        ];
+
+        const numOptions = options.length;
+        const arcSize = (2 * Math.PI) / numOptions;
+        let currentAngle = 0;
+        let isSpinning = false;
+        let spinSpeed = 0;
+        let animationFrame;
+        let countdownInterval;
+
+        function playTone(freq, type, duration) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = type;
+                oscillator.frequency.value = freq;
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function drawWheel() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const radius = canvas.width / 2;
+            ctx.save();
+            ctx.translate(radius, radius);
+            ctx.rotate(currentAngle);
+
+            for (let i = 0; i < numOptions; i++) {
+                ctx.beginPath();
+                ctx.fillStyle = options[i].color;
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius - 10, i * arcSize, (i + 1) * arcSize);
+                ctx.lineTo(0, 0);
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#1e1e2f';
+                ctx.stroke();
+
+                ctx.save();
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.rotate(i * arcSize + arcSize / 2);
+                ctx.fillText(options[i].text, radius - 30, 0);
+                ctx.restore();
+            }
+            ctx.restore();
+        }
+
+        function rotateWheel() {
+            if (!isSpinning) return;
+            currentAngle += spinSpeed;
+            currentAngle %= 2 * Math.PI;
+            drawWheel();
+            
+            if (Math.random() < 0.15) playTone(600, 'triangle', 0.05);
+            
+            animationFrame = requestAnimationFrame(rotateWheel);
+        }
+
+        function startSpin() {
+            if (isSpinning) return;
+            clearInterval(countdownInterval);
+            timerText.style.display = 'none';
+            
+            isSpinning = true;
+            spinSpeed = 0.2 + Math.random() * 0.15;
+            
+            spinBtn.style.display = 'none';
+            stopBtn.style.display = 'block';
+            resultText.innerText = "A girar a toda a velocidade... 🔥";
+            
+            playTone(400, 'sine', 0.2);
+            rotateWheel();
+        }
+
+        function stopSpin() {
+            if (!isSpinning) return;
+            stopBtn.style.display = 'none';
+            spinBtn.style.display = 'block';
+            
+            let deceleration = setInterval(() => {
+                spinSpeed *= 0.92;
+                if (spinSpeed < 0.005) {
+                    clearInterval(deceleration);
+                    isSpinning = false;
+                    cancelAnimationFrame(animationFrame);
+                    determineWinner();
+                }
+            }, 50);
+        }
+
+        function determineWinner() {
+            const normalizedAngle = (2 * Math.PI - (currentAngle % (2 * Math.PI))) % (2 * Math.PI);
+            const topPointerAngle = (normalizedAngle + Math.PI * 1.5) % (2 * Math.PI);
+            const winnerIndex = Math.floor(topPointerAngle / arcSize) % numOptions;
+            
+            const winner = options[winnerIndex];
+            resultText.innerHTML = `Desafio: <span style="color:${winner.color}">${winner.text}</span>`;
+            
+            playTone(523.25, 'sine', 0.15);
+            setTimeout(() => playTone(659.25, 'sine', 0.3), 150);
+
+            startTimer(winner.time);
+        }
+
+        function startTimer(seconds) {
+            timerText.style.display = 'block';
+            let remaining = seconds;
+            timerText.innerText = `00:${remaining < 10 ? '0' : ''}${remaining}`;
+            
+            countdownInterval = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    timerText.innerText = "TEMPO ESGOTADO! ⏰";
+                    playTone(220, 'sawtooth', 0.5);
+                } else {
+                    timerText.innerText = `00:${remaining < 10 ? '0' : ''}${remaining}`;
+                    if (remaining <= 5) playTone(800, 'sine', 0.05);
+                }
+            }, 1000);
+        }
+
+        spinBtn.addEventListener('click', startSpin);
+        centerBtn.addEventListener('click', startSpin);
+        stopBtn.addEventListener('click', stopSpin);
+
+        drawWheel();
+    </script>
 </body>
 </html>
