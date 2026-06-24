@@ -5,108 +5,242 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roleta Suprema de Desafios</title>
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1e1e2f, #2a2a40);
+            --panel-bg: rgba(255, 255, 255, 0.06);
+            --text-color: #fff;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-color: #00ffcc;
+        }
+        .light-mode {
+            --bg-gradient: linear-gradient(135deg, #f0f2f5, #e4e6eb);
+            --panel-bg: #ffffff;
+            --text-color: #1c1e21;
+            --border-color: #ccd0d5;
+            --accent-color: #007bff;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
-            color: #fff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
+            transition: all 0.3s ease;
         }
-        h1 { margin-bottom: 10px; color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.3); text-align: center; font-size: 24px; }
-        .canvas-container { position: relative; width: 100%; max-width: 340px; aspect-ratio: 1; margin: 15px 0; display: flex; justify-content: center; align-items: center; }
-        canvas { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 25px rgba(0,0,0,0.5), 0 0 5px #00ffcc; background: #fff; }
-        .arrow { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #ff3366; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); z-index: 10; }
-        .center-spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: #ff3366; border: 4px solid #fff; border-radius: 50%; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 5; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .center-spin-btn:active { background: #e02253; transform: translate(-50%, -50%) scale(0.95); }
-        .controls { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; max-width: 340px; }
-        button.action-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: all 0.2s; background: #00ffcc; color: #1e1e2f; box-shadow: 0 4px 15px rgba(0,255,204,0.2); }
-        button.action-btn:active { transform: scale(0.98); }
-        button#stop-btn { background: #ffcc00; color: #1e1e2f; display: none; }
-        #result-box { width: 100%; max-width: 340px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; text-align: center; box-sizing: border-box; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        #result-text { font-size: 18px; font-weight: bold; color: #fff; margin: 0; }
-        #timer-text { font-size: 22px; font-weight: bold; color: #ffcc00; margin-top: 8px; display: none; font-family: monospace; }
+        h1 { margin: 5px 0 2px 0; font-size: 22px; text-align: center; color: var(--accent-color); }
+        .credits { font-size: 11px; opacity: 0.7; margin-bottom: 10px; text-align: center; }
+        
+        .panel { width: 100%; max-width: 360px; background: var(--panel-bg); padding: 12px; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid var(--border-color); }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; }
+        .row:last-child { margin-bottom: 0; }
+        
+        select, input, button.sm-btn { background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--accent-color); padding: 5px 8px; border-radius: 6px; font-size: 12px; }
+        .light-mode select, .light-mode input { background: #fff; }
+
+        #scoreboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-top: 5px; }
+        .player-card { background: rgba(0,0,0,0.1); padding: 5px; border-radius: 6px; text-align: center; font-size: 12px; border: 1px solid transparent; }
+        .player-card.active { border-color: var(--accent-color); background: rgba(0,255,204,0.1); }
+
+        .canvas-container { position: relative; width: 100%; max-width: 280px; aspect-ratio: 1; margin: 10px 0; display: flex; justify-content: center; align-items: center; }
+        canvas { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); background: #fff; }
+        .arrow { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 20px solid #ff3366; z-index: 10; }
+        .center-spin-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: #ff3366; border: 3px solid #fff; border-radius: 50%; color: #fff; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; }
+        
+        .controls { display: flex; gap: 8px; margin-bottom: 10px; width: 100%; max-width: 360px; }
+        button.main-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; background: var(--accent-color); color: #fff; }
+        
+        #history-box { max-height: 70px; overflow-y: auto; font-size: 11px; opacity: 0.8; padding: 5px; background: rgba(0,0,0,0.1); border-radius: 6px; width: 100%; box-sizing: border-box; }
+
+        /* Pop-up Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: var(--bg-gradient); border: 2px solid var(--accent-color); padding: 25px; border-radius: 15px; text-align: center; max-width: 320px; width: 100%; box-sizing: border-box; color: var(--text-color); }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
+        .btn-success { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; }
+        .btn-danger { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <h1>Roleta de Desafios 🎡</h1>
+    <div class="credits">Criado por <b>bielzeiro</b> & <b>Gemini AI</b></div>
+
+    <div class="panel">
+        <div class="row">
+            <button id="toggle-mode" class="sm-btn">Alternar Modo Claro/Escuro 🌗</button>
+            <div>
+                <label>Dificuldade:</label>
+                <select id="level-select">
+                    <option value="suave">Suave 🟢</option>
+                    <option value="medio">Médio 🟡</option>
+                    <option value="hardcore">Hardcore 🔥</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div>
+                <label>Jogadores (1-5):</label>
+                <input type="number" id="players-input" value="2" min="1" max="5" style="width: 45px;">
+            </div>
+            <div>
+                <label>Tempo (seg):</label>
+                <input type="number" id="timer-input" value="30" min="5" max="120" style="width: 50px;">
+            </div>
+        </div>
+        <div id="scoreboard"></div>
+    </div>
+
+    <div class="panel">
+        <div class="row" style="font-weight: bold; border-bottom: 1px solid var(--border-color); padding-bottom: 3px; margin-bottom: 5px;">
+            <span>Gerir Desafios da Lista Atual</span>
+        </div>
+        <div class="row">
+            <input type="text" id="new-challenge-input" placeholder="Novo desafio..." style="flex: 1; margin-right: 5px;">
+            <button id="add-btn" class="sm-btn" style="background: #28a745;">Add</button>
+        </div>
+        <div class="row">
+            <select id="edit-select" style="flex: 1; margin-right: 5px;"></select>
+            <button id="remove-btn" class="sm-btn" style="background: #dc3545; margin-right: 2px;">Apagar</button>
+        </div>
+    </div>
 
     <div class="controls">
-        <button id="spin-btn" class="action-btn">Girar Roleta</button>
-        <button id="stop-btn" class="action-btn">Parar!</button>
+        <button id="spin-btn" class="main-btn">Girar Roleta (Giros: <span id="spin-count">0</span>/3)</button>
     </div>
 
     <div class="canvas-container">
         <div class="arrow"></div>
         <canvas id="wheel" width="400" height="400"></canvas>
-        <div id="center-btn" class="center-spin-btn">IR!</div>
+        <div id="center-btn" class="center-spin-btn">GIRAR</div>
     </div>
 
-    <div id="result-box">
-        <p id="result-text">Clica em "Girar" ou no centro para começar!</p>
-        <div id="timer-text">00:30</div>
+    <div class="panel">
+        <div style="font-size: 12px; font-weight: bold; margin-bottom: 3px;">Histórico de Eventos:</div>
+        <div id="history-box">Jogo iniciado! Boa sorte.<br></div>
+    </div>
+
+    <div id="challenge-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin: 0 0 10px 0; color: var(--accent-color);">Desafio Sorteado!</h2>
+            <p id="modal-player-text" style="font-weight: bold; margin: 5px 0;"></p>
+            <p id="modal-challenge-text" style="font-size: 18px; margin: 15px 0; font-weight: bold;"></p>
+            <div id="modal-timer" style="font-size: 24px; color: #ffcc00; font-family: monospace; font-weight: bold; margin: 10px 0;">00:30</div>
+            <p style="font-size: 13px; margin-bottom: 5px;">O jogador cumpriu o desafio?</p>
+            <div class="modal-buttons">
+                <button id="btn-done" class="btn-success">Sim (+10 pts)</button>
+                <button id="btn-fail" class="btn-danger">Não (0 pts)</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
         const spinBtn = document.getElementById('spin-btn');
-        const stopBtn = document.getElementById('stop-btn');
         const centerBtn = document.getElementById('center-btn');
-        const resultText = document.getElementById('result-text');
-        const timerText = document.getElementById('timer-text');
+        const historyBox = document.getElementById('history-box');
+        const spinCountText = document.getElementById('spin-count');
+        
+        const playersInput = document.getElementById('players-input');
+        const timerInput = document.getElementById('timer-input');
+        const levelSelect = document.getElementById('level-select');
+        const scoreboard = document.getElementById('scoreboard');
+        
+        const challengeModal = document.getElementById('challenge-modal');
+        const modalPlayerText = document.getElementById('modal-player-text');
+        const modalChallengeText = document.getElementById('modal-challenge-text');
+        const modalTimer = document.getElementById('modal-timer');
+        
+        const defaultChallenges = {
+            suave: ["Imitar um Macaco", "Contar uma Piada", "Ficar Estátua 20s", "Equilibrar num Pé"],
+            medio: ["Fazer 10 Flexões", "Cantar um Refrão", "Dança Engraçada", "Falar Sem Respirar"],
+            hardcore: ["Fazer Prancha 1 Min", "Falar Trava-Línguas", "Deixar Ver Celular", "Pagar uma Prenda"]
+        };
 
-        const options = [
-            { text: "Imitar um Macaco", color: "#ff3366", time: 20 },
-            { text: "Fazer 10 Flexões", color: "#33ccff", time: 30 },
-            { text: "Cantar uma Música", color: "#ffcc00", time: 40 },
-            { text: "Contar uma Piada", color: "#33ff99", time: 30 },
-            { text: "Ficar Estátua", color: "#b84dff", time: 20 },
-            { text: "Dança Engraçada", color: "#ff9933", time: 30 },
-            { text: "Falar Sem Respirar", color: "#ff3399", time: 15 },
-            { text: "Equilibrar num Pé", color: "#00ffcc", time: 25 }
-        ];
-
-        const numOptions = options.length;
-        const arcSize = (2 * Math.PI) / numOptions;
+        const colors = ["#ff3366", "#33ccff", "#ffcc00", "#33ff99", "#b84dff", "#ff9933", "#ff3399", "#00ffcc"];
+        let currentChallenges = [...defaultChallenges.suave];
+        
         let currentAngle = 0;
         let isSpinning = false;
-        let spinSpeed = 0;
-        let animationFrame;
+        let spinCount = 0;
+        let currentPlayer = 0;
+        let scores = [0, 0, 0, 0, 0];
         let countdownInterval;
 
-        function playTone(freq, type, duration) {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.type = type;
-                oscillator.frequency.value = freq;
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
+        // Gerenciador Light/Dark Mode
+        document.getElementById('toggle-mode').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+        });
+
+        // Configuração Dinâmica de Jogadores
+        function buildScoreboard() {
+            scoreboard.innerHTML = '';
+            let numPlayers = Math.min(parseInt(playersInput.value) || 1, 5);
+            for(let i=0; i<numPlayers; i++) {
+                scoreboard.innerHTML += `<div id="p-card-${i}" class="player-card ${i===currentPlayer?'active':''}">J${i+1}: <span id="p-score-${i}">${scores[i]}</span> pts</div>`;
+            }
+        }
+        playersInput.addEventListener('change', buildScoreboard);
+
+        // CRUD de Desafios (Adicionar, Editar, Remover)
+        const editSelect = document.getElementById('edit-select');
+        const newChallengeInput = document.getElementById('new-challenge-input');
+        
+        function updateChallengeSelectors() {
+            editSelect.innerHTML = '';
+            currentChallenges.forEach((c, idx) => {
+                editSelect.innerHTML += `<option value="${idx}">${c}</option>`;
+            });
+            drawWheel();
         }
 
+        document.getElementById('add-btn').addEventListener('click', () => {
+            if(newChallengeInput.value.trim() !== "") {
+                currentChallenges.push(newChallengeInput.value.trim());
+                logHistory(`Adicionado: "${newChallengeInput.value.trim()}"`);
+                newChallengeInput.value = "";
+                updateChallengeSelectors();
+            }
+        });
+
+        document.getElementById('remove-btn').addEventListener('click', () => {
+            if(currentChallenges.length > 2) {
+                let idx = editSelect.value;
+                logHistory(`Removido: "${currentChallenges[idx]}"`);
+                currentChallenges.splice(idx, 1);
+                updateChallengeSelectors();
+            } else {
+                alert("A roleta precisa de pelo menos 2 desafios!");
+            }
+        });
+
+        levelSelect.addEventListener('change', () => {
+            currentChallenges = [...defaultChallenges[levelSelect.value]];
+            logHistory(`Mudou dificuldade para: ${levelSelect.value.toUpperCase()}`);
+            updateChallengeSelectors();
+        });
+
+        function logHistory(text) {
+            historyBox.innerHTML += `${text}<br>`;
+            historyBox.scrollTop = historyBox.scrollHeight;
+        }
+
+        // Desenho da Roleta
         function drawWheel() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const radius = canvas.width / 2;
+            const arcSize = (2 * Math.PI) / currentChallenges.length;
             ctx.save();
             ctx.translate(radius, radius);
             ctx.rotate(currentAngle);
 
-            for (let i = 0; i < numOptions; i++) {
+            for (let i = 0; i < currentChallenges.length; i++) {
                 ctx.beginPath();
-                ctx.fillStyle = options[i].color;
+                ctx.fillStyle = colors[i % colors.length];
                 ctx.moveTo(0, 0);
                 ctx.arc(0, 0, radius - 10, i * arcSize, (i + 1) * arcSize);
                 ctx.lineTo(0, 0);
@@ -117,96 +251,99 @@
 
                 ctx.save();
                 ctx.fillStyle = '#fff';
-                ctx.font = 'bold 14px sans-serif';
+                ctx.font = 'bold 12px sans-serif';
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
                 ctx.rotate(i * arcSize + arcSize / 2);
-                ctx.fillText(options[i].text, radius - 30, 0);
+                ctx.fillText(currentChallenges[i], radius - 25, 0);
                 ctx.restore();
             }
             ctx.restore();
         }
 
-        function rotateWheel() {
-            if (!isSpinning) return;
-            currentAngle += spinSpeed;
-            currentAngle %= 2 * Math.PI;
-            drawWheel();
-            
-            if (Math.random() < 0.15) playTone(600, 'triangle', 0.05);
-            
-            animationFrame = requestAnimationFrame(rotateWheel);
-        }
-
+        // Sistema de Giro
         function startSpin() {
             if (isSpinning) return;
-            clearInterval(countdownInterval);
-            timerText.style.display = 'none';
+            if (spinCount >= 3) {
+                logHistory("❌ Limite de 3 giros atingido! Reinicia a página para jogar de novo.");
+                alert("Fim de Jogo! Limite de 3 giros completo.");
+                return;
+            }
             
             isSpinning = true;
-            spinSpeed = 0.2 + Math.random() * 0.15;
+            let speed = 0.2 + Math.random() * 0.2;
             
-            spinBtn.style.display = 'none';
-            stopBtn.style.display = 'block';
-            resultText.innerText = "A girar a toda a velocidade... 🔥";
-            
-            playTone(400, 'sine', 0.2);
-            rotateWheel();
-        }
-
-        function stopSpin() {
-            if (!isSpinning) return;
-            stopBtn.style.display = 'none';
-            spinBtn.style.display = 'block';
-            
-            let deceleration = setInterval(() => {
-                spinSpeed *= 0.92;
-                if (spinSpeed < 0.005) {
-                    clearInterval(deceleration);
+            let anim = setInterval(() => {
+                currentAngle += speed;
+                speed *= 0.95;
+                drawWheel();
+                
+                if(speed < 0.005) {
+                    clearInterval(anim);
                     isSpinning = false;
-                    cancelAnimationFrame(animationFrame);
+                    spinCount++;
+                    spinCountText.innerText = spinCount;
                     determineWinner();
                 }
-            }, 50);
+            }, 30);
         }
 
         function determineWinner() {
+            const arcSize = (2 * Math.PI) / currentChallenges.length;
             const normalizedAngle = (2 * Math.PI - (currentAngle % (2 * Math.PI))) % (2 * Math.PI);
             const topPointerAngle = (normalizedAngle + Math.PI * 1.5) % (2 * Math.PI);
-            const winnerIndex = Math.floor(topPointerAngle / arcSize) % numOptions;
+            const winnerIndex = Math.floor(topPointerAngle / arcSize) % currentChallenges.length;
             
-            const winner = options[winnerIndex];
-            resultText.innerHTML = `Desafio: <span style="color:${winner.color}">${winner.text}</span>`;
-            
-            playTone(523.25, 'sine', 0.15);
-            setTimeout(() => playTone(659.25, 'sine', 0.3), 150);
-
-            startTimer(winner.time);
+            const winnerText = currentChallenges[winnerIndex];
+            openModal(winnerText);
         }
 
-        function startTimer(seconds) {
-            timerText.style.display = 'block';
-            let remaining = seconds;
-            timerText.innerText = `00:${remaining < 10 ? '0' : ''}${remaining}`;
+        // Sistema de Pop-up Modal e Cronómetro Ajustável
+        function openModal(challenge) {
+            modalPlayerText.innerText = `Vez do Jogador ${currentPlayer + 1}`;
+            modalChallengeText.innerText = challenge;
+            challengeModal.style.display = "flex";
+            
+            let timeRemaining = parseInt(timerInput.value) || 30;
+            modalTimer.innerText = `00:${timeRemaining < 10 ? '0' : ''}${timeRemaining}`;
             
             countdownInterval = setInterval(() => {
-                remaining--;
-                if (remaining <= 0) {
+                timeRemaining--;
+                if(timeRemaining <= 0) {
                     clearInterval(countdownInterval);
-                    timerText.innerText = "TEMPO ESGOTADO! ⏰";
-                    playTone(220, 'sawtooth', 0.5);
+                    modalTimer.innerText = "TEMPO ESGOTADO! ⏰";
                 } else {
-                    timerText.innerText = `00:${remaining < 10 ? '0' : ''}${remaining}`;
-                    if (remaining <= 5) playTone(800, 'sine', 0.05);
+                    modalTimer.innerText = `00:${timeRemaining < 10 ? '0' : ''}${timeRemaining}`;
                 }
             }, 1000);
         }
 
+        function closeModal(success) {
+            clearInterval(countdownInterval);
+            challengeModal.style.display = "none";
+            
+            let numPlayers = Math.min(parseInt(playersInput.value) || 1, 5);
+            
+            if(success) {
+                scores[currentPlayer] += 10;
+                logHistory(`✅ J${currentPlayer+1} CUMPRIU: "${modalChallengeText.innerText}" (+10 pts)`);
+            } else {
+                logHistory(`❌ J${currentPlayer+1} FALHOU: "${modalChallengeText.innerText}" (0 pts)`);
+            }
+            
+            // Passa para o próximo jogador
+            currentPlayer = (currentPlayer + 1) % numPlayers;
+            buildScoreboard();
+        }
+
+        document.getElementById('btn-done').addEventListener('click', () => closeModal(true));
+        document.getElementById('btn-fail').addEventListener('click', () => closeModal(false));
         spinBtn.addEventListener('click', startSpin);
         centerBtn.addEventListener('click', startSpin);
-        stopBtn.addEventListener('click', stopSpin);
 
-        drawWheel();
+        // Inicialização
+        buildScoreboard();
+        updateChallengeSelectors();
     </script>
 </body>
 </html>
