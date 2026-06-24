@@ -13,6 +13,14 @@
             --primaria: #00f2fe;
             --secundaria: #4facfe;
             --botao-girar: #ff2a5f;
+            
+            /* Cores padrão das fatias (editáveis via painel) */
+            --cor-facil: #00f2fe;
+            --cor-txt-facil: #121420;
+            --cor-medio: #ffcc00;
+            --cor-txt-medio: #121420;
+            --cor-dificil: #ff2a5f;
+            --cor-txt-dificil: #ffffff;
         }
 
         [data-theme="light"] {
@@ -330,6 +338,28 @@
             opacity: 0.7;
         }
 
+        .grid-cores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .cor-seletor-bloco {
+            background: rgba(0,0,0,0.2);
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 11px;
+        }
+
+        .cor-seletor-bloco span {
+            font-weight: 600;
+        }
+
         select, input {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border-color);
@@ -497,16 +527,86 @@
                         <option value="😎">😎</option>
                         <option value="⚔️">⚔️</option>
                         <option value="🇧🇷">🇧🇷</option>
+                        <option value="🔥">🔥</option>
+                        <option value="👾">👾</option>
+                        <option value="🦊">🦊</option>
+                        <option value="💎">💎</option>
+                        <option value="🍕">🍕</option>
+                        <option value="🚀">🚀</option>
+                        <option value="🍀">🍀</option>
+                        <option value="🎭">🎭</option>
                     </select>
                     <button class="btn-acao" onclick="adicionarJogador()">+ Entrar</button>
                 </div>
-                <div class="lista-jogadores" id="listaJogadoresContainer">
-                    </div>
+                <div class="lista-jogadores" id="listaJogadoresContainer"></div>
             </div>
 
             <div class="card">
-                <div class="card-titulo">📝 Editor de Fatias</div>
+                <div class="card-titulo">📝 Editor de Fatias & Cores</div>
                 
+                <div class="input-grupo">
+                    <label>Customizar Cores da Roleta</label>
+                    <div class="grid-cores">
+                        <div class="cor-seletor-bloco" style="border-top: 3px solid var(--cor-facil);">
+                            <span>Fácil 🟢</span>
+                            <select id="corFundoFacil" onchange="atualizarCoresCustomizadas()">
+                                <option value="#00f2fe" selected>Ciano</option>
+                                <option value="#4facfe">Azul</option>
+                                <option value="#ffffff">Branco</option>
+                                <option value="#f0f2f5">Cinza</option>
+                                <option value="#ff69b4">Rosa</option>
+                                <option value="#ffcc00">Amarelo</option>
+                                <option value="#ff2a5f">Vermelho</option>
+                                <option value="#ffaa00">Laranja</option>
+                                <option value="#8b5a2b">Marrom</option>
+                                <option value="#121420">Preto</option>
+                            </select>
+                            <select id="corTxtFacil" onchange="atualizarCoresCustomizadas()">
+                                <option value="#121420" selected>Texto Preto</option>
+                                <option value="#ffffff">Texto Branco</option>
+                            </select>
+                        </div>
+                        <div class="cor-seletor-bloco" style="border-top: 3px solid var(--cor-medio);">
+                            <span>Médio 🟡</span>
+                            <select id="corFundoMedio" onchange="atualizarCoresCustomizadas()">
+                                <option value="#ffcc00" selected>Amarelo</option>
+                                <option value="#ffaa00">Laranja</option>
+                                <option value="#4facfe">Azul</option>
+                                <option value="#00f2fe">Ciano</option>
+                                <option value="#ff69b4">Rosa</option>
+                                <option value="#ffffff">Branco</option>
+                                <option value="#f0f2f5">Cinza</option>
+                                <option value="#ff2a5f">Vermelho</option>
+                                <option value="#8b5a2b">Marrom</option>
+                                <option value="#121420">Preto</option>
+                            </select>
+                            <select id="corTxtMedio" onchange="atualizarCoresCustomizadas()">
+                                <option value="#121420" selected>Texto Preto</option>
+                                <option value="#ffffff">Texto Branco</option>
+                            </select>
+                        </div>
+                        <div class="cor-seletor-bloco" style="border-top: 3px solid var(--cor-dificil);">
+                            <span>Difícil 🔴</span>
+                            <select id="corFundoDificil" onchange="atualizarCoresCustomizadas()">
+                                <option value="#ff2a5f" selected>Vermelho</option>
+                                <option value="#ffaa00">Laranja</option>
+                                <option value="#ff69b4">Rosa</option>
+                                <option value="#8b5a2b">Marrom</option>
+                                <option value="#4facfe">Azul</option>
+                                <option value="#00f2fe">Ciano</option>
+                                <option value="#ffcc00">Amarelo</option>
+                                <option value="#ffffff">Branco</option>
+                                <option value="#f0f2f5">Cinza</option>
+                                <option value="#121420">Preto</option>
+                            </select>
+                            <select id="corTxtDificil" onchange="atualizarCoresCustomizadas()">
+                                <option value="#ffffff" selected>Texto Branco</option>
+                                <option value="#121420">Texto Preto</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="input-grupo">
                     <label>Dificuldade Ativa do Jogo</label>
                     <div class="botoes-dificuldade">
@@ -625,6 +725,26 @@
             }
         }
 
+        function atualizarCoresCustomizadas() {
+            const root = document.documentElement;
+            
+            const fundoFacil = document.getElementById('corFundoFacil').value;
+            const txtFacil = document.getElementById('corTxtFacil').value;
+            const fundoMedio = document.getElementById('corFundoMedio').value;
+            const txtMedio = document.getElementById('corTxtMedio').value;
+            const fundoDificil = document.getElementById('corFundoDificil').value;
+            const txtDificil = document.getElementById('corTxtDificil').value;
+
+            root.style.setProperty('--cor-facil', fundoFacil);
+            root.style.setProperty('--cor-txt-facil', txtFacil);
+            root.style.setProperty('--cor-medio', fundoMedio);
+            root.style.setProperty('--cor-txt-medio', txtMedio);
+            root.style.setProperty('--cor-dificil', fundoDificil);
+            root.style.setProperty('--cor-txt-dificil', txtDificil);
+
+            desenharRoleta();
+        }
+
         function obterDesafiosFiltrados() {
             return desafios.filter(d => filtrosAtivos[d.dif]);
         }
@@ -642,23 +762,37 @@
             }
 
             const tamanhoAngulo = (2 * Math.PI) / lista.length;
-            const cores = { "Fácil": "#00f2fe", "Médio": "#ffcc00", "Difícil": "#ff2a5f" };
+            const rootStyle = getComputedStyle(document.documentElement);
 
             lista.forEach((desafio, i) => {
+                let corFundo = '#4facfe';
+                let corTexto = '#ffffff';
+
+                if (desafio.dif === 'Fácil') {
+                    corFundo = rootStyle.getPropertyValue('--cor-facil').trim();
+                    corTexto = rootStyle.getPropertyValue('--cor-txt-facil').trim();
+                } else if (desafio.dif === 'Médio') {
+                    corFundo = rootStyle.getPropertyValue('--cor-medio').trim();
+                    corTexto = rootStyle.getPropertyValue('--cor-txt-medio').trim();
+                } else if (desafio.dif === 'Difícil') {
+                    corFundo = rootStyle.getPropertyValue('--cor-dificil').trim();
+                    corTexto = rootStyle.getPropertyValue('--cor-txt-dificil').trim();
+                }
+
                 ctx.beginPath();
                 ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, i * tamanhoAngulo, (i + 1) * tamanhoAngulo);
-                ctx.fillStyle = cores[desafio.dif] || "#4facfe";
+                ctx.fillStyle = corFundo;
                 ctx.fill();
                 ctx.lineWidth = 3;
-                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-principal').trim();
+                ctx.strokeStyle = rootStyle.getPropertyValue('--bg-principal').trim();
                 ctx.stroke();
 
                 ctx.save();
                 ctx.translate(250, 250);
                 ctx.rotate(i * tamanhoAngulo + tamanhoAngulo / 2);
                 ctx.textAlign = "right";
-                ctx.fillStyle = "#121420";
+                ctx.fillStyle = corTexto;
                 ctx.font = "bold 13px sans-serif";
                 
                 let txtCurto = desafio.texto.length > 20 ? desafio.texto.substring(0, 18) + "..." : desafio.texto;
@@ -673,7 +807,7 @@
             const minutos = Math.floor(valor / 60);
             const segundos = valor % 60;
             document.getElementById('cronometro').innerText = 
-                `${minutos < 10 ? '0' + minutos : minutes}:${segundos < 10 ? '0' + segundos : segundos}`;
+                `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
         }
 
         function atualizarJogadores() {
@@ -817,8 +951,8 @@
                 const pontosPorDif = { "Fácil": 10, "Médio": 20, "Difícil": 40 };
                 pontosSorteadosAtuais = pontosPorDif[desafioSorteadoAtual.dif] || 10;
 
-                const jogadorNome = jogadores.length > 0 ? jogadores[jugadorAtualIndex].nome : "Jogador";
-                document.getElementById('validacaoTitulo').innerHTML = `Vez de: <strong>${jogadorNome}</strong>`;
+                const playerNome = jogadores.length > 0 ? jogadores[jugadorAtualIndex].nome : "Jogador";
+                document.getElementById('validacaoTitulo').innerHTML = `Vez de: <strong>${playerNome}</strong>`;
                 document.getElementById('desafioAtualTexto').innerText = `"${desafioSorteadoAtual.texto}" [${desafioSorteadoAtual.dif}]`;
                 document.getElementById('painelValidacao').style.display = 'flex';
 
