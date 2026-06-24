@@ -101,16 +101,67 @@
             gap: 20px;
         }
 
+        .cronometro-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-painel);
+            padding: 12px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+        }
+
         .cronometro-container {
             font-size: 32px;
             font-weight: 700;
-            background: var(--bg-painel);
-            padding: 8px 24px;
-            border-radius: 30px;
-            border: 1px solid var(--border-color);
             letter-spacing: 1px;
             color: var(--primaria);
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+        }
+
+        .cronometro-controles {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .cronometro-controles input[type="number"] {
+            width: 55px;
+            padding: 4px 6px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .cronometro-controles label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .giros-contador {
+            font-size: 14px;
+            opacity: 0.8;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 14px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .giros-contador input {
+            width: 50px;
+            padding: 2px 5px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border-color);
+            color: var(--primaria);
+            font-weight: bold;
+            text-align: center;
+            border-radius: 4px;
         }
 
         .roleta-wrapper {
@@ -159,28 +210,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             text-transform: uppercase;
             z-index: 12;
-        }
-
-        .giros-contador {
-            font-size: 14px;
-            opacity: 0.8;
-            background: rgba(0,0,0,0.3);
-            padding: 6px 14px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .giros-contador input {
-            width: 50px;
-            padding: 2px 5px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid var(--border-color);
-            color: var(--primaria);
-            font-weight: bold;
-            text-align: center;
-            border-radius: 4px;
         }
 
         .secao-configuracoes {
@@ -361,7 +390,18 @@
     <main class="dashboard">
         
         <section class="area-roleta">
-            <div class="cronometro-container" id="cronometro">00:30</div>
+            <div class="cronometro-wrapper">
+                <div class="cronometro-container" id="cronometro">00:30</div>
+                <div class="cronometro-controles">
+                    <label>Tempo (s): 
+                        <input type="number" id="tempoInput" value="30" min="5" max="300" onchange="atualizarDisplayTempo()">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="ativarTempo" checked> Ativo
+                    </label>
+                </div>
+            </div>
+
             <div class="giros-contador">
                 <span>Giros Disponíveis:</span>
                 <input type="number" id="girosInput" value="5" min="1" max="99">
@@ -447,7 +487,6 @@
     </footer>
 
     <script>
-        // Memória inicial vazia para os jogadores
         let jogadores = [];
         let jugadorAtualIndex = 0;
         let estaGirando = false;
@@ -464,6 +503,53 @@
 
         const canvas = document.getElementById('roletaCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Sistema Nativo de Som (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function tocarSomTick() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function tocarSomSucesso() {
+            const notas = [440, 554, 659, 880];
+            notas.forEach((nota, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(nota, audioCtx.currentTime + i * 0.1);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.2);
+                osc.start(audioCtx.currentTime + i * 0.1);
+                osc.stop(audioCtx.currentTime + i * 0.1 + 0.2);
+            });
+        }
+
+        function tocarSomAlarme() {
+            for(let i = 0; i < 3; i++) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime + i * 0.25);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.25);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.25 + 0.2);
+                osc.start(audioCtx.currentTime + i * 0.25);
+                osc.stop(audioCtx.currentTime + i * 0.25 + 0.2);
+            }
+        }
 
         function obterDesafiosFiltrados() {
             return desafios.filter(d => filtrosAtivos[d.dif]);
@@ -505,6 +591,15 @@
                 ctx.fillText(txtCurto, 220, 5);
                 ctx.restore();
             });
+        }
+
+        function atualizarDisplayTempo() {
+            const tempoInput = document.getElementById('tempoInput');
+            let valor = parseInt(tempoInput.value) || 30;
+            const minutos = Math.floor(valor / 60);
+            const segundos = valor % 60;
+            document.getElementById('cronometro').innerText = 
+                `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
         }
 
         function atualizarJogadores() {
@@ -603,6 +698,11 @@
         function girarRoleta() {
             if (estaGirando) return;
 
+            // Desperta o contexto de áudio (exigência dos navegadores modernos)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
             const girosInput = document.getElementById('girosInput');
             let girosRestantes = parseInt(girosInput.value);
 
@@ -615,6 +715,7 @@
             if (lista.length === 0) return;
 
             estaGirando = true;
+            if(window.cronometroAtivo) clearInterval(window.cronometroAtivo);
             
             girosRestantes--;
             girosInput.value = girosRestantes;
@@ -625,8 +726,18 @@
 
             canvas.style.transform = `rotate(${anguloAtual}deg)`;
 
+            // Simulação do efeito sonoro estalado (ticks) baseado na velocidade
+            let ticksMax = 25;
+            for (let i = 0; i < ticksMax; i++) {
+                let atraso Exponential = Math.pow(i / (ticksMax - 1), 2) * 3300; 
+                setTimeout(() => {
+                    if (estaGirando) tocarSomTick();
+                }, atrasoExponential);
+            }
+
             setTimeout(() => {
                 estaGirando = false;
+                tocarSomSucesso();
                 
                 const grausFinais = (360 - (anguloAtual % 360) + 270) % 360;
                 const tamanhoAngulo = 360 / lista.length;
@@ -637,30 +748,43 @@
                 const pts = pontosPorDif[desafioSorteado.dif] || 10;
 
                 if (jogadores.length > 0) {
-                    jogadores[jugadorAtualIndex].pontos += pts;
-                    document.getElementById('historico').innerHTML = `🎯 <strong>${jogadores[jugadorAtualIndex].nome}</strong> tirou: "${desafioSorteado.texto}" [${desafioSorteado.dif}] (+${pts} pts)`;
+                    jogadores[jogadorAtualIndex].pontos += pts;
+                    document.getElementById('historico').innerHTML = `🎯 <strong>${jogadores[jogadorAtualIndex].nome}</strong> tirou: "${desafioSorteado.texto}" [${desafioSorteado.dif}] (+${pts} pts)`;
                     
-                    jugadorAtualIndex = (jugadorAtualIndex + 1) % jogadores.length;
+                    jogadorAtualIndex = (jogadorAtualIndex + 1) % jogadores.length;
                 } else {
                     document.getElementById('historico').innerHTML = `🎯 Sorteado: "${desafioSorteado.texto}" [${desafioSorteado.dif}]`;
                 }
 
                 atualizarJogadores();
-                iniciarCronometro();
+                
+                if (document.getElementById('ativarTempo').checked) {
+                    iniciarCronometro();
+                }
             }, 3500);
         }
 
         function iniciarCronometro() {
-            let tempo = 30;
-            document.getElementById('cronometro').innerText = "00:30";
+            let tempoInput = document.getElementById('tempoInput');
+            let tempo = parseInt(tempoInput.value) || 30;
             
             if(window.cronometroAtivo) clearInterval(window.cronometroAtivo);
 
-            window.cronomegaAtivo = setInterval(() => {
+            const atualizarDisplay = (t) => {
+                const minutos = Math.floor(t / 60);
+                const segundos = t % 60;
+                document.getElementById('cronometro').innerText = 
+                    `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
+            };
+
+            atualizarDisplay(tempo);
+
+            window.cronometroAtivo = setInterval(() => {
                 tempo--;
-                document.getElementById('cronometro').innerText = `00:${tempo < 10 ? '0' + tempo : tempo}`;
+                atualizarDisplay(tempo);
                 if (tempo <= 0) {
-                    clearInterval(window.cronomegaAtivo);
+                    clearInterval(window.cronometroAtivo);
+                    tocarSomAlarme();
                 }
             }, 1000);
         }
@@ -675,10 +799,10 @@
             desenharRoleta();
         }
 
-        // Inicializar os dados na tela
         atualizarJogadores();
         atualizarSeletores();
         desenharRoleta();
+        atualizarDisplayTempo();
     </script>
 </body>
 </html>
