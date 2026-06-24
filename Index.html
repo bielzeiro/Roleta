@@ -41,7 +41,6 @@
             overflow-x: hidden;
         }
 
-        /* Topo / Header */
         header {
             display: flex;
             justify-content: space-between;
@@ -76,142 +75,27 @@
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .btn-header:hover {
             border-color: var(--primaria);
         }
 
-        /* Container Principal do Layout Desenhado */
+        /* Dashboard mudado para Coluna para deixar a roleta no topo */
         .dashboard {
             display: flex;
-            flex: 1;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
-            gap: 20px;
-            max-width: 1600px;
+            gap: 25px;
+            max-width: 1000px;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* Coluna de Configurações e Jogadores (Esquerda) */
-        .painel-lateral {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            min-width: 320px;
-            max-width: 400px;
-        }
-
-        .card {
-            background: var(--bg-painel);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-        }
-
-        .card-titulo {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--primaria);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Grid de Opções */
-        .config-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .input-grupo {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .input-grupo label {
-            font-size: 11px;
-            text-transform: uppercase;
-            opacity: 0.7;
-            letter-spacing: 0.5px;
-        }
-
-        select, input {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border-color);
-            color: var(--texto);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            outline: none;
-        }
-
-        select:focus, input:focus {
-            border-color: var(--primaria);
-        }
-
-        /* Área de Jogadores / Avatares */
-        .lista-jogadores {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .jogador-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(0, 0, 0, 0.15);
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid transparent;
-        }
-
-        .jogador-item.ativo {
-            border-color: var(--primaria);
-            background: rgba(0, 242, 254, 0.05);
-        }
-
-        .avatar-preview {
-            width: 36px;
-            height: 36px;
-            background: var(--secundaria);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: white;
-        }
-
-        .jogador-info {
-            flex: 1;
-        }
-
-        .jogador-nome {
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .jogador-pontos {
-            font-size: 11px;
-            opacity: 0.6;
-        }
-
-        /* Coluna Central da Roleta */
+        /* ÁREA DA ROLETA EM DESTAQUE NO TOPO */
         .area-roleta {
-            flex: 2;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -235,7 +119,7 @@
         .roleta-wrapper {
             position: relative;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             aspect-ratio: 1;
             display: flex;
             align-items: center;
@@ -276,23 +160,100 @@
             justify-content: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        /* Lista de Desafios e Histórico */
-        .gerenciador-desafios {
+        .giros-contador {
+            font-size: 14px;
+            opacity: 0.8;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        /* PAINÉIS DE CONFIGURAÇÃO ABAIXO DA ROLETA */
+        .secao-configuracoes {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .secao-configuracoes {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-painel);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        }
+
+        .card-titulo {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primaria);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Filtros Ativos */
+        .botoes-dificuldade {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-dif {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: rgba(0,0,0,0.2);
+            color: var(--texto);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-dif.ativo {
+            border-color: var(--primaria);
+            background: rgba(0, 242, 254, 0.15);
+        }
+
+        /* Inputs e Formulários */
+        .input-grupo {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .input-grupo label {
+            font-size: 11px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        select, input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            color: var(--texto);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            width: 100%;
         }
 
         .input-add-grupo {
             display: flex;
             gap: 8px;
-        }
-
-        .input-add-grupo input {
-            flex: 1;
         }
 
         .btn-acao {
@@ -304,6 +265,7 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 13px;
+            white-space: nowrap;
         }
 
         .btn-acao.apagar {
@@ -311,29 +273,58 @@
             color: white;
         }
 
+        /* Lista de Jogadores */
+        .lista-jogadores {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .jogador-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+        }
+
+        .jogador-item.ativo {
+            border-color: var(--primaria);
+            background: rgba(0, 242, 254, 0.05);
+        }
+
+        .avatar-preview {
+            width: 32px;
+            height: 32px;
+            background: var(--secundaria);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .jogador-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .historico-caixa {
             background: rgba(0,0,0,0.2);
             border-radius: 8px;
             padding: 12px;
-            height: 100px;
+            height: 80px;
             overflow-y: auto;
             font-size: 12px;
             line-height: 1.6;
             opacity: 0.8;
-        }
-
-        /* Layout responsivo para telas verticais (Telemóvel em pé) */
-        @media (max-width: 900px) {
-            .dashboard {
-                flex-direction: column;
-            }
-            .painel-lateral {
-                max-width: 100%;
-                min-width: 100%;
-            }
-            .area-roleta {
-                padding: 40px 0;
-            }
+            width: 100%;
         }
     </style>
 </head>
@@ -351,81 +342,64 @@
 
     <main class="dashboard">
         
-        <section class="painel-lateral">
-            
-            <div class="card">
-                <div class="card-titulo">⚙️ Painel de Controlo</div>
-                <div class="config-grid">
-                    <div class="input-grupo">
-                        <label>Filtro Dificuldade</label>
-                        <select id="filtro-dificuldade">
-                            <option value="suave">Suave 🟢</option>
-                            <option value="moderado">Moderado 🟡</option>
-                            <option value="hardcore">Hardcore 🔴</option>
-                        </select>
-                    </div>
-                    <div class="input-grupo">
-                        <label>Tempo de Jogo</label>
-                        <input type="number" id="tempo-input" value="30" min="5">
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-titulo">👥 Ordem dos Jogadores</div>
-                <div class="lista-jogadores" id="lista-jogadores">
-                    <div class="jogador-item ativo">
-                        <div class="avatar-preview">👑</div>
-                        <div class="jogador-info">
-                            <div class="jogador-nome">Bielzeiro</div>
-                            <div class="jogador-pontos">0 pts</div>
-                        </div>
-                    </div>
-                    <div class="jogador-item">
-                        <div class="avatar-preview">🦊</div>
-                        <div class="jogador-info">
-                            <div class="jogador-nome">Jogador 2</div>
-                            <div class="jogador-pontos">0 pts</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-titulo">📝 Customizar Fatias</div>
-                <div class="gerenciador-desafios">
-                    <div class="input-add-grupo">
-                        <input type="text" id="novo-desafio" placeholder="Digitar novo desafio...">
-                        <button class="btn-acao">Add</button>
-                    </div>
-                    <div class="input-add-grupo">
-                        <select id="seletor-desafios" style="flex: 1;">
-                            <option>Equilibrar num Pé</option>
-                            <option>Ficar Estátua 20s</option>
-                        </select>
-                        <button class="btn-acao apagar">Apagar</button>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
         <section class="area-roleta">
-            
-            <div class="cronometro-container" id="cronometro">
-                00:30
-            </div>
+            <div class="cronometro-container" id="cronometro">00:30</div>
+            <div class="giros-contador" id="girosContador">Giros Restantes: 3</div>
 
             <div class="roleta-wrapper">
                 <div class="marcador-topo"></div>
                 <canvas id="roletaCanvas" width="500" height="500"></canvas>
-                <button class="btn-centro-girar" id="btnGirar">Girar</button>
+                <button class="btn-centro-girar" id="btnGirar" onclick="girarRoleta()">Girar</button>
             </div>
 
-            <div class="card" style="width: 100%; max-width: 500px;">
-                <div class="card-titulo" style="margin-bottom: 8px; font-size: 13px;">📜 Histórico da Partida</div>
-                <div class="historico-caixa" id="historico">
-                    Jogo iniciado com layout limpo! Prontos para rodar.
+            <div class="card" style="width: 100%; max-width: 500px; padding: 12px;">
+                <div class="historico-caixa" id="historico">Prontos para rodar! Adicione jogadores e desafios abaixo.</div>
+            </div>
+        </section>
+
+        <section class="secao-configuracoes">
+            
+            <div class="card">
+                <div class="card-titulo">👥 Configurar Jogadores (Máx 5)</div>
+                <div class="input-add-grupo" style="margin-bottom: 15px;">
+                    <input type="text" id="nome-jogador" placeholder="Nome do jogador...">
+                    <button class="btn-acao" onclick="adicionarJogador()">+ Entrar</button>
+                </div>
+                <div class="lista-jogadores" id="listaJogadoresContainer">
+                    </div>
+            </div>
+
+            <div class="card">
+                <div class="card-titulo">📝 Editor de Fatias</div>
+                
+                <div class="input-grupo">
+                    <label>Dificuldade Ativa do Jogo</label>
+                    <div class="botoes-dificuldade">
+                        <button class="btn-dif ativo" id="filtro-facil" onclick="mudarFiltro('Fácil')">Fácil 🟢</button>
+                        <button class="btn-dif ativo" id="filtro-medio" onclick="mudarFiltro('Médio')">Médio 🟡</button>
+                        <button class="btn-dif ativo" id="filtro-dificil" onclick="mudarFiltro('Difícil')">Difícil 🔴</button>
+                    </div>
+                </div>
+
+                <div class="input-grupo">
+                    <label>Novo Desafio</label>
+                    <div class="input-add-grupo">
+                        <input type="text" id="texto-desafio" placeholder="O que fazer...">
+                        <select id="Dificuldade-desafio" style="width: 110px;">
+                            <option value="Fácil">Fácil</option>
+                            <option value="Médio">Médio</option>
+                            <option value="Difícil">Difícil</option>
+                        </select>
+                        <button class="btn-acao" onclick="adicionarDesafio()">Add</button>
+                    </div>
+                </div>
+
+                <div class="input-grupo" style="margin-bottom: 0;">
+                    <label>Remover Desafio</label>
+                    <div class="input-add-grupo">
+                        <select id="seletor-remover"></select>
+                        <button class="btn-acao apagar" onclick="removerDesafio()">Apagar</button>
+                    </div>
                 </div>
             </div>
 
@@ -434,49 +408,216 @@
     </main>
 
     <script>
-        // Lógica visual básica para renderizar a roleta inicial e alternar os modos
+        // Banco de dados em memória interna
+        let jogadores = [
+            { nome: "Bielzeiro", pontos: 0, avatar: "👑" }
+        ];
+        let jogadorAtualIndex = 0;
+        let girosRestantes = 3;
+        let estaGirando = false;
+
+        let desafios = [
+            { texto: "Equilibrar num pé só", dif: "Fácil" },
+            { texto: "Ficar estátua por 20s", dif: "Fácil" },
+            { texto: "Imitar um macaco", dif: "Médio" },
+            { texto: "Pagar 10 flexões", dif: "Difícil" }
+        ];
+
+        let filtrosAtivos = { "Fácil": true, "Médio": true, "Difícil": true };
+
         const canvas = document.getElementById('roletaCanvas');
         const ctx = canvas.getContext('2d');
-        
-        function desenharRoletaInicial() {
-            const fatias = ["Equilibrar num Pé", "Ficar Estátua 20s", "Imitar um Macaco", "Contar uma Piada"];
-            const cores = ["#00f2fe", "#ff2a5f", "#4facfe", "#ffcc00"];
-            const tamanhoAngulo = (2 * Math.PI) / fatias.length;
 
-            for (let i = 0; i < fatias.length; i++) {
+        function obterDesafiosFiltrados() {
+            return desafios.filter(d => filtrosAtivos[d.dif]);
+        }
+
+        function desenharRoleta() {
+            const lista = obterDesafiosFiltrados();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (lista.length === 0) {
+                ctx.fillStyle = varColor('--texto');
+                ctx.font = "16px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("Nenhum desafio ativo para estes filtros", 250, 250);
+                return;
+            }
+
+            const tamanhoAngulo = (2 * Math.PI) / lista.length;
+            const cores = { "Fácil": "#00f2fe", "Médio": "#ffcc00", "Difícil": "#ff2a5f" };
+
+            lista.forEach((desafio, i) => {
                 ctx.beginPath();
                 ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, i * tamanhoAngulo, (i + 1) * tamanhoAngulo);
-                ctx.fillStyle = cores[i];
+                ctx.fillStyle = cores[desafio.dif] || "#4facfe";
                 ctx.fill();
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = '#ffffff';
                 ctx.stroke();
 
-                // Desenhar Texto Rotacionado Nativamente
                 ctx.save();
                 ctx.translate(250, 250);
                 ctx.rotate(i * tamanhoAngulo + tamanhoAngulo / 2);
                 ctx.textAlign = "right";
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "bold 14px sans-serif";
-                ctx.fillText(fatias[i], 220, 5);
+                ctx.fillStyle = "#121420";
+                ctx.font = "bold 13px sans-serif";
+                
+                let txt Curto = desafio.texto.length > 22 ? desafio.texto.substring(0, 20) + "..." : desafio.texto;
+                ctx.fillText(txtCurto, 220, 5);
                 ctx.restore();
+            });
+        }
+
+        function atualizarJogadores() {
+            const container = document.getElementById('listaJogadoresContainer');
+            container.innerHTML = '';
+            jogadores.forEach((j, idx) => {
+                const classeAtivo = idx === jogadorAtualIndex ? 'ativo' : '';
+                container.innerHTML += `
+                    <div class="jogador-item ${classeAtivo}">
+                        <div class="avatar-preview">${j.avatar}</div>
+                        <div class="jogador-info">
+                            <span class="jogador-nome">${j.nome}</span>
+                            <span class="jogador-pontos"><strong>${j.pontos} pts</strong></span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function atualizarSeletores() {
+            const seletor = document.getElementById('seletor-remover');
+            seletor.innerHTML = '';
+            desafios.forEach((d, idx) => {
+                seletor.innerHTML += `<option value="${idx}">${d.texto} [${d.dif}]</option>`;
+            });
+        }
+
+        function adicionarJogador() {
+            const input = document.getElementById('nome-jogador');
+            if (!input.value.trim()) return;
+            if (jogadores.length >= 5) {
+                alert("Limite máximo de 5 jogadores atingido!");
+                return;
             }
+            const avatares = ["🦊", "🥷", "🚀", "👻", "💎"];
+            jogadores.push({
+                nome: input.value.trim(),
+                pontos: 0,
+                avatar: avatares[jogadores.length % avatares.length]
+            });
+            input.value = '';
+            atualizarJogadores();
+        }
+
+        function adicionarDesafio() {
+            const txt = document.getElementById('texto-desafio');
+            const dif = document.getElementById('Dificuldade-desafio');
+            if (!txt.value.trim()) return;
+            
+            desafios.push({ texto: txt.value.trim(), dif: dif.value });
+            txt.value = '';
+            atualizarSeletores();
+            desenharRoleta();
+        }
+
+        function removerDesafio() {
+            const seletor = document.getElementById('seletor-remover');
+            if (seletor.value === '') return;
+            desafios.splice(Number(seletor.value), 1);
+            atualizarSeletores();
+            desenharRoleta();
+        }
+
+        function mudarFiltro(dif) {
+            filtrosAtivos[dif] = !filtrosAtivos[dif];
+            const btn = document.getElementById(`filtro-${dif.toLowerCase().replace('á','a').replace('í','i')}`);
+            if (filtrosAtivos[dif]) btn.classList.add('ativo');
+            else btn.classList.remove('ativo');
+            desenharRoleta();
+        }
+
+        function girarRoleta() {
+            if (estaGirando || girosRestantes <= 0) return;
+            const lista = obterDesafiosFiltrados();
+            if (lista.length === 0) return;
+
+            estaGirando = true;
+            girosRestantes--;
+            document.getElementById('girosContador').innerText = `Giros Restantes: ${girosRestantes}`;
+
+            let grausAtuais = 0;
+            const grausTotais = 1800 + Math.random() * 360;
+            const tempoGiro = 3500;
+            const inicio = performance.now();
+
+            function animar(agora) {
+                const progresso = (agora - inicio) / tempoGiro;
+                if (progresso < 1) {
+                    const easeOut = 1 - Math.pow(1 - progresso, 4);
+                    grausAtuais = easeOut * grausTotais;
+                    canvas.style.transform = `rotate(${grausAtuais}deg)`;
+                    requestAnimationFrame(animar);
+                } else {
+                    canvas.style.transform = `rotate(${grausTotais}deg)`;
+                    estaGirando = false;
+                    processarResultado(grausTotais, lista);
+                }
+            }
+            requestAnimationFrame(animar);
+        }
+
+        function processarResultado(graus, lista) {
+            const grausNorm = (360 - (graus % 360) + 270) % 360;
+            const tamanhoAngulo = 360 / lista.length;
+            const indexGanho = Math.floor(grausNorm / tamanhoAngulo) % lista.length;
+            const desafioSorteado = lista[indexGanho];
+
+            // Atribuição de pontos com base na dificuldade do desafio sorteado
+            const pontosPorDif = { "Fácil": 10, "Médio": 20, "Difícil": 40 };
+            const ptsganhos = pontosPorDif[desafioSorteado.dif] || 10;
+
+            if (jogadores.length > 0) {
+                jogadores[jogadorAtualIndex].pontos += ptsganhos;
+                document.getElementById('historico').innerHTML = `🎯 <strong>${jogadores[jogadorAtualIndex].nome}</strong> tirou: "${desafioSorteado.texto}" [${desafioSorteado.dif}] (+${ptsganhos} pts)`;
+                
+                // Passa para o próximo jogador da rodada
+                jogadorAtualIndex = (jogadorAtualIndex + 1) % jogadores.length;
+            }
+
+            atualizarJogadores();
+            iniciarCronometro();
+        }
+
+        function iniciarCronometro() {
+            let tempo = 30;
+            document.getElementById('cronometro').innerText = "00:30";
+            const intervalo = setInterval(() => {
+                tempo--;
+                document.getElementById('cronometro').innerText = `00:${tempo < 10 ? '0' + tempo : tempo}`;
+                if (tempo <= 0) {
+                    clearInterval(intervalo);
+                }
+            }, 1000);
+        }
+
+        function varColor(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         }
 
         function alternarModo() {
             const body = document.body;
-            if (body.getAttribute('data-theme') === 'light') {
-                body.removeAttribute('data-theme');
-            } else {
-                body.setAttribute('data-theme', 'light');
-            }
-            desenharRoletaInicial();
+            if (body.getAttribute('data-theme') === 'light') body.removeAttribute('data-theme');
+            else body.setAttribute('data-theme', 'light');
+            desenharRoleta();
         }
 
-        // Desenhar assim que abre a página
-        desenharRoletaInicial();
+        // Inicialização
+        atualizarJogadores();
+        atualizarSeletores();
+        desenharRoleta();
     </script>
 </body>
 </html>
