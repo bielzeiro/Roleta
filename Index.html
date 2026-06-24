@@ -49,6 +49,74 @@
             --secundaria: #ffcc00;
         }
 
+        /* --- TEMAS SAZONAIS --- */
+        [data-sazonal="ano-novo"] {
+            --bg-principal: #1c1a17;
+            --primaria: #d4af37;
+            --texto: #ffffff;
+            --cor-facil: #ffffff; --cor-txt-facil: #121420;
+            --cor-medio: #e5c158; --cor-txt-medio: #121420;
+            --cor-dificil: #aa841c; --cor-txt-dificil: #ffffff;
+        }
+        [data-sazonal="fogos"] {
+            --bg-principal: #2b080c;
+            --primaria: #ff3b30;
+            --texto: #ffe5e5;
+            --cor-facil: #d4af37; --cor-txt-facil: #121420;
+            --cor-medio: #ff453a; --cor-txt-medio: #ffffff;
+            --cor-dificil: #b81d24; --cor-txt-dificil: #ffffff;
+        }
+        [data-sazonal="volta-aulas"] {
+            --bg-principal: #1a2a3a;
+            --primaria: #3498db;
+            --texto: #ffffff;
+            --cor-facil: #ffffff; --cor-txt-facil: #1a2a3a;
+            --cor-medio: #a8dadc; --cor-txt-medio: #1a2a3a;
+            --cor-dificil: #457b9d; --cor-txt-dificil: #ffffff;
+        }
+        [data-sazonal="carnaval"] {
+            --bg-principal: #2e1a47;
+            --primaria: #e0115f;
+            --texto: #ffffff;
+            --cor-facil: #00f2fe; --cor-txt-facil: #121420;
+            --cor-medio: #ffcc00; --cor-txt-medio: #121420;
+            --cor-dificil: #ff2a5f; --cor-txt-dificil: #ffffff;
+        }
+        [data-sazonal="pascoa"] {
+            --bg-principal: #fff5f7;
+            --bg-painel: rgba(0, 0, 0, 0.03);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --texto: #4a3b32;
+            --primaria: #ff94b8;
+            --cor-facil: #ffffff; --cor-txt-facil: #4a3b32;
+            --cor-medio: #ffb7b2; --cor-txt-medio: #4a3b32;
+            --cor-dificil: #b5e2ff; --cor-txt-dificil: #4a3b32;
+        }
+        [data-sazonal="dia-maes"] {
+            --bg-principal: #2c1619;
+            --primaria: #ff6584;
+            --texto: #ffeef1;
+            --cor-facil: #ffffff; --cor-txt-facil: #2c1619;
+            --cor-medio: #ff85a2; --cor-txt-medio: #ffffff;
+            --cor-dificil: #f02a5f; --cor-txt-dificil: #ffffff;
+        }
+        [data-sazonal="mes-amor"] {
+            --bg-principal: #1f1226;
+            --primaria: #b800ff;
+            --texto: #fbf5ff;
+            --cor-facil: #ff7300; --cor-txt-facil: #ffffff;
+            --cor-medio: #ff007c; --cor-txt-medio: #ffffff;
+            --cor-dificil: #7900b8; --cor-txt-dificil: #ffffff;
+        }
+        [data-sazonal="sao-joao"] {
+            --bg-principal: #361700;
+            --primaria: #ffaa00;
+            --texto: #fff3e0;
+            --cor-facil: #ffcc00; --cor-txt-facil: #121420;
+            --cor-medio: #ff5500; --cor-txt-medio: #ffffff;
+            --cor-dificil: #00a86b; --cor-txt-dificil: #ffffff;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -95,6 +163,7 @@
             background: var(--bg-painel);
             border: 1px solid var(--border-color);
             color: var(--texto);
+            padding: 8px 166px;
             padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
@@ -324,6 +393,7 @@
             display: flex;
             gap: 8px;
             margin-bottom: 15px;
+            width: 100%;
         }
 
         .btn-dif {
@@ -473,13 +543,24 @@
             width: 100%;
         }
 
-        /* --- ESTILOS DO SISTEMA DE POP-UP (MODAL) --- */
+        /* --- SINALIZADOR VISUAL DE EVENTO SAZONAL --- */
+        #bannerSazonal {
+            display: none;
+            background: var(--primaria);
+            color: #121420;
+            width: 100%;
+            text-align: center;
+            padding: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- POP-UPS / MODALS --- */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
             display: none;
@@ -560,9 +641,24 @@
             opacity: 0.7;
         }
         .modal-fechar:hover { opacity: 1; }
+
+        .popup-sazonal-titulo {
+            color: var(--primaria);
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .popup-sazonal-msg {
+            font-size: 15px;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
+
+    <div id="bannerSazonal">🎉 EVENTO ATIVO COM PALETA EXCLUSIVA! 🎉</div>
 
     <header>
         <div class="creditos">
@@ -641,7 +737,7 @@
                         <option value="🚀">🚀</option>
                         <option value="🍀">🍀</option>
                         <option value="🎭">🎭</option>
-                        </select>
+                    </select>
                     <button class="btn-acao" onclick="adicionarJogador()">+ Entrar</button>
                 </div>
                 <div class="lista-jogadores" id="listaJogadoresContainer"></div>
@@ -755,13 +851,11 @@
                 <button class="modal-aba-btn ativa" id="abaLogin" onclick="mudarAbaAuth('login')">Login</button>
                 <button class="modal-aba-btn" id="abaCadastro" onclick="mudarAbaAuth('cadastro')">Cadastro</button>
             </div>
-
             <form class="modal-form ativo" id="formLogin" onsubmit="executarLogin(event)">
                 <input type="text" id="loginUser" placeholder="Username ou E-mail" required>
                 <input type="password" id="loginSenha" placeholder="Senha" required>
                 <button type="submit" class="modal-btn-submeter">Entrar</button>
             </form>
-
             <form class="modal-form" id="formCadastro" onsubmit="executarCadastro(event)">
                 <input type="text" id="cadNome" placeholder="Nome Completo" required>
                 <input type="text" id="cadUser" placeholder="Username (tudo minúsculo)" oninput="this.value = this.value.toLowerCase()" required>
@@ -773,6 +867,14 @@
                 </div>
                 <button type="submit" class="modal-btn-submeter">Criar Conta</button>
             </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalSazonal">
+        <div class="modal-card" style="text-align: center;">
+            <div class="popup-sazonal-titulo" id="sazonalTitulo">✨ Evento Especial ✨</div>
+            <div class="popup-sazonal-msg" id="sazonalMensagem">Mensagem do evento.</div>
+            <button class="modal-btn-submeter" style="width: 100%;" onclick="fecharModalSazonal()">Confirmar e Jogar! 🚀</button>
         </div>
     </div>
 
@@ -789,7 +891,7 @@
         let desafioSorteadoAtual = null;
         let pontosSorteadosAtuais = 0;
         let usuarioLogado = null;
-        let modoAtualIndex = 0; // 0 = dark, 1 = light, 2 = azul/verde, 3 = azul/roxo
+        let modoAtualIndex = 0; 
 
         let desafios = [
             { texto: "Equilibrar num pé só", dif: "Fácil" },
@@ -804,37 +906,129 @@
         const ctx = canvas.getContext('2d');
         let audioCtx = null;
 
-        // --- SISTEMA DE LOGIN E CADASTRO ---
-        function abrirModalAuth() {
-            document.getElementById('modalAuth').style.display = 'flex';
-        }
+        // --- ENGENHARIA DO CALENDÁRIO SAZONAL ---
+        function gerenciarCalendarioSazonal() {
+            const agora = new Date();
+            const dia = agora.getDate();
+            const mes = agora.getMonth() + 1; // Janeiro = 1, Fevereiro = 2...
+            const anoAtual = agora.getFullYear();
 
-        function fecharModalAuth() {
-            document.getElementById('modalAuth').style.display = 'none';
-        }
+            const body = document.body;
+            const banner = document.getElementById('bannerSazonal');
+            
+            let chaveTema = "";
+            let textoPopup = "";
+            let tituloPopup = "";
+            let emojisTemporarios = [];
 
-        function mudarAbaAuth(tipo) {
-            const abaL = document.getElementById('abaLogin');
-            const abaC = document.getElementById('abaCadastro');
-            const formL = document.getElementById('formLogin');
-            const formC = document.getElementById('formCadastro');
+            // Janeiro
+            if (mes === 1) {
+                if (dia <= 15) {
+                    chaveTema = "ano-novo";
+                    tituloPopup = "🎆 Feliz Ano Novo!";
+                    textoPopup = `Que o ano letivo e civil de ${anoAtual} traga muitos desafios cumpridos e diversão na nossa Roleta!`;
+                } else {
+                    chaveTema = "fogos";
+                }
+            }
+            // Fevereiro
+            else if (mes === 2) {
+                if (dia >= 16) {
+                    chaveTema = "volta-aulas";
+                    tituloPopup = "🎒 Volta às Aulas!";
+                    textoPopup = `Desejo a você um bom retorno às aulas no ano letivo de ${anoAtual}! Que os estudos e os jogos andem juntos.`;
+                }
+            }
+            // Março
+            else if (mes === 3) {
+                if (dia <= 5) {
+                    chaveTema = "carnaval";
+                    tituloPopup = "🎭 Folia de Carnaval!";
+                    textoPopup = "Entre no ritmo da festa, mas lembre-se: cuide-se e previna-se!";
+                }
+            }
+            // Abril
+            else if (mes === 4) {
+                if (dia <= 20) {
+                    chaveTema = "pascoa";
+                }
+            }
+            // Maio
+            else if (mes === 5) {
+                if (dia <= 20) {
+                    chaveTema = "dia-maes";
+                    tituloPopup = "💖 Dia das Mães";
+                    textoPopup = "Feliz dia das mães para todas as guerreiras!";
+                    emojisTemporarios = ["🌷", "🌹"];
+                }
+            }
+            // Junho
+            else if (mes === 6) {
+                if (dia <= 15) {
+                    chaveTema = "mes-amor";
+                    tituloPopup = "❤️ Mês do Amor";
+                    textoPopup = "Feliz mês do amor! Jogue com quem você ama.";
+                    emojisTemporarios = ["💐", "👫", "👭", "👬"];
+                } else {
+                    chaveTema = "sao-joao";
+                }
+            }
 
-            if (tipo === 'login') {
-                abaL.classList.add('ativa');
-                abaC.classList.remove('ativa');
-                formL.classList.add('ativo');
-                formC.classList.remove('ativo');
+            // Aplicar o tema se detectado
+            if (chaveTema) {
+                body.setAttribute('data-sazonal', chaveTema);
+                banner.style.display = 'block';
+                banner.innerText = `🎉 EVENTO SAZONAL ATIVO: ${chaveTema.toUpperCase().replace("-", " ")} 🎉`;
+                
+                // Trata emojis temporários
+                if (emojisTemporarios.length > 0) {
+                    inyetarEmojisTemporais(emojisTemporarios);
+                }
+
+                // Trata Pop-up único por sessão
+                if (textoPopup && !sessionStorage.getItem(`sazonal_popup_${chaveTema}`)) {
+                    document.getElementById('sazonalTitulo').innerText = tituloPopup;
+                    document.getElementById('sazonalMensagem').innerText = textoPopup;
+                    document.getElementById('modalSazonal').style.display = 'flex';
+                    sessionStorage.setItem(`sazonal_popup_${chaveTema}`, 'true');
+                }
             } else {
-                abaC.classList.add('ativa');
-                abaL.classList.remove('ativa');
-                formC.classList.add('ativo');
-                formL.classList.remove('ativo');
+                body.removeAttribute('data-sazonal');
+                banner.style.display = 'none';
             }
         }
 
-        function obterContas() {
-            return JSON.parse(localStorage.getItem('roleta_contas')) || [];
+        function inyetarEmojisTemporais(listaEmojis) {
+            const seletorEmoji = document.getElementById('emoji-jogador');
+            listaEmojis.forEach(emoji => {
+                if (!Array.from(seletorEmoji.options).some(opt => opt.value === emoji)) {
+                    const opt = document.createElement('option');
+                    opt.value = emoji;
+                    opt.innerText = `${emoji} (Evento)`;
+                    seletorEmoji.appendChild(opt);
+                }
+            });
         }
+
+        function fecharModalSazonal() {
+            document.getElementById('modalSazonal').style.display = 'none';
+        }
+
+        // --- SISTEMA DE LOGIN E CADASTRO ---
+        function abrirModalAuth() { document.getElementById('modalAuth').style.display = 'flex'; }
+        function fecharModalAuth() { document.getElementById('modalAuth').style.display = 'none'; }
+
+        function mudarAbaAuth(tipo) {
+            const abaL = document.getElementById('abaLogin'); const abaC = document.getElementById('abaCadastro');
+            const formL = document.getElementById('formLogin'); const formC = document.getElementById('formCadastro');
+            if (tipo === 'login') {
+                abaL.classList.add('ativa'); abaC.classList.remove('ativa'); formL.classList.add('ativo'); formC.classList.remove('ativo');
+            } else {
+                abaC.classList.add('ativa'); abaL.classList.remove('ativa'); formC.classList.add('ativo'); formL.classList.remove('ativo');
+            }
+        }
+
+        function obterContas() { return JSON.parse(localStorage.getItem('roleta_contas')) || []; }
 
         function executarCadastro(e) {
             e.preventDefault();
@@ -845,20 +1039,11 @@
             const nascimento = document.getElementById('cadNascimento').value;
 
             let contas = obterContas();
+            if (contas.some(c => c.user === user)) { alert("Este Username já está em uso!"); return; }
+            if (contas.some(c => c.email === email)) { alert("Este E-mail já está cadastrado!"); return; }
 
-            if (contas.some(c => c.user === user)) {
-                alert("Este Username já está em uso!");
-                return;
-            }
-            if (contas.some(c => c.email === email)) {
-                alert("Este E-mail já está cadastrado!");
-                return;
-            }
-
-            const novaConta = { nome, user, email, senha, nascimento };
-            contas.push(novaConta);
+            contas.push({ nome, user, email, senha, nascimento });
             localStorage.setItem('roleta_contas', JSON.stringify(contas));
-
             alert("Conta criada com sucesso! Faça seu login.");
             document.getElementById('formCadastro').reset();
             mudarAbaAuth('login');
@@ -872,107 +1057,75 @@
             const contas = obterContas();
             const contaValida = contas.find(c => (c.user === loginInput || c.email === loginInput) && c.senha === senhaInput);
 
-            if (!contaValida) {
-                alert("Usuário ou senha incorretos!");
-                return;
-            }
+            if (!contaValida) { alert("Usuário ou senha incorretos!"); return; }
 
             usuarioLogado = contaValida;
             document.getElementById('btnAuthHeader').innerText = `👤 Olá, ${usuarioLogado.user}`;
             document.getElementById('formLogin').reset();
             fecharModalAuth();
-            
             liberarRecompensas();
-            alert("Logado com sucesso! Recompensas de acesso desbloqueadas: +2 Fundos Degradê e +5 Emojis Premium!");
+            alert("Logado! Você liberou +2 Temas Degradê e +5 Emojis Premium (💯💫🫡🤘⭐️)!");
         }
 
         function liberarRecompensas() {
             const seletorEmoji = document.getElementById('emoji-jogador');
             const emojisBonus = ["💯", "💫", "🫡", "🤘", "⭐️"];
-            
-            // Evita duplicação se logar de novo
             emojisBonus.forEach(emoji => {
                 if (!Array.from(seletorEmoji.options).some(opt => opt.value === emoji)) {
                     const opt = document.createElement('option');
-                    opt.value = emoji;
-                    opt.innerText = emoji;
-                    seletorEmoji.appendChild(opt);
+                    opt.value = emoji; opt.innerText = emoji; seletorEmoji.appendChild(opt);
                 }
             });
         }
 
         function alternarModo() {
             const body = document.body;
-            // Se não estiver logado, alterna apenas entre dark e light tradicional
             let totalModos = usuarioLogado ? 4 : 2; 
             modoAtualIndex = (modoAtualIndex + 1) % totalModos;
 
             body.removeAttribute('data-theme');
-
-            if (modoAtualIndex === 1) {
-                body.setAttribute('data-theme', 'light');
-            } else if (modoAtualIndex === 2) {
-                body.setAttribute('data-theme', 'degrade1');
-            } else if (modoAtualIndex === 3) {
-                body.setAttribute('data-theme', 'degrade2');
-            }
+            if (modoAtualIndex === 1) body.setAttribute('data-theme', 'light');
+            else if (modoAtualIndex === 2) body.setAttribute('data-theme', 'degrade1');
+            else if (modoAtualIndex === 3) body.setAttribute('data-theme', 'degrade2');
+            
             desenharRoleta();
         }
 
         // --- CONTROLADORES DE ÁUDIO ---
         function inicializarAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
         function tocarSomTick() {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime); gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.05);
         }
 
         function tocarSomSucesso() {
             if (!audioCtx) return;
             const notas = [440, 554, 659, 880];
             notas.forEach((nota, i) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(nota, audioCtx.currentTime + i * 0.1);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.1);
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'triangle';
+                osc.frequency.setValueAtTime(nota, audioCtx.currentTime + i * 0.1); gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.1);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.2);
-                osc.start(audioCtx.currentTime + i * 0.1);
-                osc.stop(audioCtx.currentTime + i * 0.1 + 0.2);
+                osc.start(audioCtx.currentTime + i * 0.1); osc.stop(audioCtx.currentTime + i * 0.1 + 0.2);
             });
         }
 
         function tocarSomAlarme() {
             if (!audioCtx) return;
             for(let i = 0; i < 3; i++) {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime + i * 0.25);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.25);
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime + i * 0.25); gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.25);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.25 + 0.2);
-                osc.start(audioCtx.currentTime + i * 0.25);
-                osc.stop(audioCtx.currentTime + i * 0.25 + 0.2);
+                osc.start(audioCtx.currentTime + i * 0.25); osc.stop(audioCtx.currentTime + i * 0.25 + 0.2);
             }
         }
 
@@ -988,9 +1141,7 @@
             desenharRoleta();
         }
 
-        function obterDesafiosFiltrados() {
-            return desafios.filter(d => filtrosAtivos[d.dif]);
-        }
+        function obterDesafiosFiltrados() { return desafios.filter(d => filtrosAtivos[d.dif]); }
 
         function desenharRoleta() {
             const lista = obterDesafiosFiltrados();
@@ -998,70 +1149,47 @@
             
             if (lista.length === 0) {
                 ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--texto').trim();
-                ctx.font = "16px sans-serif";
-                ctx.textAlign = "center";
-                ctx.fillText("Ative alguma dificuldade abaixo!", 250, 250);
-                return;
+                ctx.font = "16px sans-serif"; ctx.textAlign = "center";
+                ctx.fillText("Ative alguma dificuldade abaixo!", 250, 250); return;
             }
 
             const tamanhoAngulo = (2 * Math.PI) / lista.length;
             const rootStyle = getComputedStyle(document.documentElement);
 
             lista.forEach((desafio, i) => {
-                let corFundo = '#4facfe';
-                let corTexto = '#ffffff';
-
+                let corFundo = '#4facfe'; let corTexto = '#ffffff';
                 if (desafio.dif === 'Fácil') {
-                    corFundo = rootStyle.getPropertyValue('--cor-facil').trim();
-                    corTexto = rootStyle.getPropertyValue('--cor-txt-facil').trim();
+                    corFundo = rootStyle.getPropertyValue('--cor-facil').trim(); corTexto = rootStyle.getPropertyValue('--cor-txt-facil').trim();
                 } else if (desafio.dif === 'Médio') {
-                    corFundo = rootStyle.getPropertyValue('--cor-medio').trim();
-                    corTexto = rootStyle.getPropertyValue('--cor-txt-medio').trim();
+                    corFundo = rootStyle.getPropertyValue('--cor-medio').trim(); corTexto = rootStyle.getPropertyValue('--cor-txt-medio').trim();
                 } else if (desafio.dif === 'Difícil') {
-                    corFundo = rootStyle.getPropertyValue('--cor-dificil').trim();
-                    corTexto = rootStyle.getPropertyValue('--cor-txt-dificil').trim();
+                    corFundo = rootStyle.getPropertyValue('--cor-dificil').trim(); corTexto = rootStyle.getPropertyValue('--cor-txt-dificil').trim();
                 }
 
-                ctx.beginPath();
-                ctx.moveTo(250, 250);
+                ctx.beginPath(); ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, i * tamanhoAngulo, (i + 1) * tamanhoAngulo);
-                ctx.fillStyle = corFundo;
-                ctx.fill();
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = rootStyle.getPropertyValue('--bg-principal').trim() || "#121420";
-                ctx.stroke();
+                ctx.fillStyle = corFundo; ctx.fill(); ctx.lineWidth = 3;
+                ctx.strokeStyle = rootStyle.getPropertyValue('--bg-principal').trim() || "#121420"; ctx.stroke();
 
-                ctx.save();
-                ctx.translate(250, 250);
-                ctx.rotate(i * tamanhoAngulo + tamanhoAngulo / 2);
-                ctx.textAlign = "right";
-                ctx.fillStyle = corTexto;
-                ctx.font = "bold 13px sans-serif";
-                
+                ctx.save(); ctx.translate(250, 250); ctx.rotate(i * tamanhoAngulo + tamanhoAngulo / 2);
+                ctx.textAlign = "right"; ctx.fillStyle = corTexto; ctx.font = "bold 13px sans-serif";
                 let txtCurto = desafio.texto.length > 20 ? desafio.texto.substring(0, 18) + "..." : desafio.texto;
-                ctx.fillText(txtCurto, 220, 5);
-                ctx.restore();
+                ctx.fillText(txtCurto, 220, 5); ctx.restore();
             });
         }
 
         function atualizarDisplayTempo() {
             const tempoInput = document.getElementById('tempoInput');
             let valor = parseInt(tempoInput.value) || 30;
-            const minutos = Math.floor(valor / 60);
-            const segundos = valor % 60;
-            document.getElementById('cronometro').innerText = 
-                `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
+            const minutos = Math.floor(valor / 60); const segundos = valor % 60;
+            document.getElementById('cronometro').innerText = `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
         }
 
         function atualizarJogadores() {
-            const container = document.getElementById('listaJogadoresContainer');
-            container.innerHTML = '';
-            
+            const container = document.getElementById('listaJogadoresContainer'); container.innerHTML = '';
             if (jogadores.length === 0) {
-                container.innerHTML = '<div style="font-size: 13px; opacity: 0.5; padding: 10px; text-align: center;">Nenhum jogador em jogo.</div>';
-                return;
+                container.innerHTML = '<div style="font-size: 13px; opacity: 0.5; padding: 10px; text-align: center;">Nenhum jogador em jogo.</div>'; return;
             }
-
             jogadores.forEach((j, idx) => {
                 const classeAtivo = idx === jugadorAtualIndex ? 'ativo' : '';
                 container.innerHTML += `
@@ -1071,116 +1199,66 @@
                             <span class="jogador-nome">${j.nome} ${idx === jugadorAtualIndex ? '⚡' : ''}</span>
                             <span class="jogador-pontos"><strong>${j.pontos} pts</strong></span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
         function atualizarSeletores() {
-            const seletor = document.getElementById('seletor-remover');
-            seletor.innerHTML = '';
-            desafios.forEach((d, idx) => {
-                seletor.innerHTML += `<option value="${idx}">${d.texto} (${d.dif})</option>`;
-            });
+            const seletor = document.getElementById('seletor-remover'); seletor.innerHTML = '';
+            desafios.forEach((d, idx) => { seletor.innerHTML += `<option value="${idx}">${d.texto} (${d.dif})</option>`; });
         }
 
         function adicionarJogador() {
-            inicializarAudio();
-            const input = document.getElementById('nome-jogador');
-            const selectEmoji = document.getElementById('emoji-jogador');
-            const nome = input.value.trim();
-            if (!nome) return;
-            
-            if (jogadores.length >= 5) {
-                alert("Máximo de 5 jogadores atingido!");
-                return;
-            }
-
-            jogadores.push({
-                nome: nome,
-                pontos: 0,
-                avatar: selectEmoji.value
-            });
-
-            input.value = '';
-            atualizarJogadores();
+            inicializarAudio(); const input = document.getElementById('nome-jogador');
+            const selectEmoji = document.getElementById('emoji-jogador'); const nome = input.value.trim();
+            if (!nome) return; if (jogadores.length >= 5) { alert("Máximo de 5 jogadores atingido!"); return; }
+            jogadores.push({ nome: nome, pontos: 0, avatar: selectEmoji.value });
+            input.value = ''; atualizarJogadores();
         }
 
         function adicionarDesafio() {
-            const txtInput = document.getElementById('texto-desafio');
-            const difSelect = document.getElementById('dificuldade-desafio');
-            const texto = txtInput.value.trim();
-
-            if (!texto) return;
-
-            desafios.push({ texto: texto, dif: difSelect.value });
-            txtInput.value = '';
-            
-            atualizarSeletores();
-            desenharRoleta();
+            const txtInput = document.getElementById('texto-desafio'); const difSelect = document.getElementById('dificuldade-desafio');
+            const texto = txtInput.value.trim(); if (!texto) return;
+            desafios.push({ texto: texto, dif: difSelect.value }); txtInput.value = '';
+            atualizarSeletores(); desenharRoleta();
         }
 
         function removerDesafio() {
-            const seletor = document.getElementById('seletor-remover');
-            const idx = seletor.value;
-            if (idx === '') return;
-
-            desafios.splice(Number(idx), 1);
-            atualizarSeletores();
-            desenharRoleta();
+            const seletor = document.getElementById('seletor-remover'); const idx = seletor.value; if (idx === '') return;
+            desafios.splice(Number(idx), 1); atualizarSeletores(); desenharRoleta();
         }
 
         function mudarFiltro(dif) {
             filtrosAtivos[dif] = !filtrosAtivos[dif];
             let idBotao = dif === 'Fácil' ? 'filtro-facil' : dif === 'Médio' ? 'filtro-medio' : 'filtro-dificil';
             const btn = document.getElementById(idBotao);
-            
-            if (filtrosAtivos[dif]) btn.classList.add('ativo');
-            else btn.classList.remove('ativo');
-            
-            desenharRoleta();
-            atualizarSeletores();
+            if (filtrosAtivos[dif]) btn.classList.add('ativo'); else btn.classList.remove('ativo');
+            desenharRoleta(); atualizarSeletores();
         }
 
         function girarRoleta() {
-            if (estaGirando) return;
-            inicializarAudio();
-
-            const girosInput = document.getElementById('girosInput');
-            let girosRestantes = parseInt(girosInput.value);
-
+            if (estaGirando) return; inicializarAudio();
+            const girosInput = document.getElementById('girosInput'); let girosRestantes = parseInt(girosInput.value);
             if (isNaN(girosRestantes) || girosRestantes <= 0) return; 
+            const lista = obterDesafiosFiltrados(); if (lista.length === 0) return;
 
-            const lista = obterDesafiosFiltrados();
-            if (lista.length === 0) return;
-
-            estaGirando = true;
-            document.getElementById('painelValidacao').style.display = 'none';
+            estaGirando = true; document.getElementById('painelValidacao').style.display = 'none';
             if(window.cronometroAtivo) clearInterval(window.cronometroAtivo);
-            
-            girosRestantes--;
-            girosInput.value = girosRestantes;
+            girosRestantes--; girosInput.value = girosRestantes;
 
-            const voltasExtras = 5 + Math.floor(Math.random() * 5);
-            const grausSorteados = Math.floor(Math.random() * 360);
+            const voltasExtras = 5 + Math.floor(Math.random() * 5); const grausSorteados = Math.floor(Math.random() * 360);
             anguloAtual += (voltasExtras * 360) + grausSorteados;
-
             canvas.style.transform = `rotate(${anguloAtual}deg)`;
 
             let ticksMax = 25;
             for (let i = 0; i < ticksMax; i++) {
                 let atrasoExponential = Math.pow(i / (ticksMax - 1), 2) * 3300; 
-                setTimeout(() => {
-                    if (estaGirando) tocarSomTick();
-                }, atrasoExponential);
+                setTimeout(() => { if (estaGirando) tocarSomTick(); }, atrasoExponential);
             }
 
             setTimeout(() => {
-                estaGirando = false;
-                tocarSomSucesso();
-                
-                const grausFinais = (360 - (anguloAtual % 360) + 270) % 360;
-                const tamanhoAngulo = 360 / lista.length;
+                estaGirando = false; tocarSomSucesso();
+                const grausFinais = (360 - (anguloAtual % 360) + 270) % 360; const tamanhoAngulo = 360 / lista.length;
                 const indexGanho = Math.floor(grausFinais / tamanhoAngulo) % lista.length;
                 
                 desafioSorteadoAtual = lista[indexGanho];
@@ -1192,15 +1270,10 @@
                 document.getElementById('desafioAtualTexto').innerText = `"${desafioSorteadoAtual.texto}" [${desafioSorteadoAtual.dif}]`;
                 document.getElementById('painelValidacao').style.display = 'flex';
 
-                if (jogadores.length > 0) {
-                    document.getElementById('historico').innerHTML = `🎯 Sorteado para <strong>${jogadores[jugadorAtualIndex].nome}</strong>: "${desafioSorteadoAtual.texto}"`;
-                } else {
-                    document.getElementById('historico').innerHTML = `🎯 Sorteado: "${desafioSorteadoAtual.texto}"`;
-                }
+                if (jogadores.length > 0) document.getElementById('historico').innerHTML = `🎯 Sorteado para <strong>${jogadores[jugadorAtualIndex].nome}</strong>: "${desafioSorteadoAtual.texto}"`;
+                else document.getElementById('historico').innerHTML = `🎯 Sorteado: "${desafioSorteadoAtual.texto}"`;
 
-                if (document.getElementById('ativarTempo').checked) {
-                    iniciarCronometro();
-                }
+                if (document.getElementById('ativarTempo').checked) iniciarCronometro();
             }, 3500);
         }
 
@@ -1210,55 +1283,38 @@
 
             if (jogadores.length > 0) {
                 const jogadorDeAgora = jogadores[jugadorAtualIndex];
-                
                 if (cumpriu) {
                     jogadorDeAgora.pontos += pontosSorteadosAtuais;
                     document.getElementById('historico').innerHTML = `✅ <strong>${jogadorDeAgora.nome}</strong> CUMPRIU e ganhou +${pontosSorteadosAtuais} pts!`;
                 } else {
                     document.getElementById('historico').innerHTML = `❌ <strong>${jogadorDeAgora.nome}</strong> NÃO cumpriu a missão.`;
                 }
-
-                jugadorAtualIndex = (jugadorAtualIndex + 1) % jogadores.length;
-                atualizarJogadores();
+                jugadorAtualIndex = (jugadorAtualIndex + 1) % jogadores.length; atualizarJogadores();
             } else {
                 document.getElementById('historico').innerHTML = cumpriu ? `✅ Desafio concluído!` : `❌ Desafio não concluído.`;
             }
 
             const girosRestantes = parseInt(document.getElementById('girosInput').value);
-            if (girosRestantes > 0) {
-                setTimeout(() => {
-                    girarRoleta();
-                }, 1500);
-            } else {
-                document.getElementById('historico').innerHTML += " 🏁 <strong>Fim da rodada de giros!</strong>";
-            }
+            if (girosRestantes > 0) { setTimeout(() => { girarRoleta(); }, 1500); }
+            else { document.getElementById('historico').innerHTML += " 🏁 <strong>Fim da rodada de giros!</strong>"; }
         }
 
         function iniciarCronometro() {
-            let tempoInput = document.getElementById('tempoInput');
-            let tempo = parseInt(tempoInput.value) || 30;
-            
+            let tempoInput = document.getElementById('tempoInput'); let tempo = parseInt(tempoInput.value) || 30;
             if(window.cronometroAtivo) clearInterval(window.cronometroAtivo);
-
             const atualizarDisplay = (t) => {
-                const minutos = Math.floor(t / 60);
-                const segundos = t % 60;
-                document.getElementById('cronometro').innerText = 
-                    `${minutos < 10 ? '0' + minutos : minutes}:${segundos < 10 ? '0' + segundos : segundos}`;
+                const minutos = Math.floor(t / 60); const segundos = t % 60;
+                document.getElementById('cronometro').innerText = `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
             };
-
             atualizarDisplay(tempo);
-
             window.cronometroAtivo = setInterval(() => {
-                tempo--;
-                atualizarDisplay(tempo);
-                if (tempo <= 0) {
-                    clearInterval(window.cronometroAtivo);
-                    tocarSomAlarme();
-                }
+                tempo--; atualizarDisplay(tempo);
+                if (tempo <= 0) { clearInterval(window.cronometroAtivo); tocarSomAlarme(); }
             }, 1000);
         }
 
+        // Inicialização com a checagem do calendário ativo
+        gerenciarCalendarioSazonal();
         atualizarJogadores();
         atualizarSeletores();
         desenharRoleta();
