@@ -14,7 +14,6 @@
             --secundaria: #4facfe;
             --botao-girar: #ff2a5f;
             
-            /* Cores padrão das fatias (editáveis via painel) */
             --cor-facil: #00f2fe;
             --cor-txt-facil: #121420;
             --cor-medio: #ffcc00;
@@ -32,6 +31,24 @@
             --secundaria: #00c6ff;
         }
 
+        [data-theme="degrade1"] {
+            --bg-principal: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --bg-painel: rgba(255, 255, 255, 0.15);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --texto: #ffffff;
+            --primaria: #fff;
+            --secundaria: #00f2fe;
+        }
+
+        [data-theme="degrade2"] {
+            --bg-principal: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --bg-painel: rgba(255, 255, 255, 0.15);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --texto: #ffffff;
+            --primaria: #ffffff;
+            --secundaria: #ffcc00;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -41,6 +58,7 @@
         }
 
         body {
+            background: var(--bg-principal);
             background-color: var(--bg-principal);
             color: var(--texto);
             min-height: 100vh;
@@ -454,6 +472,94 @@
             opacity: 0.8;
             width: 100%;
         }
+
+        /* --- ESTILOS DO SISTEMA DE POP-UP (MODAL) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: #1a1d24;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            color: #f0f2f5;
+        }
+
+        .modal-abas {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .modal-aba-btn {
+            background: transparent;
+            border: none;
+            color: #f0f2f5;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.5;
+            padding: 4px 10px;
+        }
+
+        .modal-aba-btn.ativa {
+            opacity: 1;
+            color: var(--primaria);
+            border-bottom: 2px solid var(--primaria);
+        }
+
+        .modal-form {
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-form.ativo {
+            display: flex;
+        }
+
+        .modal-form input {
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+        }
+
+        .modal-btn-submeter {
+            background: var(--primaria);
+            color: #121420;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .modal-fechar {
+            float: right;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        .modal-fechar:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -464,7 +570,7 @@
         </div>
         <div class="header-controles">
             <button class="btn-header" onclick="alternarModo()">🌓 Modo</button>
-            <button class="btn-header" style="border-color: var(--primaria);">👤 Login Opcional</button>
+            <button class="btn-header" id="btnAuthHeader" style="border-color: var(--primaria);" onclick="abrirModalAuth()">👤 Login / Cadastro</button>
         </div>
     </header>
 
@@ -535,7 +641,7 @@
                         <option value="🚀">🚀</option>
                         <option value="🍀">🍀</option>
                         <option value="🎭">🎭</option>
-                    </select>
+                        </select>
                     <button class="btn-acao" onclick="adicionarJogador()">+ Entrar</button>
                 </div>
                 <div class="lista-jogadores" id="listaJogadoresContainer"></div>
@@ -642,6 +748,34 @@
 
     </main>
 
+    <div class="modal-overlay" id="modalAuth">
+        <div class="modal-card">
+            <button class="modal-fechar" onclick="fecharModalAuth()">✕</button>
+            <div class="modal-abas">
+                <button class="modal-aba-btn ativa" id="abaLogin" onclick="mudarAbaAuth('login')">Login</button>
+                <button class="modal-aba-btn" id="abaCadastro" onclick="mudarAbaAuth('cadastro')">Cadastro</button>
+            </div>
+
+            <form class="modal-form ativo" id="formLogin" onsubmit="executarLogin(event)">
+                <input type="text" id="loginUser" placeholder="Username ou E-mail" required>
+                <input type="password" id="loginSenha" placeholder="Senha" required>
+                <button type="submit" class="modal-btn-submeter">Entrar</button>
+            </form>
+
+            <form class="modal-form" id="formCadastro" onsubmit="executarCadastro(event)">
+                <input type="text" id="cadNome" placeholder="Nome Completo" required>
+                <input type="text" id="cadUser" placeholder="Username (tudo minúsculo)" oninput="this.value = this.value.toLowerCase()" required>
+                <input type="email" id="cadEmail" placeholder="E-mail" required>
+                <input type="password" id="cadSenha" placeholder="Senha (max 8 caracteres)" maxlength="8" required>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-size:11px; opacity:0.7;">DATA DE NASCIMENTO:</label>
+                    <input type="date" id="cadNascimento" required>
+                </div>
+                <button type="submit" class="modal-btn-submeter">Criar Conta</button>
+            </form>
+        </div>
+    </div>
+
     <footer style="text-align: center; padding: 20px; font-size: 13px; opacity: 0.6; border-top: 1px solid var(--border-color); margin-top: auto;">
         Criado por <strong>bielzeiro</strong> & <strong>Gemini AI</strong>
     </footer>
@@ -654,6 +788,8 @@
         
         let desafioSorteadoAtual = null;
         let pontosSorteadosAtuais = 0;
+        let usuarioLogado = null;
+        let modoAtualIndex = 0; // 0 = dark, 1 = light, 2 = azul/verde, 3 = azul/roxo
 
         let desafios = [
             { texto: "Equilibrar num pé só", dif: "Fácil" },
@@ -666,9 +802,124 @@
 
         const canvas = document.getElementById('roletaCanvas');
         const ctx = canvas.getContext('2d');
-
         let audioCtx = null;
 
+        // --- SISTEMA DE LOGIN E CADASTRO ---
+        function abrirModalAuth() {
+            document.getElementById('modalAuth').style.display = 'flex';
+        }
+
+        function fecharModalAuth() {
+            document.getElementById('modalAuth').style.display = 'none';
+        }
+
+        function mudarAbaAuth(tipo) {
+            const abaL = document.getElementById('abaLogin');
+            const abaC = document.getElementById('abaCadastro');
+            const formL = document.getElementById('formLogin');
+            const formC = document.getElementById('formCadastro');
+
+            if (tipo === 'login') {
+                abaL.classList.add('ativa');
+                abaC.classList.remove('ativa');
+                formL.classList.add('ativo');
+                formC.classList.remove('ativo');
+            } else {
+                abaC.classList.add('ativa');
+                abaL.classList.remove('ativa');
+                formC.classList.add('ativo');
+                formL.classList.remove('ativo');
+            }
+        }
+
+        function obterContas() {
+            return JSON.parse(localStorage.getItem('roleta_contas')) || [];
+        }
+
+        function executarCadastro(e) {
+            e.preventDefault();
+            const nome = document.getElementById('cadNome').value.trim();
+            const user = document.getElementById('cadUser').value.trim().toLowerCase();
+            const email = document.getElementById('cadEmail').value.trim();
+            const senha = document.getElementById('cadSenha').value;
+            const nascimento = document.getElementById('cadNascimento').value;
+
+            let contas = obterContas();
+
+            if (contas.some(c => c.user === user)) {
+                alert("Este Username já está em uso!");
+                return;
+            }
+            if (contas.some(c => c.email === email)) {
+                alert("Este E-mail já está cadastrado!");
+                return;
+            }
+
+            const novaConta = { nome, user, email, senha, nascimento };
+            contas.push(novaConta);
+            localStorage.setItem('roleta_contas', JSON.stringify(contas));
+
+            alert("Conta criada com sucesso! Faça seu login.");
+            document.getElementById('formCadastro').reset();
+            mudarAbaAuth('login');
+        }
+
+        function executarLogin(e) {
+            e.preventDefault();
+            const loginInput = document.getElementById('loginUser').value.trim().toLowerCase();
+            const senhaInput = document.getElementById('loginSenha').value;
+
+            const contas = obterContas();
+            const contaValida = contas.find(c => (c.user === loginInput || c.email === loginInput) && c.senha === senhaInput);
+
+            if (!contaValida) {
+                alert("Usuário ou senha incorretos!");
+                return;
+            }
+
+            usuarioLogado = contaValida;
+            document.getElementById('btnAuthHeader').innerText = `👤 Olá, ${usuarioLogado.user}`;
+            document.getElementById('formLogin').reset();
+            fecharModalAuth();
+            
+            liberarRecompensas();
+            alert("Logado com sucesso! Recompensas de acesso desbloqueadas: +2 Fundos Degradê e +5 Emojis Premium!");
+        }
+
+        function liberarRecompensas() {
+            const seletorEmoji = document.getElementById('emoji-jogador');
+            const emojisBonus = ["💯", "💫", "🫡", "🤘", "⭐️"];
+            
+            // Evita duplicação se logar de novo
+            emojisBonus.forEach(emoji => {
+                if (!Array.from(seletorEmoji.options).some(opt => opt.value === emoji)) {
+                    const opt = document.createElement('option');
+                    opt.value = emoji;
+                    opt.innerText = emoji;
+                    seletorEmoji.appendChild(opt);
+                }
+            });
+        }
+
+        function alternarModo() {
+            const body = document.body;
+            // Se não estiver logado, alterna apenas entre dark e light tradicional
+            let totalModos = usuarioLogado ? 4 : 2; 
+            modoAtualIndex = (modoAtualIndex + 1) % totalModos;
+
+            body.removeAttribute('data-theme');
+
+            if (modoAtualIndex === 1) {
+                body.setAttribute('data-theme', 'light');
+            } else if (modoAtualIndex === 2) {
+                body.setAttribute('data-theme', 'degrade1');
+            } else if (modoAtualIndex === 3) {
+                body.setAttribute('data-theme', 'degrade2');
+            }
+            desenharRoleta();
+        }
+
+        // --- CONTROLADORES DE ÁUDIO ---
         function inicializarAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -725,23 +976,15 @@
             }
         }
 
+        // --- SISTEMA DA ROLETA ---
         function atualizarCoresCustomizadas() {
             const root = document.documentElement;
-            
-            const fundoFacil = document.getElementById('corFundoFacil').value;
-            const txtFacil = document.getElementById('corTxtFacil').value;
-            const fundoMedio = document.getElementById('corFundoMedio').value;
-            const txtMedio = document.getElementById('corTxtMedio').value;
-            const fundoDificil = document.getElementById('corFundoDificil').value;
-            const txtDificil = document.getElementById('corTxtDificil').value;
-
-            root.style.setProperty('--cor-facil', fundoFacil);
-            root.style.setProperty('--cor-txt-facil', txtFacil);
-            root.style.setProperty('--cor-medio', fundoMedio);
-            root.style.setProperty('--cor-txt-medio', txtMedio);
-            root.style.setProperty('--cor-dificil', fundoDificil);
-            root.style.setProperty('--cor-txt-dificil', txtDificil);
-
+            root.style.setProperty('--cor-facil', document.getElementById('corFundoFacil').value);
+            root.style.setProperty('--cor-txt-facil', document.getElementById('corTxtFacil').value);
+            root.style.setProperty('--cor-medio', document.getElementById('corFundoMedio').value);
+            root.style.setProperty('--cor-txt-medio', document.getElementById('corTxtMedio').value);
+            root.style.setProperty('--cor-dificil', document.getElementById('corFundoDificil').value);
+            root.style.setProperty('--cor-txt-dificil', document.getElementById('corTxtDificil').value);
             desenharRoleta();
         }
 
@@ -785,7 +1028,7 @@
                 ctx.fillStyle = corFundo;
                 ctx.fill();
                 ctx.lineWidth = 3;
-                ctx.strokeStyle = rootStyle.getPropertyValue('--bg-principal').trim();
+                ctx.strokeStyle = rootStyle.getPropertyValue('--bg-principal').trim() || "#121420";
                 ctx.stroke();
 
                 ctx.save();
@@ -889,17 +1132,12 @@
 
         function mudarFiltro(dif) {
             filtrosAtivos[dif] = !filtrosAtivos[dif];
-            
-            let idBotao = 'filtro-facil';
-            if (dif === 'Médio') idBotao = 'filtro-medio';
-            if (dif === 'Difícil') idBotao = 'filtro-dificil';
-
+            let idBotao = dif === 'Fácil' ? 'filtro-facil' : dif === 'Médio' ? 'filtro-medio' : 'filtro-dificil';
             const btn = document.getElementById(idBotao);
-            if (filtrosAtivos[dif]) {
-                btn.classList.add('ativo');
-            } else {
-                btn.classList.remove('ativo');
-            }
+            
+            if (filtrosAtivos[dif]) btn.classList.add('ativo');
+            else btn.classList.remove('ativo');
+            
             desenharRoleta();
             atualizarSeletores();
         }
@@ -911,9 +1149,7 @@
             const girosInput = document.getElementById('girosInput');
             let girosRestantes = parseInt(girosInput.value);
 
-            if (isNaN(girosRestantes) || girosRestantes <= 0) {
-                return; 
-            }
+            if (isNaN(girosRestantes) || girosRestantes <= 0) return; 
 
             const lista = obterDesafiosFiltrados();
             if (lista.length === 0) return;
@@ -1021,16 +1257,6 @@
                     tocarSomAlarme();
                 }
             }, 1000);
-        }
-
-        function alternarModo() {
-            const body = document.body;
-            if (body.getAttribute('data-theme') === 'light') {
-                body.removeAttribute('data-theme');
-            } else {
-                body.setAttribute('data-theme', 'light');
-            }
-            desenharRoleta();
         }
 
         atualizarJogadores();
