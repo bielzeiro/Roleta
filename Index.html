@@ -51,9 +51,8 @@
         }
 
         .creditos h1 {
-            font-size: 14px;
-            opacity: 0.8;
-            font-weight: 400;
+            font-size: 18px;
+            font-weight: 700;
         }
 
         .creditos strong {
@@ -88,7 +87,7 @@
             padding: 20px;
             gap: 25px;
             max-width: 1000px;
-            margin: 0 auto;
+            margin: 30px auto; /* Espaço aumentado para dar destaque à roleta */
             width: 100%;
         }
 
@@ -337,7 +336,7 @@
 
     <header>
         <div class="creditos">
-            <h1>Criado por <strong>bielzeiro</strong> & <strong>Gemini AI</strong></h1>
+            <h1><strong>Roleta</strong></h1>
         </div>
         <div class="header-controles">
             <button class="btn-header" onclick="alternarModo()">🌓 Modo</button>
@@ -411,6 +410,10 @@
         </section>
 
     </main>
+
+    <footer style="text-align: center; padding: 20px; font-size: 13px; opacity: 0.6; border-top: 1px solid var(--border-color); margin-top: auto;">
+        Criado por <strong>bielzeiro</strong> & <strong>Gemini AI</strong>
+    </footer>
 
     <script>
         // Memória e Estados do Jogo
@@ -573,7 +576,7 @@
             girosRestantes--;
             document.getElementById('girosContador').innerText = `Giros Restantes: ${girosRestantes}`;
 
-            const voltas Extras = 5 + Math.floor(Math.random() * 5);
+            const voltasExtras = 5 + Math.floor(Math.random() * 5); // Espaço em branco corrigido aqui!
             const grausSorteados = Math.floor(Math.random() * 360);
             anguloAtual += (voltasExtras * 360) + grausSorteados;
 
@@ -606,7 +609,6 @@
             let tempo = 30;
             document.getElementById('cronometro').innerText = "00:30";
             
-            // Limpar intervalos antigos se houver
             if(window.cronometroAtivo) clearInterval(window.cronometroAtivo);
 
             window.cronometroAtivo = setInterval(() => {
