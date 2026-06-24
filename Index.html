@@ -212,6 +212,57 @@
             z-index: 12;
         }
 
+        .painel-validacao {
+            width: 100%;
+            max-width: 500px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            text-align: center;
+            background: var(--bg-painel);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .painel-validacao h3 {
+            font-size: 14px;
+            color: var(--primaria);
+        }
+
+        .desafio-atual-texto {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .botoes-validacao {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn-validar {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: #121420;
+        }
+
+        .btn-validar.sucesso {
+            background: #00f2fe;
+        }
+
+        .btn-validar.falha {
+            background: #ff2a5f;
+            color: white;
+        }
+
         .secao-configuracoes {
             width: 100%;
             display: grid;
@@ -413,6 +464,15 @@
                 <button class="btn-centro-girar" id="btnGirar" onclick="girarRoleta()">Girar</button>
             </div>
 
+            <div class="painel-validacao" id="painelValidacao">
+                <h3 id="validacaoTitulo">Validar Missão</h3>
+                <div class="desafio-atual-texto" id="desafioAtualTexto">"Desafio"</div>
+                <div class="botoes-validacao">
+                    <button class="btn-validar sucesso" onclick="validarResultado(true)">Cumpriu 👍</button>
+                    <button class="btn-validar falha" onclick="validarResultado(false)">Não Cumpriu 👎</button>
+                </div>
+            </div>
+
             <div class="card" style="width: 100%; max-width: 500px; padding: 12px;">
                 <div class="historico-caixa" id="historico">Prontos para rodar! Adicione jogadores e desafios abaixo.</div>
             </div>
@@ -491,6 +551,9 @@
         let jugadorAtualIndex = 0;
         let estaGirando = false;
         let anguloAtual = 0;
+        
+        let desafioSorteadoAtual = null;
+        let pontosSorteadosAtuais = 0;
 
         let desafios = [
             { texto: "Equilibrar num pé só", dif: "Fácil" },
@@ -504,10 +567,19 @@
         const canvas = document.getElementById('roletaCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Sistema Nativo de Som (Web Audio API)
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioCtx = null;
+
+        function inicializarAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
 
         function tocarSomTick() {
+            if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -521,6 +593,7 @@
         }
 
         function tocarSomSucesso() {
+            if (!audioCtx) return;
             const notas = [440, 554, 659, 880];
             notas.forEach((nota, i) => {
                 const osc = audioCtx.createOscillator();
@@ -537,6 +610,7 @@
         }
 
         function tocarSomAlarme() {
+            if (!audioCtx) return;
             for(let i = 0; i < 3; i++) {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
@@ -599,7 +673,7 @@
             const minutos = Math.floor(valor / 60);
             const segundos = valor % 60;
             document.getElementById('cronometro').innerText = 
-                `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
+                `${minutos < 10 ? '0' + minutos : minutes}:${segundos < 10 ? '0' + segundos : segundos}`;
         }
 
         function atualizarJogadores() {
@@ -634,6 +708,7 @@
         }
 
         function adicionarJogador() {
+            inicializarAudio();
             const input = document.getElementById('nome-jogador');
             const selectEmoji = document.getElementById('emoji-jogador');
             const nome = input.value.trim();
@@ -697,24 +772,20 @@
 
         function girarRoleta() {
             if (estaGirando) return;
-
-            // Desperta o contexto de áudio (exigência dos navegadores modernos)
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            inicializarAudio();
 
             const girosInput = document.getElementById('girosInput');
             let girosRestantes = parseInt(girosInput.value);
 
             if (isNaN(girosRestantes) || girosRestantes <= 0) {
-                alert("Insira um número de giros válido!");
-                return;
+                return; 
             }
 
             const lista = obterDesafiosFiltrados();
             if (lista.length === 0) return;
 
             estaGirando = true;
+            document.getElementById('painelValidacao').style.display = 'none';
             if(window.cronometroAtivo) clearInterval(window.cronometroAtivo);
             
             girosRestantes--;
@@ -726,10 +797,9 @@
 
             canvas.style.transform = `rotate(${anguloAtual}deg)`;
 
-            // Simulação do efeito sonoro estalado (ticks) baseado na velocidade
             let ticksMax = 25;
             for (let i = 0; i < ticksMax; i++) {
-                let atraso Exponential = Math.pow(i / (ticksMax - 1), 2) * 3300; 
+                let atrasoExponential = Math.pow(i / (ticksMax - 1), 2) * 3300; 
                 setTimeout(() => {
                     if (estaGirando) tocarSomTick();
                 }, atrasoExponential);
@@ -742,26 +812,56 @@
                 const grausFinais = (360 - (anguloAtual % 360) + 270) % 360;
                 const tamanhoAngulo = 360 / lista.length;
                 const indexGanho = Math.floor(grausFinais / tamanhoAngulo) % lista.length;
-                const desafioSorteado = lista[indexGanho];
-
+                
+                desafioSorteadoAtual = lista[indexGanho];
                 const pontosPorDif = { "Fácil": 10, "Médio": 20, "Difícil": 40 };
-                const pts = pontosPorDif[desafioSorteado.dif] || 10;
+                pontosSorteadosAtuais = pontosPorDif[desafioSorteadoAtual.dif] || 10;
+
+                const jogadorNome = jogadores.length > 0 ? jogadores[jugadorAtualIndex].nome : "Jogador";
+                document.getElementById('validacaoTitulo').innerHTML = `Vez de: <strong>${jogadorNome}</strong>`;
+                document.getElementById('desafioAtualTexto').innerText = `"${desafioSorteadoAtual.texto}" [${desafioSorteadoAtual.dif}]`;
+                document.getElementById('painelValidacao').style.display = 'flex';
 
                 if (jogadores.length > 0) {
-                    jogadores[jogadorAtualIndex].pontos += pts;
-                    document.getElementById('historico').innerHTML = `🎯 <strong>${jogadores[jogadorAtualIndex].nome}</strong> tirou: "${desafioSorteado.texto}" [${desafioSorteado.dif}] (+${pts} pts)`;
-                    
-                    jogadorAtualIndex = (jogadorAtualIndex + 1) % jogadores.length;
+                    document.getElementById('historico').innerHTML = `🎯 Sorteado para <strong>${jogadores[jugadorAtualIndex].nome}</strong>: "${desafioSorteadoAtual.texto}"`;
                 } else {
-                    document.getElementById('historico').innerHTML = `🎯 Sorteado: "${desafioSorteado.texto}" [${desafioSorteado.dif}]`;
+                    document.getElementById('historico').innerHTML = `🎯 Sorteado: "${desafioSorteadoAtual.texto}"`;
                 }
 
-                atualizarJogadores();
-                
                 if (document.getElementById('ativarTempo').checked) {
                     iniciarCronometro();
                 }
             }, 3500);
+        }
+
+        function validarResultado(cumpriu) {
+            if(window.cronometroAtivo) clearInterval(window.cronometroAtivo);
+            document.getElementById('painelValidacao').style.display = 'none';
+
+            if (jogadores.length > 0) {
+                const jogadorDeAgora = jogadores[jugadorAtualIndex];
+                
+                if (cumpriu) {
+                    jogadorDeAgora.pontos += pontosSorteadosAtuais;
+                    document.getElementById('historico').innerHTML = `✅ <strong>${jogadorDeAgora.nome}</strong> CUMPRIU e ganhou +${pontosSorteadosAtuais} pts!`;
+                } else {
+                    document.getElementById('historico').innerHTML = `❌ <strong>${jogadorDeAgora.nome}</strong> NÃO cumpriu a missão.`;
+                }
+
+                jugadorAtualIndex = (jugadorAtualIndex + 1) % jogadores.length;
+                atualizarJogadores();
+            } else {
+                document.getElementById('historico').innerHTML = cumpriu ? `✅ Desafio concluído!` : `❌ Desafio não concluído.`;
+            }
+
+            const girosRestantes = parseInt(document.getElementById('girosInput').value);
+            if (girosRestantes > 0) {
+                setTimeout(() => {
+                    girarRoleta();
+                }, 1500);
+            } else {
+                document.getElementById('historico').innerHTML += " 🏁 <strong>Fim da rodada de giros!</strong>";
+            }
         }
 
         function iniciarCronometro() {
@@ -774,7 +874,7 @@
                 const minutos = Math.floor(t / 60);
                 const segundos = t % 60;
                 document.getElementById('cronometro').innerText = 
-                    `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
+                    `${minutos < 10 ? '0' + minutos : minutes}:${segundos < 10 ? '0' + segundos : segundos}`;
             };
 
             atualizarDisplay(tempo);
