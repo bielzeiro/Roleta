@@ -81,7 +81,6 @@
             border-color: var(--primaria);
         }
 
-        /* Dashboard mudado para Coluna para deixar a roleta no topo */
         .dashboard {
             display: flex;
             flex-direction: column;
@@ -93,7 +92,6 @@
             width: 100%;
         }
 
-        /* ÁREA DA ROLETA EM DESTAQUE NO TOPO */
         .area-roleta {
             width: 100%;
             display: flex;
@@ -142,6 +140,7 @@
             height: 100%;
             border-radius: 50%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 3.5s cubic-bezier(0.1, 0.8, 0.1, 1);
         }
 
         .btn-centro-girar {
@@ -160,6 +159,7 @@
             justify-content: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             text-transform: uppercase;
+            z-index: 12;
         }
 
         .giros-contador {
@@ -170,7 +170,6 @@
             border-radius: 12px;
         }
 
-        /* PAINÉIS DE CONFIGURAÇÃO ABAIXO DA ROLETA */
         .secao-configuracoes {
             width: 100%;
             display: grid;
@@ -202,7 +201,6 @@
             gap: 8px;
         }
 
-        /* Filtros Ativos */
         .botoes-dificuldade {
             display: flex;
             gap: 8px;
@@ -226,7 +224,6 @@
             background: rgba(0, 242, 254, 0.15);
         }
 
-        /* Inputs e Formulários */
         .input-grupo {
             display: flex;
             flex-direction: column;
@@ -273,7 +270,6 @@
             color: white;
         }
 
-        /* Lista de Jogadores */
         .lista-jogadores {
             display: flex;
             flex-direction: column;
@@ -294,7 +290,7 @@
 
         .jogador-item.ativo {
             border-color: var(--primaria);
-            background: rgba(0, 242, 254, 0.05);
+            background: rgba(0, 242, 254, 0.12);
         }
 
         .avatar-preview {
@@ -313,6 +309,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .jogador-nome {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .jogador-pontos {
+            font-size: 13px;
         }
 
         .historico-caixa {
@@ -385,7 +390,7 @@
                     <label>Novo Desafio</label>
                     <div class="input-add-grupo">
                         <input type="text" id="texto-desafio" placeholder="O que fazer...">
-                        <select id="Dificuldade-desafio" style="width: 110px;">
+                        <select id="dificuldade-desafio" style="width: 110px;">
                             <option value="Fácil">Fácil</option>
                             <option value="Médio">Médio</option>
                             <option value="Difícil">Difícil</option>
@@ -408,13 +413,14 @@
     </main>
 
     <script>
-        // Banco de dados em memória interna
+        // Memória e Estados do Jogo
         let jogadores = [
             { nome: "Bielzeiro", pontos: 0, avatar: "👑" }
         ];
         let jogadorAtualIndex = 0;
         let girosRestantes = 3;
         let estaGirando = false;
+        let anguloAtual = 0;
 
         let desafios = [
             { texto: "Equilibrar num pé só", dif: "Fácil" },
@@ -437,10 +443,10 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             if (lista.length === 0) {
-                ctx.fillStyle = varColor('--texto');
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--texto').trim();
                 ctx.font = "16px sans-serif";
                 ctx.textAlign = "center";
-                ctx.fillText("Nenhum desafio ativo para estes filtros", 250, 250);
+                ctx.fillText("Ative alguma dificuldade abaixo!", 250, 250);
                 return;
             }
 
@@ -453,10 +459,11 @@
                 ctx.arc(250, 250, 240, i * tamanhoAngulo, (i + 1) * tamanhoAngulo);
                 ctx.fillStyle = cores[desafio.dif] || "#4facfe";
                 ctx.fill();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-principal').trim();
                 ctx.stroke();
 
+                // Desenhar o Texto
                 ctx.save();
                 ctx.translate(250, 250);
                 ctx.rotate(i * tamanhoAngulo + tamanhoAngulo / 2);
@@ -464,7 +471,7 @@
                 ctx.fillStyle = "#121420";
                 ctx.font = "bold 13px sans-serif";
                 
-                let txt Curto = desafio.texto.length > 22 ? desafio.texto.substring(0, 20) + "..." : desafio.texto;
+                let txtCurto = desafio.texto.length > 20 ? desafio.texto.substring(0, 18) + "..." : desafio.texto;
                 ctx.fillText(txtCurto, 220, 5);
                 ctx.restore();
             });
@@ -479,7 +486,7 @@
                     <div class="jogador-item ${classeAtivo}">
                         <div class="avatar-preview">${j.avatar}</div>
                         <div class="jogador-info">
-                            <span class="jogador-nome">${j.nome}</span>
+                            <span class="jogador-nome">${j.nome} ${idx === jogadorAtualIndex ? '⚡' : ''}</span>
                             <span class="jogador-pontos"><strong>${j.pontos} pts</strong></span>
                         </div>
                     </div>
@@ -491,52 +498,70 @@
             const seletor = document.getElementById('seletor-remover');
             seletor.innerHTML = '';
             desafios.forEach((d, idx) => {
-                seletor.innerHTML += `<option value="${idx}">${d.texto} [${d.dif}]</option>`;
+                seletor.innerHTML += `<option value="${idx}">${d.texto} (${d.dif})</option>`;
             });
         }
 
         function adicionarJogador() {
             const input = document.getElementById('nome-jogador');
-            if (!input.value.trim()) return;
+            const nome = input.value.trim();
+            if (!nome) return;
+            
             if (jogadores.length >= 5) {
-                alert("Limite máximo de 5 jogadores atingido!");
+                alert("Máximo de 5 jogadores atingido!");
                 return;
             }
-            const avatares = ["🦊", "🥷", "🚀", "👻", "💎"];
+
+            const avataresDisponiveis = ["🦊", "🥷", "🚀", "👻", "💎"];
             jogadores.push({
-                nome: input.value.trim(),
+                nome: nome,
                 pontos: 0,
-                avatar: avatares[jogadores.length % avatares.length]
+                avatar: avataresDisponiveis[jogadores.length]
             });
+
             input.value = '';
             atualizarJogadores();
         }
 
         function adicionarDesafio() {
-            const txt = document.getElementById('texto-desafio');
-            const dif = document.getElementById('Dificuldade-desafio');
-            if (!txt.value.trim()) return;
+            const txtInput = document.getElementById('texto-desafio');
+            const difSelect = document.getElementById('dificuldade-desafio');
+            const texto = txtInput.value.trim();
+
+            if (!texto) return;
+
+            desafios.push({ texto: texto, dif: difSelect.value });
+            txtInput.value = '';
             
-            desafios.push({ texto: txt.value.trim(), dif: dif.value });
-            txt.value = '';
             atualizarSeletores();
             desenharRoleta();
         }
 
         function removerDesafio() {
             const seletor = document.getElementById('seletor-remover');
-            if (seletor.value === '') return;
-            desafios.splice(Number(seletor.value), 1);
+            const idx = seletor.value;
+            if (idx === '') return;
+
+            desafios.splice(Number(idx), 1);
             atualizarSeletores();
             desenharRoleta();
         }
 
         function mudarFiltro(dif) {
             filtrosAtivos[dif] = !filtrosAtivos[dif];
-            const btn = document.getElementById(`filtro-${dif.toLowerCase().replace('á','a').replace('í','i')}`);
-            if (filtrosAtivos[dif]) btn.classList.add('ativo');
-            else btn.classList.remove('ativo');
+            
+            let idBotao = 'filtro-facil';
+            if (dif === 'Médio') idBotao = 'filtro-medio';
+            if (dif === 'Difícil') idBotao = 'filtro-dificil';
+
+            const btn = document.getElementById(idBotao);
+            if (filtrosAtivos[dif]) {
+                btn.classList.add('ativo');
+            } else {
+                btn.classList.remove('ativo');
+            }
             desenharRoleta();
+            atualizarSeletores();
         }
 
         function girarRoleta() {
@@ -548,73 +573,62 @@
             girosRestantes--;
             document.getElementById('girosContador').innerText = `Giros Restantes: ${girosRestantes}`;
 
-            let grausAtuais = 0;
-            const grausTotais = 1800 + Math.random() * 360;
-            const tempoGiro = 3500;
-            const inicio = performance.now();
+            const voltas Extras = 5 + Math.floor(Math.random() * 5);
+            const grausSorteados = Math.floor(Math.random() * 360);
+            anguloAtual += (voltasExtras * 360) + grausSorteados;
 
-            function animar(agora) {
-                const progresso = (agora - inicio) / tempoGiro;
-                if (progresso < 1) {
-                    const easeOut = 1 - Math.pow(1 - progresso, 4);
-                    grausAtuais = easeOut * grausTotais;
-                    canvas.style.transform = `rotate(${grausAtuais}deg)`;
-                    requestAnimationFrame(animar);
-                } else {
-                    canvas.style.transform = `rotate(${grausTotais}deg)`;
-                    estaGirando = false;
-                    processarResultado(grausTotais, lista);
-                }
-            }
-            requestAnimationFrame(animar);
-        }
+            canvas.style.transform = `rotate(${anguloAtual}deg)`;
 
-        function processarResultado(graus, lista) {
-            const grausNorm = (360 - (graus % 360) + 270) % 360;
-            const tamanhoAngulo = 360 / lista.length;
-            const indexGanho = Math.floor(grausNorm / tamanhoAngulo) % lista.length;
-            const desafioSorteado = lista[indexGanho];
-
-            // Atribuição de pontos com base na dificuldade do desafio sorteado
-            const pontosPorDif = { "Fácil": 10, "Médio": 20, "Difícil": 40 };
-            const ptsganhos = pontosPorDif[desafioSorteado.dif] || 10;
-
-            if (jogadores.length > 0) {
-                jogadores[jogadorAtualIndex].pontos += ptsganhos;
-                document.getElementById('historico').innerHTML = `🎯 <strong>${jogadores[jogadorAtualIndex].nome}</strong> tirou: "${desafioSorteado.texto}" [${desafioSorteado.dif}] (+${ptsganhos} pts)`;
+            setTimeout(() => {
+                estaGirando = false;
                 
-                // Passa para o próximo jogador da rodada
-                jogadorAtualIndex = (jogadorAtualIndex + 1) % jogadores.length;
-            }
+                const grausFinais = (360 - (anguloAtual % 360) + 270) % 360;
+                const tamanhoAngulo = 360 / lista.length;
+                const indexGanho = Math.floor(grausFinais / tamanhoAngulo) % lista.length;
+                const desafioSorteado = lista[indexGanho];
 
-            atualizarJogadores();
-            iniciarCronometro();
+                const pontosPorDif = { "Fácil": 10, "Médio": 20, "Difícil": 40 };
+                const pts = pontosPorDif[desafioSorteado.dif] || 10;
+
+                if (jogadores.length > 0) {
+                    jogadores[jogadorAtualIndex].pontos += pts;
+                    document.getElementById('historico').innerHTML = `🎯 <strong>${jogadores[jogadorAtualIndex].nome}</strong> tirou: "${desafioSorteado.texto}" [${desafioSorteado.dif}] (+${pts} pts)`;
+                    
+                    jogadorAtualIndex = (jogadorAtualIndex + 1) % jogadores.length;
+                }
+
+                atualizarJogadores();
+                iniciarCronometro();
+            }, 3500);
         }
 
         function iniciarCronometro() {
             let tempo = 30;
             document.getElementById('cronometro').innerText = "00:30";
-            const intervalo = setInterval(() => {
+            
+            // Limpar intervalos antigos se houver
+            if(window.cronometroAtivo) clearInterval(window.cronometroAtivo);
+
+            window.cronometroAtivo = setInterval(() => {
                 tempo--;
                 document.getElementById('cronometro').innerText = `00:${tempo < 10 ? '0' + tempo : tempo}`;
                 if (tempo <= 0) {
-                    clearInterval(intervalo);
+                    clearInterval(window.cronometroAtivo);
                 }
             }, 1000);
         }
 
-        function varColor(name) {
-            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-        }
-
         function alternarModo() {
             const body = document.body;
-            if (body.getAttribute('data-theme') === 'light') body.removeAttribute('data-theme');
-            else body.setAttribute('data-theme', 'light');
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+            } else {
+                body.setAttribute('data-theme', 'light');
+            }
             desenharRoleta();
         }
 
-        // Inicialização
+        // Inicializar os dados na tela
         atualizarJogadores();
         atualizarSeletores();
         desenharRoleta();
