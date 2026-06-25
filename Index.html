@@ -36,7 +36,7 @@
             --roleta-borda: rgba(0, 0, 0, 0.1);
         }
 
-        /* Temas aplicados EXCLUSIVAMENTE à Roleta e Elementos de Destaque */
+        /* Temas aplicados à Roleta e Elementos de Destaque */
         [data-roleta-theme="verde-neon"] {
             --roleta-fundo-1: #0d2419; --roleta-fundo-2: #143525; --roleta-texto: #39ff14; --roleta-borda: #39ff14;
         }
@@ -259,7 +259,7 @@
                 </div>
                 <div class="input-add-grupo"><select id="seletor-remover"></select><button class="btn-acao apagar" onclick="removerDesafio()">Apagar</button></div>
                 
-                <div id="secaoSalvarRoleta" style="display:none; border-top:1px solid var(--border-color); padding-top:10px;">
+                <div id="secaoSalvarRoleta" style="display:none !important; border-top:1px solid var(--border-color); padding-top:10px;">
                     <span style="font-size:12px; font-weight:bold; opacity:0.7;">💾 Salvar/Carregar Layout com Configurações</span>
                     <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;" id="containerSlotsRoleta"></div>
                 </div>
@@ -309,10 +309,12 @@
                     <label style="font-size:12px; width:100px;">Fundo Avatar:</label>
                     <select id="editFundoAvatar" onchange="salvarEdicaoPerfil()"><option value="#4facfe">Azul</option><option value="#ff2a5f">Rosa</option><option value="#39ff14">Néon</option></select>
                 </div>
-                <div style="margin-top:10px;">
+                
+                <div style="margin-top:10px; display:none !important;">
                     <span style="font-size:12px; font-weight:bold; opacity:0.7;">🎨 Seus Estilos Desbloqueados por Nível</span>
                     <div style="display:flex; flex-direction:column; gap:6px; margin-top:5px;" id="editTemasItens"></div>
                 </div>
+                
                 <div style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; text-align:center;">
                     <span style="font-size:11px; opacity:0.6;">Código Online da sua Sala:</span>
                     <div id="lblCodigoSala" style="font-weight:bold; font-size:18px; color:var(--primaria);">------</div>
@@ -365,7 +367,10 @@
             if(logadoSalvo) {
                 usuarioLogado = JSON.parse(logadoSalvo);
                 sanitizarContaFaltante(usuarioLogado);
+                // Força tema padrão estável inicial
                 document.body.setAttribute('data-roleta-theme', usuarioLogado.temaAtivo || 'verde-neon');
+            } else {
+                document.body.setAttribute('data-roleta-theme', 'verde-neon');
             }
             
             let jogSalvos = localStorage.getItem('roleta_jogadores_locais');
@@ -416,7 +421,7 @@
             document.getElementById('formLogin').classList.toggle('ativo', tipo==='login'); document.getElementById('formCadastro').classList.toggle('ativo', tipo==='cadastro');
         }
 
-        function executarCadastro(e) {
+        function ejecutarCadastro(e) {
             e.preventDefault();
             let user = document.getElementById('cadUser').value.trim().toLowerCase();
             let email = document.getElementById('cadEmail').value.trim();
@@ -453,7 +458,7 @@
 
         function executarLogout() {
             usuarioLogado = null; localStorage.removeItem('roleta_logado');
-            document.body.removeAttribute('data-roleta-theme'); salaOnlineCriada = false;
+            document.body.setAttribute('data-roleta-theme', 'verde-neon'); salaOnlineCriada = false;
             atualizarInterfaceLogado(); atualizarJogadores(); desenharRoleta();
         }
 
@@ -465,7 +470,7 @@
             let divSalvar = document.getElementById('secaoSalvarRoleta');
 
             if(usuarioLogado) {
-                pBox.style.display = 'block'; btnAuth.style.display = 'none'; btnOut.style.display = 'block'; btnCriar.style.display = 'block'; divSalvar.style.display = 'block';
+                pBox.style.display = 'block'; btnAuth.style.display = 'none'; btnOut.style.display = 'block'; btnCriar.style.display = 'block'; divSalvar.style.display = 'none'; // Forçado Oculto
                 document.getElementById('perfAvatar').innerText = usuarioLogado.emoji;
                 document.getElementById('perfAvatar').style.background = usuarioLogado.fundoAvatar;
                 document.getElementById('perfNome').innerText = usuarioLogado.nome;
@@ -492,15 +497,6 @@
             if(aba === 'editar') {
                 document.getElementById('editEmoji').value = usuarioLogado.emoji; document.getElementById('editFundoAvatar').value = usuarioLogado.fundoAvatar;
                 document.getElementById('lblCodigoSala').innerText = usuarioLogado.codigoSala;
-                let nv = usuarioLogado.nivel;
-                document.getElementById('editTemasItens').innerHTML = `
-                    <div class="item-badge ${usuarioLogado.temaAtivo==='verde-neon'?'ativo':''}" onclick="mudarTemaPerfil('verde-neon')">❇️ Verde Néon (Nível 1)</div>
-                    <div class="item-badge ${nv < 8 ? 'bloqueado':''} ${usuarioLogado.temaAtivo==='azul-nv8'?'ativo':''}" onclick="mudarTemaPerfil('azul-nv8')">🔷 Azul (Desbloqueia no Nv.8) ${nv < 8 ? '🔒' : ''}</div>
-                    <div class="item-badge ${nv < 13 ? 'bloqueado':''} ${usuarioLogado.temaAtivo==='rosa-nv13'?'ativo':''}" onclick="mudarTemaPerfil('rosa-nv13')">🌸 Rosa (Desbloqueia no Nv.13) ${nv < 13 ? '🔒' : ''}</div>
-                    <div class="item-badge ${nv < 21 ? 'bloqueado':''} ${usuarioLogado.temaAtivo==='verde-nv21'?'ativo':''}" onclick="mudarTemaPerfil('verde-nv21')">🌲 Verde (Desbloqueia no Nv.21) ${nv < 21 ? '🔒' : ''}</div>
-                    <div class="item-badge ${nv < 26 ? 'bloqueado':''} ${usuarioLogado.temaAtivo==='roxo-nv26'?'ativo':''}" onclick="mudarTemaPerfil('roxo-nv26')">🔮 Roxo (Desbloqueia no Nv.26) ${nv < 26 ? '🔒' : ''}</div>
-                    <div class="item-badge ${nv < 30 ? 'bloqueado':''} ${usuarioLogado.temaAtivo==='dourado-nv30'?'ativo':''}" onclick="mudarTemaPerfil('dourado-nv30')">👑 Dourado (Desbloqueia no Nv.30) ${nv < 30 ? '🔒' : ''}</div>
-                `;
             } else { atualizarListaAmigos(); }
         }
 
@@ -509,70 +505,14 @@
             salvarUsuarioNoBanco(usuarioLogado); atualizarInterfaceLogado(); atualizarJogadores();
         }
 
+        // Funções mantidas estruturalmente mas desativadas das views críticas
         function mudarTemaPerfil(tema) {
-            if(tema === 'azul-nv8' && usuarioLogado.nivel < 8) return;
-            if(tema === 'rosa-nv13' && usuarioLogado.nivel < 13) return;
-            if(tema === 'verde-nv21' && usuarioLogado.nivel < 21) return;
-            if(tema === 'roxo-nv26' && usuarioLogado.nivel < 26) return;
-            if(tema === 'dourado-nv30' && usuarioLogado.nivel < 30) return;
             usuarioLogado.temaAtivo = tema; document.body.setAttribute('data-roleta-theme', tema);
-            salvarEdicaoPerfil(); mudarAbaPerfil('editar'); desenharRoleta();
+            salvarEdicaoPerfil(); desenharRoleta();
         }
 
-        function renderizarSlotsRoleta() {
-            let container = document.getElementById('containerSlotsRoleta'); container.innerHTML = '';
-            if(!usuarioLogado.roletasSalvas) usuarioLogado.roletasSalvas = [];
-            
-            let nv = usuarioLogado.nivel || 1;
-
-            for(let i = 0; i < 6; i++) {
-                let bloqueado = false;
-                let nivelRequisitado = 1;
-
-                if (i === 3) { nivelRequisitado = 5; if(nv < 5) bloqueado = true; }
-                if (i === 4) { nivelRequisitado = 10; if(nv < 10) bloqueado = true; }
-                if (i === 5) { nivelRequisitado = 15; if(nv < 15) bloqueado = true; }
-
-                let salvo = usuarioLogado.roletasSalvas[i];
-                
-                if (bloqueado) {
-                    container.innerHTML += `<button class="btn-header" style="font-size:11px; padding:6px; opacity: 0.5; cursor: not-allowed; border-color: red;" disabled>🔒 Slot ${i+1} (Bloqueado Nv.${nivelRequisitado})</button>`;
-                } else {
-                    container.innerHTML += `
-                        <div style="display:flex; gap: 4px; width:100%;">
-                            <button class="btn-header" style="font-size:11px; padding:6px; border-color:var(--primaria); flex: 1;" onclick="acaoSlotRoleta(${i}, 'carregar')">📂 ${salvo ? 'Carregar Slot '+(i+1) : 'Slot '+(i+1)+' Vazio'}</button>
-                            <button class="btn-header" style="font-size:11px; padding:6px; background: rgba(0,242,254,0.2);" onclick="acaoSlotRoleta(${i}, 'salvar')">💾 Salvar</button>
-                        </div>`;
-                }
-            }
-        }
-
-        function acaoSlotRoleta(idx, acao) {
-            if(acao === 'carregar') {
-                if(usuarioLogado.roletasSalvas[idx]) {
-                    let pacote = usuarioLogado.roletasSalvas[idx];
-                    desafios = pacote.desafios || desafios;
-                    filtrosAtivos = pacote.filtrosAtivos || { "Fácil": true, "Médio": true, "Difícil": true };
-                    
-                    for(let key in filtrosAtivos) {
-                        let btn = document.getElementById(`filtro-${key.toLowerCase()}`);
-                        if(btn) btn.classList.toggle('ativo', filtrosAtivos[key]);
-                    }
-                    
-                    atualizarSeletores(); 
-                    desenharRoleta(); 
-                    alert(`Slot ${idx+1} carregado com sucesso!`);
-                } else {
-                    alert("Este slot está vazio. Salve alguma configuração nele primeiro!");
-                }
-            } else if(acao === 'salvar') {
-                usuarioLogado.roletasSalvas[idx] = { 
-                    desafios: JSON.parse(JSON.stringify(desafios)), 
-                    filtrosAtivos: JSON.parse(JSON.stringify(filtrosAtivos)) 
-                };
-                salvarUsuarioNoBanco(usuarioLogado); renderizarSlotsRoleta(); alert(`Configurações salvas no Slot ${idx+1}!`);
-            }
-        }
+        function renderizarSlotsRoleta() {}
+        function acaoSlotRoleta(idx, acao) {}
 
         function criarSalaOnline() { salaOnlineCriada = true; atualizarJogadores(); alert(`Sala Online Ativa! Código: ${usuarioLogado.codigoSala}`); }
         function entrarPorCodigo() {
@@ -623,21 +563,20 @@
         function desenharRoleta() {
             let lista = obterDesafiosFiltrados(); ctx.clearRect(0, 0, canvas.width, canvas.height);
             if(lista.length === 0) {
-                ctx.fillStyle = varProp('--texto') || "#1a1d24"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
+                ctx.fillStyle = "#ffffff"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
                 ctx.fillText("Nenhuma dificuldade ativa", 250, 250);
                 return;
             }
 
             let tamAng = (2 * Math.PI) / lista.length;
             
-            // Garantir leituras de cores dinâmicas baseadas no container correto
-            let roletaWrapper = document.getElementById('roletaCanvas').parentElement;
-            let rStyle = getComputedStyle(roletaWrapper);
+            // CORREÇÃO: Puxa estilos diretamente do document.body para evitar valores nulos ao trocar de classe/tema
+            let bodyStyle = getComputedStyle(document.body);
             
-            let c1 = rStyle.getPropertyValue('--roleta-fundo-1').trim() || "#1a1d2d";
-            let c2 = rStyle.getPropertyValue('--roleta-fundo-2').trim() || "#24293e";
-            let txtC = rStyle.getPropertyValue('--roleta-texto').trim() || "#ffffff";
-            let bordaC = rStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)";
+            let c1 = bodyStyle.getPropertyValue('--roleta-fundo-1').trim() || "#1a1d2d";
+            let c2 = bodyStyle.getPropertyValue('--roleta-fundo-2').trim() || "#24293e";
+            let txtC = bodyStyle.getPropertyValue('--roleta-texto').trim() || "#ffffff";
+            let bordaC = bodyStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)";
 
             lista.forEach((d, i) => {
                 ctx.beginPath(); ctx.moveTo(250, 250);
@@ -652,7 +591,6 @@
                 ctx.fillText(tag + d.texto.substring(0, 14), 210, 5); ctx.restore();
             });
         }
-        function varProp(p) { return getComputedStyle(document.documentElement).getPropertyValue(p).trim(); }
 
         function girarRoleta() {
             if(estaGirando) return;
@@ -702,11 +640,7 @@
                 tempoRestante--;
                 if(tempoRestante <= 0) {
                     clearInterval(cronometroInterval); document.getElementById('cronometro').innerText = "00:00";
-                    
-                    if(!document.getElementById('mutarSomCheck').checked) {
-                        console.log("Efeito Sonoro: Tempo esgotado!");
-                    }
-
+                    if(!document.getElementById('mutarSomCheck').checked) console.log("Efeito Sonoro: Tempo esgotado!");
                     if(document.getElementById('autoGirarCheck').checked) setTimeout(() => validarResultado(false), 1500);
                 } else { document.getElementById('cronometro').innerText = formatarTempo(tempoRestante); }
             }, 1000);
@@ -762,9 +696,13 @@
             document.getElementById('cronometro').innerText = formatarTempo(t); 
         }
         
+        // CORREÇÃO: Tratamento do Filtro de Dificuldade unificado e atualizado de forma síncrona com o Canvas
         function mudarFiltro(d) { 
             filtrosAtivos[d] = !filtrosAtivos[d]; 
-            document.getElementById(`filtro-${d.toLowerCase()}`).classList.toggle('ativo', filtrosAtivos[d]); 
+            let btn = document.getElementById(`filtro-${d.toLowerCase()}`);
+            if(btn) {
+                btn.classList.toggle('ativo', filtrosAtivos[d]);
+            }
             desenharRoleta(); 
         }
         
@@ -775,7 +713,7 @@
         }
         
         function atualizarSeletores() { 
-            let s = document.getElementById('seletor-remover'); 
+            let s = document.getElementById('seletor-remover'); if(!s) return;
             s.innerHTML = ''; 
             desafios.forEach((d, i) => {
                 s.innerHTML += `<option value="${i}">[${d.dif}] ${d.texto}</option>`;
@@ -784,7 +722,7 @@
         
         function removerDesafio() { 
             let seletor = document.getElementById('seletor-remover');
-            if(seletor.value === "") return;
+            if(!seletor || seletor.value === "") return;
             desafios.splice(parseInt(seletor.value), 1); 
             atualizarSeletores(); 
             desenharRoleta(); 
