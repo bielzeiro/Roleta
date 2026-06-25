@@ -56,10 +56,6 @@
             --roleta-fundo-1: #2d240a; --roleta-fundo-2: #423511; --roleta-texto: #d4af37; --roleta-borda: #d4af37;
         }
 
-        /* SAZONALIDADE DESATIVADA TEMPORARIAMENTE NO CSS */
-        /* [data-sazonal="true"][data-event="sao-joao"] { --roleta-fundo-1: #361700; --roleta-fundo-2: #5c2900; --roleta-texto: #ffaa00; --roleta-borda: #ffaa00; } */
-        /* [data-sazonal="true"][data-event="ano-novo"] { --roleta-fundo-1: #1c1a17; --roleta-fundo-2: #2d2924; --roleta-texto: #d4af37; --roleta-borda: #d4af37; } */
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; }
         body { background: var(--bg-principal); color: var(--texto); min-height: 100vh; display: flex; flex-direction: column; }
         
@@ -72,7 +68,6 @@
         .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; }
         .area-roleta { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
-        /* Modificado para integrar dentro da caixa unificada */
         .cronometro-caixa-interna { font-size: 42px; font-weight: 800; color: var(--primaria); font-family: monospace; letter-spacing: 1px; text-align: center; margin: 5px 0; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 5px; border: 1px solid var(--border-color); }
 
         .painel-controle-partida { background: var(--bg-painel); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -121,11 +116,13 @@
 
         .botoes-dificuldade { display: flex; gap: 8px; width: 100%; }
         .btn-dif { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: var(--texto); cursor: pointer; font-size: 11px; opacity: 0.4; }
-        .btn-dif.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.15); opacity: 1; }
+        .btn-dif.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.25); opacity: 1; font-weight: bold; }
 
         select, input { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); color: var(--texto); padding: 10px; border-radius: 8px; font-size: 13px; outline: none; width: 100%; }
+        [data-theme="light"] select, [data-theme="light"] input { background: rgba(255, 255, 255, 0.9); color: #1a1d24; }
         .input-add-grupo { display: flex; gap: 8px; width: 100%; }
         .btn-acao { background: var(--primaria); color: #121420; border: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; white-space: nowrap; }
+        [data-theme="light"] .btn-acao { color: #fff; }
         .btn-acao.apagar { background: #ff4a4a; color: white; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
@@ -368,14 +365,11 @@
             if(logadoSalvo) {
                 usuarioLogado = JSON.parse(logadoSalvo);
                 sanitizarContaFaltante(usuarioLogado);
-                document.getElementById('roletaCanvas').parentElement.parentElement.setAttribute('data-roleta-theme', usuarioLogado.temaAtivo || 'verde-neon');
+                document.body.setAttribute('data-roleta-theme', usuarioLogado.temaAtivo || 'verde-neon');
             }
             
             let jogSalvos = localStorage.getItem('roleta_jogadores_locais');
             if(jogSalvos) jogadoresLocais = JSON.parse(jogSalvos);
-
-            // Sazonalidade temporariamente bypassada/desativada
-            // checarCalendarioSazonal();
             
             atualizarInterfaceLogado();
             atualizarJogadores();
@@ -395,16 +389,6 @@
             if(!userObj.roletasSalvas) { userObj.roletasSalvas = []; alterou = true; }
             if(!userObj.temaAtivo || userObj.temaAtivo === 'default') { userObj.temaAtivo = 'verde-neon'; alterou = true; }
             if(alterou) { salvarUsuarioNoBanco(userObj); }
-        }
-
-        function checarCalendarioSazonal() {
-            // Desativado a pedido
-            return;
-        }
-
-        function alternarSazonalidade() {
-            // Desativado temporariamente
-            return;
         }
 
         function alternarModo() {
@@ -639,21 +623,27 @@
         function desenharRoleta() {
             let lista = obterDesafiosFiltrados(); ctx.clearRect(0, 0, canvas.width, canvas.height);
             if(lista.length === 0) {
-                ctx.fillStyle = varProp('--texto') || "#fff"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
+                ctx.fillStyle = varProp('--texto') || "#1a1d24"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
                 ctx.fillText("Nenhuma dificuldade ativa", 250, 250);
                 return;
             }
 
             let tamAng = (2 * Math.PI) / lista.length;
-            let rStyle = getComputedStyle(document.documentElement);
-            let c1 = rStyle.getPropertyValue('--roleta-fundo-1').trim();
-            let c2 = rStyle.getPropertyValue('--roleta-fundo-2').trim();
-            let txtC = rStyle.getPropertyValue('--roleta-texto').trim();
+            
+            // Garantir leituras de cores dinâmicas baseadas no container correto
+            let roletaWrapper = document.getElementById('roletaCanvas').parentElement;
+            let rStyle = getComputedStyle(roletaWrapper);
+            
+            let c1 = rStyle.getPropertyValue('--roleta-fundo-1').trim() || "#1a1d2d";
+            let c2 = rStyle.getPropertyValue('--roleta-fundo-2').trim() || "#24293e";
+            let txtC = rStyle.getPropertyValue('--roleta-texto').trim() || "#ffffff";
+            let bordaC = rStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)";
 
             lista.forEach((d, i) => {
                 ctx.beginPath(); ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, i * tamAng, (i + 1) * tamAng);
-                ctx.fillStyle = (i % 2 === 0) ? c1 : c2; ctx.fill(); ctx.strokeStyle = rStyle.getPropertyValue('--roleta-borda').trim() || varProp('--border-color'); ctx.stroke();
+                ctx.fillStyle = (i % 2 === 0) ? c1 : c2; ctx.fill(); 
+                ctx.strokeStyle = bordaC; ctx.stroke();
 
                 ctx.save(); ctx.translate(250, 250); ctx.rotate(i * tamAng + tamAng/2);
                 ctx.textAlign = "right"; ctx.fillStyle = txtC; ctx.font = "bold 13px sans-serif";
@@ -672,7 +662,6 @@
             let voltas = 6 + Math.floor(Math.random() * 5); let graus = Math.floor(Math.random() * 360);
             anguloAtual += (voltas * 360) + graus; canvas.style.transform = `rotate(${anguloAtual}deg)`;
 
-            // Executa som se não estiver mutado
             if(!document.getElementById('mutarSomCheck').checked){
                 console.log("Efeito Sonoro: Roleta girando...");
             }
@@ -695,13 +684,11 @@
                 document.getElementById('desafioAtualTexto').innerText = `Missão: "${desafioSorteadoGlobal.texto}" valendo ${ptsValor} Pontos!`;
                 document.getElementById('painelValidacao').style.display = 'flex';
                 
-                // Só roda se o temporizador estiver marcado como ativo
                 if(document.getElementById('ativarTempo').checked) {
                     let modo = document.getElementById('modoTempoSelect').value;
                     if (modo === 'automatico') {
                         iniciarCronometroRegressivo();
                     } else {
-                        // Modo Manual: Apenas exibe o tempo definido sem decrescer sozinho
                         atualizarDisplayTempo();
                     }
                 }
@@ -786,8 +773,23 @@
             desafios.push({ texto: txtInp.value.trim(), dif: document.getElementById('dificuldade-desafio').value }); 
             txtInp.value = ''; atualizarSeletores(); desenharRoleta(); 
         }
-        function atualizarSeletores() { let s = document.getElementById('seletor-remover'); s.innerHTML=''; desafios.forEach((d,i)=>s.innerHTML+=`<option value="${i}">${d.texto}</option>`); }
-        function removerDesafio() { desafios.splice(document.getElementById('seletor-remover').value,1); atualizarSeletores(); desenharRoleta(); }
+        
+        function atualizarSeletores() { 
+            let s = document.getElementById('seletor-remover'); 
+            s.innerHTML = ''; 
+            desafios.forEach((d, i) => {
+                s.innerHTML += `<option value="${i}">[${d.dif}] ${d.texto}</option>`;
+            }); 
+        }
+        
+        function removerDesafio() { 
+            let seletor = document.getElementById('seletor-remover');
+            if(seletor.value === "") return;
+            desafios.splice(parseInt(seletor.value), 1); 
+            atualizarSeletores(); 
+            desenharRoleta(); 
+        }
+        
         function buscarEAdicionarAmigo() { alert("Simulado local!"); }
         function atualizarListaAmigos() {}
     </script>
