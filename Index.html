@@ -73,12 +73,11 @@
         
         .cronometro-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--bg-painel); padding: 15px 30px; border-radius: 20px; border: 1px solid var(--border-color); min-width: 200px; text-align: center; }
         .cronometro-container { font-size: 36px; font-weight: 800; color: var(--primaria); font-family: monospace; letter-spacing: 1px; }
-        .cronometro-controles { display: flex; align-items: center; gap: 10px; font-size: 12px; justify-content: center; width: 100%; }
-        .cronometro-controles input[type="number"] { width: 55px; padding: 4px; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--texto); border-radius: 6px; }
 
-        .controles-superiores-roleta { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%; max-width: 500px; }
-        .controles-giro-caixa { display: flex; gap: 10px; font-size: 13px; background: rgba(0,0,0,0.2); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); align-items: center; flex: 1; min-width: 200px; justify-content: center; }
-        .controles-giro-caixa input { width: 50px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); text-align: center; color: var(--primaria); font-weight: bold; font-size: 14px; border-radius: 4px; }
+        .painel-controle-partida { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 12px; }
+        .controle-linha { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; }
+        .controle-linha label { display: flex; align-items: center; gap: 6px; }
+        .controle-linha input[type="number"] { width: 60px; padding: 4px; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--texto); border-radius: 6px; }
 
         .roleta-wrapper { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
         .marcador-topo { position: absolute; top: -10px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid var(--botao-girar); z-index: 10; }
@@ -118,7 +117,7 @@
         .item-badge.bloqueado { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; border-color: rgba(255,0,0,0.3); }
         .item-badge.ativo { border-color: var(--primaria); background: rgba(0,242,254,0.1); }
 
-        .botoes-dificuldade { display: flex; gap: 8px; }
+        .botoes-dificuldade { display: flex; gap: 8px; width: 100%; }
         .btn-dif { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: var(--texto); cursor: pointer; font-size: 11px; opacity: 0.4; }
         .btn-dif.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.15); opacity: 1; }
 
@@ -162,22 +161,26 @@
         <section class="area-roleta">
             <div class="cronometro-wrapper">
                 <div class="cronometro-container" id="cronometro">00:30</div>
-                <div class="cronometro-controles">
-                    <label>Tempo (s): <input type="number" id="tempoInput" value="30" min="5" max="300" onchange="atualizarDisplayTempo()"></label>
-                    <label><input type="checkbox" id="ativarTempo" checked> Ativo</label>
-                </div>
             </div>
 
-            <div class="controles-superiores-roleta">
-                <div class="controles-giro-caixa">
-                    <label><input type="checkbox" id="autoGirarCheck"> Giro Auto</label>
-                    <span style="margin-left: 10px;">Qtd:</span>
-                    <input type="number" id="girosInput" value="5" min="1">
+            <div class="painel-controle-partida">
+                <div class="controle-linha">
+                    <span style="font-weight: bold; color: var(--primaria);">⚙️ Painel de Controle de Partida</span>
                 </div>
-                <div class="controles-giro-caixa" id="boxFiltrosRapidos">
-                    <button class="btn-dif ativo" id="filtro-facil" onclick="mudarFiltro('Fácil')" style="padding: 4px;">🟢 F</button>
-                    <button class="btn-dif ativo" id="filtro-medio" onclick="mudarFiltro('Médio')" style="padding: 4px;">🟡 M</button>
-                    <button class="btn-dif ativo" id="filtro-dificil" onclick="mudarFiltro('Difícil')" style="padding: 4px;">🔴 D</button>
+                <div class="controle-linha">
+                    <label>Tempo (s): <input type="number" id="tempoInput" value="30" min="5" max="300" onchange="atualizarDisplayTempo()"></label>
+                    <label><input type="checkbox" id="ativarTempo" checked> Contagem Ativa</label>
+                </div>
+                <div class="controle-linha">
+                    <label><input type="checkbox" id="autoGirarCheck"> Giro Automático contínuo</label>
+                    <label>Qtd Giros: <input type="number" id="girosInput" value="5" min="1"></label>
+                </div>
+                <div class="controle-linha" style="margin-top: 5px;">
+                    <div class="botoes-dificuldade" id="boxFiltrosRapidos">
+                        <button class="btn-dif ativo" id="filtro-facil" onclick="mudarFiltro('Fácil')">🟢 Fácil</button>
+                        <button class="btn-dif ativo" id="filtro-medio" onclick="mudarFiltro('Médio')">🟡 Médio</button>
+                        <button class="btn-dif ativo" id="filtro-dificil" onclick="mudarFiltro('Difícil')">🔴 Difícil</button>
+                    </div>
                 </div>
             </div>
 
@@ -354,7 +357,7 @@
             if(logadoSalvo) {
                 usuarioLogado = JSON.parse(logadoSalvo);
                 sanitizarContaFaltante(usuarioLogado);
-                document.canvas.parentElement.parentElement.setAttribute('data-roleta-theme', usuarioLogado.temaAtivo || 'default');
+                document.getElementById('roletaCanvas').parentElement.parentElement.setAttribute('data-roleta-theme', usuarioLogado.temaAtivo || 'verde-neon');
             }
             
             let jogSalvos = localStorage.getItem('roleta_jogadores_locais');
@@ -383,9 +386,12 @@
 
         function checarCalendarioSazonal() {
             const agora = new Date(); const dia = agora.getDate(); const mes = agora.getMonth() + 1;
-            if (mes === 6 && dia >= 15) eventoAtivoChave = "sao-joao";
+            if (mes === 6 && dia >= 1) eventoAtivoChave = "sao-joao";
             else if (mes === 12 || (mes === 1 && dia <= 5)) eventoAtivoChave = "ano-novo";
-            if (eventoAtivoChave) { document.getElementById('bannerSazonal').style.display = "block"; document.getElementById('btnSazonalToggle').style.display = "block"; }
+            if (eventoAtivoChave) { 
+                document.getElementById('bannerSazonal').style.display = "block"; 
+                document.getElementById('btnSazonalToggle').style.display = "block"; 
+            }
         }
 
         function alternarSazonalidade() {
@@ -473,7 +479,7 @@
                 document.getElementById('perfAvatar').innerText = usuarioLogado.emoji;
                 document.getElementById('perfAvatar').style.background = usuarioLogado.fundoAvatar;
                 document.getElementById('perfNome').innerText = usuarioLogado.nome;
-                document.getElementById('perfID').innerText = usuarioLogado.id;
+                document.getElementById('perfID').innerText = usuarioObj.id || usuarioLogado.id;
                 document.getElementById('perfNivel').innerText = `Nível ${usuarioLogado.nivel}`;
                 let max = 50 + (usuarioLogado.nivel - 1) * 25;
                 document.getElementById('perfXpTexto').innerText = `XP: ${usuarioLogado.xp}/${max}`;
@@ -534,15 +540,14 @@
                 let nivelRequisitado = 1;
 
                 if (i === 3) { nivelRequisitado = 5; if(nv < 5) bloqueado = true; }
-                if (i === 4) { nivelRequisitado = 15; if(nv < 15) bloqueado = true; }
-                if (i === 5) { nivelRequisitado = 25; if(nv < 25) bloqueado = true; }
+                if (i === 4) { nivelRequisitado = 10; if(nv < 10) bloqueado = true; }
+                if (i === 5) { nivelRequisitado = 15; if(nv < 15) bloqueado = true; }
 
                 let salvo = usuarioLogado.roletasSalvas[i];
                 
                 if (bloqueado) {
                     container.innerHTML += `<button class="btn-header" style="font-size:11px; padding:6px; opacity: 0.5; cursor: not-allowed; border-color: red;" disabled>🔒 Slot ${i+1} (Bloqueado Nv.${nivelRequisitado})</button>`;
                 } else {
-                    let lbl = salvo ? `Carregar Slot ${i+1}` : `Salvar no Slot ${i+1}`;
                     container.innerHTML += `
                         <div style="display:flex; gap: 4px; width:100%;">
                             <button class="btn-header" style="font-size:11px; padding:6px; border-color:var(--primaria); flex: 1;" onclick="acaoSlotRoleta(${i}, 'carregar')">📂 ${salvo ? 'Carregar Slot '+(i+1) : 'Slot '+(i+1)+' Vazio'}</button>
@@ -559,12 +564,15 @@
                     desafios = pacote.desafios || desafios;
                     filtrosAtivos = pacote.filtrosAtivos || { "Fácil": true, "Médio": true, "Difícil": true };
                     
+                    // Sincroniza visualmente os botões de filtros ativos
                     for(let key in filtrosAtivos) {
                         let btn = document.getElementById(`filtro-${key.toLowerCase()}`);
                         if(btn) btn.classList.toggle('ativo', filtrosAtivos[key]);
                     }
                     
-                    atualizarSeletores(); desenharRoleta(); alert(`Slot ${idx+1} carregado com sucesso!`);
+                    atualizarSeletores(); 
+                    desenharRoleta(); 
+                    alert(`Slot ${idx+1} carregado com sucesso!`);
                 } else {
                     alert("Este slot está vazio. Salve alguma configuração nele primeiro!");
                 }
@@ -626,7 +634,7 @@
         function desenharRoleta() {
             let lista = obterDesafiosFiltrados(); ctx.clearRect(0, 0, canvas.width, canvas.height);
             if(lista.length === 0) {
-                ctx.fillStyle = "#fff"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
+                ctx.fillStyle = varProp('--texto') || "#fff"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
                 ctx.fillText("Nenhuma dificuldade ativa", 250, 250);
                 return;
             }
@@ -735,8 +743,9 @@
         }
         
         function adicionarDesafio() { 
-            desafios.push({ texto: document.getElementById('texto-desafio').value, dif: document.getElementById('dificuldade-desafio').value }); 
-            atualizarSeletores(); desenharRoleta(); 
+            let txtInp = document.getElementById('texto-desafio'); if(!txtInp.value.trim()) return;
+            desasfios.push({ texto: txtInp.value.trim(), dif: document.getElementById('dificuldade-desafio').value }); 
+            txtInp.value = ''; atualizarSeletores(); desenharRoleta(); 
         }
         function atualizarSeletores() { let s = document.getElementById('seletor-remover'); s.innerHTML=''; desafios.forEach((d,i)=>s.innerHTML+=`<option value="${i}">${d.texto}</option>`); }
         function removerDesafio() { desafios.splice(document.getElementById('seletor-remover').value,1); atualizarSeletores(); desenharRoleta(); }
