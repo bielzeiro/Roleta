@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roleta de Desafios Ultra Pro v3</title>
+    <title>Roleta de Desafios Ultra Pro v3.1</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --bg-principal: #121420;
@@ -70,8 +72,8 @@
         .cronometro-controles { display: flex; align-items: center; gap: 10px; font-size: 12px; justify-content: center; width: 100%; }
         .cronometro-controles input[type="number"] { width: 55px; padding: 4px; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--texto); border-radius: 6px; }
 
-        .giros-contador { font-size: 14px; background: rgba(0,0,0,0.2); padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border-color); }
-        .giros-contador input { width: 45px; background: transparent; border: none; text-align: center; color: var(--primaria); font-weight: bold; font-size: 14px; }
+        .controles-giro-caixa { display: flex; gap: 10px; font-size: 14px; background: rgba(0,0,0,0.2); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); align-items: center; }
+        .controles-giro-caixa input { width: 50px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); text-align: center; color: var(--primaria); font-weight: bold; font-size: 14px; border-radius: 4px; }
 
         .roleta-wrapper { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
         .marcador-topo { position: absolute; top: -10px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid var(--botao-girar); z-index: 10; }
@@ -105,7 +107,7 @@
         .jogador-item.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.1); }
         .jogador-item.lider { border-left: 4px solid #ffaa00; }
         
-        .avatar-preview { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+                .avatar-preview { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .jogador-info { display: flex; justify-content: space-between; width: 100%; font-size: 13px; align-items: center; }
 
         .item-badge { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 5px; }
@@ -165,7 +167,11 @@
                 </div>
             </div>
 
-            <div class="giros-contador">Giros: <input type="number" id="girosInput" value="5"></div>
+            <div class="controles-giro-caixa">
+                <label><input type="checkbox" id="autoGirarCheck"> Giro Auto</label>
+                <span>Qtd Giros:</span>
+                <input type="number" id="girosInput" value="5" min="1">
+            </div>
 
             <div class="roleta-wrapper">
                 <div class="marcador-topo"></div>
@@ -338,6 +344,23 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO SERVIDOR (MUDE AQUI SE CONFIGURAR O FIREBASE)
+        const USAR_SERVIDOR_REAL = false; 
+        let db;
+        
+        if (USAR_SERVIDOR_REAL) {
+            const firebaseConfig = {
+                apiKey: "SUA_API_KEY",
+                authDomain: "SEU_DOMINIO.firebaseapp.com",
+                projectId: "SEU_PROJECT_ID",
+                storageBucket: "SEU_BUCKET.appspot.com",
+                messagingSenderId: "SEU_SENDER_ID",
+                appId: "SUA_APP_ID"
+            };
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+        }
+
         let jogadoresLocais = [];
         let jugadorAtualIndex = 0;
         let estaGirando = false;
@@ -428,14 +451,21 @@
         function fecharTutorial() { document.getElementById('modalTutorial').style.display = 'none'; }
 
         function obterContas() { return JSON.parse(localStorage.getItem('roleta_contas')) || []; }
+        
         function salvarUsuarioNoBanco(userObj) {
             let contas = obterContas();
             let idx = contas.findIndex(c => c.user === userObj.user);
             if(idx !== -1) contas[idx] = userObj;
             localStorage.setItem('roleta_contas', JSON.stringify(contas));
+            
             if(usuarioLogado && usuarioLogado.user === userObj.user) {
                 usuarioLogado = userObj;
                 localStorage.setItem('roleta_logado', JSON.stringify(userObj));
+            }
+
+            // Sincroniza com servidor real se ativo
+            if (USAR_SERVIDOR_REAL) {
+                db.collection("usuarios").doc(userObj.user).set(userObj, { merge: true });
             }
         }
 
@@ -460,7 +490,7 @@
             let novoUser = {
                 id: geradoID, nome: document.getElementById('cadNome').value.trim(), user, email,
                 senha: document.getElementById('cadSenha').value, emoji: "👑", fundoAvatar: "#4facfe",
-                nivel: 1, xp: 0, xpDiario: 0, temaAtivo: "default", 
+                nivel: 1, xp: 0, xpDiario: 0, temaAtivo: "default", pontos: 0,
                 codigoSala: Math.floor(100000 + Math.random() * 900000).toString(), amigos: [], roletasSalvas: []
             };
 
@@ -469,6 +499,11 @@
             
             usuarioLogado = novoUser;
             localStorage.setItem('roleta_logado', JSON.stringify(novoUser));
+            
+            if (USAR_SERVIDOR_REAL) {
+                db.collection("usuarios").doc(user).set(novoUser);
+            }
+
             fecharModalAuth();
             atualizarInterfaceLogado();
             atualizarJogadores();
@@ -478,10 +513,23 @@
             e.preventDefault();
             let inp = document.getElementById('loginUser').value.trim().toLowerCase();
             let pass = document.getElementById('loginSenha').value;
-            let conta = obterContas().find(c => (c.user === inp || c.email === inp) && c.senha === pass);
 
-            if(!conta) { alert("Incorreto!"); return; }
-            usuarioLogado = conta;
+            if (USAR_SERVIDOR_REAL) {
+                db.collection("usuarios").doc(inp).get().then((doc) => {
+                    if (doc.exists && doc.data().senha === pass) {
+                        usuarioLogado = doc.data();
+                        concluirLogin();
+                    } else { alert("Incorreto!"); }
+                });
+            } else {
+                let conta = obterContas().find(c => (c.user === inp || c.email === inp) && c.senha === pass);
+                if(!conta) { alert("Incorreto!"); return; }
+                usuarioLogado = conta;
+                concluirLogin();
+            }
+        }
+
+        function concluirLogin() {
             sanitizarContaFaltante(usuarioLogado);
             localStorage.setItem('roleta_logado', JSON.stringify(usuarioLogado));
             document.body.setAttribute('data-theme', usuarioLogado.temaAtivo || 'default');
@@ -586,10 +634,22 @@
             if(!usuarioLogado.amigos) usuarioLogado.amigos = [];
             if(usuarioLogado.amigos.length >= 30) { alert("Limite de 30 amigos alcançado!"); return; }
 
-            let contas = obterContas();
-            let encontrado = contas.find(c => c.user === busca.toLowerCase() || c.id === busca || c.id === "#" + busca);
+            if (USAR_SERVIDOR_REAL) {
+                db.collection("usuarios").where("id", "==", busca).get().then((snap) => {
+                    if(!snap.empty) {
+                        let fData = snap.docs[0].data();
+                        adicionarAmigoEstrutura(fData);
+                    } else { alert("ID não localizado remotamente!"); }
+                });
+            } else {
+                let contas = obterContas();
+                let encontrado = contas.find(c => c.user === busca.toLowerCase() || c.id === busca || c.id === "#" + busca);
+                if(!encontrado) { alert("Usuário ou ID não localizado no banco de dados local!"); return; }
+                adicionarAmigoEstrutura(encontrado);
+            }
+        }
 
-            if(!encontrado) { alert("Usuário ou ID não localizado no banco de dados local!"); return; }
+        function adicionarAmigoEstrutura(encontrado) {
             if(encontrado.user === usuarioLogado.user) { alert("Não pode adicionar você mesmo!"); return; }
             if(usuarioLogado.amigos.some(a => a.user === encontrado.user)) { alert("Este amigo já está na sua lista!"); return; }
 
@@ -597,7 +657,7 @@
             salvarUsuarioNoBanco(usuarioLogado);
             document.getElementById('txtBuscaAmigo').value = '';
             atualizarListaAmigos();
-            alert("Amigo adicionado com sucesso!");
+            alert("Amigo adicionado!");
         }
 
         function atualizarListaAmigos() {
@@ -655,14 +715,45 @@
             }
         }
 
-        function criarSalaOnline() { salaOnlineCriada = true; atualizarJogadores(); alert(`Sala Online Ativa! Código: ${usuarioLogado.codigoSala}`); }
+        function criarSalaOnline() { 
+            salaOnlineCriada = true; 
+            atualizarJogadores(); 
+            
+            if (USAR_SERVIDOR_REAL) {
+                db.collection("salas").doc(usuarioLogado.codigoSala).set({
+                    lider: usuarioLogado.nome,
+                    jogadores: [{ nome: usuarioLogado.nome, avatar: usuarioLogado.emoji, pontos: 0 }],
+                    desafioAtual: "",
+                    status: "aguardando"
+                });
+                
+                // Ouvir em tempo real mudanças na sala remota
+                db.collection("salas").doc(usuarioLogado.codigoSala).onSnapshot((doc) => {
+                    if(doc.exists) {
+                        let dados = doc.data();
+                        // Aqui atualizaria a lista de jogadores remotos na tela
+                    }
+                });
+            }
+            alert(`Sala Online Ativa! Código: ${usuarioLogado.codigoSala}`); 
+        }
         
         function entrarPorCodigo() {
             let cod = document.getElementById('codigoConviteInput').value.trim();
             if(cod.length !== 6) { alert("O código precisa ter exatamente 6 dígitos."); return; }
             
+            if (USAR_SERVIDOR_REAL) {
+                db.collection("salas").doc(cod).get().then((doc) => {
+                    if (doc.exists) {
+                        alert("Conectado na sala do servidor real!");
+                        // Lógica para se acoplar à lista remota
+                    } else { alert("Sala não encontrada."); }
+                });
+                return;
+            }
+
             let sala = obterContas().find(c => c.codigoSala === cod);
-            if(!sala) { alert("Sala não localizada! Certifique-se de que o líder criou a conta neste navegador."); return; }
+            if(!sala) { alert("Sala não localizada localmente!"); return; }
             
             if(usuarioLogado && sala.user === usuarioLogado.user) { alert("Você já é o dono desta sala!"); return; }
             if(jogadoresLocais.some(j => j.nome === sala.nome)) { alert("Este jogador já está na sala!"); return; }
@@ -677,10 +768,7 @@
         function removerJogadorLocal(index) {
             jogadoresLocais.splice(index, 1);
             localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
-            
-            if (jugadorAtualIndex >= obterListaTotalJogadores().length) {
-                jugadorAtualIndex = 0;
-            }
+            if (jugadorAtualIndex >= obterListaTotalJogadores().length) jugadorAtualIndex = 0;
             atualizarJogadores();
         }
 
@@ -704,10 +792,7 @@
             listaCompleta.forEach((j, idx) => {
                 let ativo = idx === jugadorAtualIndex ? 'ativo' : '';
                 let liderCls = j.lider ? 'lider' : '';
-                
-                let botaoRemover = !j.principal 
-                    ? `<button onclick="removerJogadorLocal(${j.indexLocal})" style="background: rgba(255,42,95,0.2); border: 1px solid #ff2a5f; color: #ff2a5f; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 10px;">✕</button>` 
-                    : '';
+                let botaoRemover = !j.principal ? `<button onclick="removerJogadorLocal(${j.indexLocal})" style="background: rgba(255,42,95,0.2); border: 1px solid #ff2a5f; color: #ff2a5f; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 10px;">✕</button>` : '';
 
                 container.innerHTML += `
                     <div class="jogador-item ${ativo} ${liderCls}">
@@ -731,11 +816,6 @@
         }
 
         function obterDesafiosFiltrados() { return desafios.filter(d => filtrosAtivos[d.dif]); }
-
-        document.getElementById('girosInput').addEventListener('input', function() {
-            let val = parseInt(this.value);
-            if(isNaN(val) || val < 1) this.value = 1;
-        });
 
         function desenharRoleta() {
             let lista = obterDesafiosFiltrados();
@@ -766,14 +846,9 @@
         function girarRoleta() {
             if(estaGirando) return;
             
-            let gInput = document.getElementById('girosInput');
-            let girosRestantes = parseInt(gInput.value) || 0;
-            if(girosRestantes <= 0) { alert("Você não possui mais giros disponíveis!"); return; }
-
             let lista = obterDesafiosFiltrados(); if(lista.length === 0) return;
             estaGirando = true;
             
-            gInput.value = girosRestantes - 1;
             clearInterval(cronometroInterval); 
 
             let voltas = 6 + Math.floor(Math.random() * 5); let graus = Math.floor(Math.random() * 360);
@@ -806,8 +881,7 @@
             let tempoRestante = parseInt(document.getElementById('tempoInput').value) || 30;
             
             function formatarTempo(s) {
-                let min = Math.floor(s / 60);
-                let seg = s % 60;
+                let min = Math.floor(s / 60); let seg = s % 60;
                 return `${min < 10 ? '0'+min : min}:${seg < 10 ? '0'+seg : seg}`;
             }
 
@@ -818,7 +892,12 @@
                 if(tempoRestante <= 0) {
                     clearInterval(cronometroInterval);
                     document.getElementById('cronometro').innerText = "00:00";
-                    document.getElementById('historico').innerText = "💥 O tempo acabou para o desafio atual!";
+                    document.getElementById('historico').innerText = "💥 O tempo acabou para o desafio!";
+                    
+                    // Se estiver no automático, passa a vez mesmo falhando
+                    if(document.getElementById('autoGirarCheck').checked) {
+                        setTimeout(() => validarResultado(false), 2000);
+                    }
                 } else {
                     document.getElementById('cronometro').innerText = formatarTempo(tempoRestante);
                 }
@@ -829,37 +908,50 @@
             clearInterval(cronometroInterval);
             document.getElementById('painelValidacao').style.display = 'none';
             let listaCompleta = obterListaTotalJogadores();
-            if(listaCompleta.length > 0) {
-                let j = listaCompleta[jugadorAtualIndex];
-                
-                if(cumpriu) {
-                    if (usuarioLogado && jugadorAtualIndex === 0) {
-                        usuarioLogado.pontos = (usuarioLogado.pontos || 0) + 10;
-                        salvarUsuarioNoBanco(usuarioLogado);
-                    } else {
-                        let idxLocal = usuarioLogado ? jugadorAtualIndex - 1 : jugadorAtualIndex;
-                        if(jogadoresLocais[idxLocal]) jogadoresLocais[idxLocal].pontos = (jogadoresLocais[idxLocal].pontos || 0) + 10;
-                    }
-                }
+            if(listaCompleta.length === 0) return;
 
-                document.getElementById('historico').innerText = cumpriu ? `${j.nome} completou e ganhou 10 pts!` : `${j.nome} não cumpriu.`;
-                jugadorAtualIndex = (jugadorAtualIndex + 1) % listaCompleta.length;
-                
-                localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
-                atualizarJogadores();
-                atualizarDisplayTempo();
+            let j = listaCompleta[jugadorAtualIndex];
+            
+            if(cumpriu) {
+                if (usuarioLogado && jugadorAtualIndex === 0) {
+                    usuarioLogado.pontos = (usuarioLogado.pontos || 0) + 10;
+                    salvarUsuarioNoBanco(usuarioLogado);
+                } else {
+                    let idxLocal = usuarioLogado ? jugadorAtualIndex - 1 : jugadorAtualIndex;
+                    if(jogadoresLocais[idxLocal]) jogadoresLocais[idxLocal].pontos = (jogadoresLocais[idxLocal].pontos || 0) + 10;
+                }
+            }
+
+            document.getElementById('historico').innerText = cumpriu ? `${j.nome} completou e ganhou 10 pts!` : `${j.nome} não cumpriu.`;
+            
+            // Avança para o próximo jogador
+            jugadorAtualIndex = (jugadorAtualIndex + 1) % listaCompleta.length;
+            localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
+            atualizarJogadores();
+            atualizarDisplayTempo();
+
+            // Lógica de Giro Automático Sequencial
+            let autoGirar = document.getElementById('autoGirarCheck').checked;
+            let gInput = document.getElementById('girosInput');
+            let girosRestantes = parseInt(gInput.value) || 0;
+
+            if (autoGirar && girosRestantes > 1) {
+                gInput.value = girosRestantes - 1;
+                setTimeout(() => { girarRoleta(); }, 2000); // Gira de novo sozinho após 2 segundos
+            } else if (autoGirar && girosRestantes <= 1) {
+                document.getElementById('autoGirarCheck').checked = false;
+                gInput.value = 5; // Reseta valor padrão
+                alert("Rodadas em Modo Automático concluídas!");
             }
         }
 
         function atualizarDisplayTempo() { 
             let t = parseInt(document.getElementById('tempoInput').value) || 30; 
-            let min = Math.floor(t / 60);
-            let seg = t % 60;
+            let min = Math.floor(t / 60); let seg = t % 60;
             document.getElementById('cronometro').innerText = `${min < 10 ? '0'+min : min}:${seg < 10 ? '0'+seg : seg}`; 
         }
         
         function mudarFiltro(d) { filtrosAtivos[d] = !filtrosAtivos[d]; document.getElementById(`filtro-${d.toLowerCase()}`).classList.toggle('ativo', filtrosAtivos[d]); desenharRoleta(); }
-        
         function atualizarCoresCustomizadas() {
             let root = document.documentElement;
             root.style.setProperty('--cor-facil', document.getElementById('corFundoFacil').value);
