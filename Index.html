@@ -65,7 +65,6 @@
         .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; }
         .area-roleta { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
-        /* Layout Ajustado do Cronômetro */
         .cronometro-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--bg-painel); padding: 15px 30px; border-radius: 20px; border: 1px solid var(--border-color); min-width: 200px; text-align: center; }
         .cronometro-container { font-size: 36px; font-weight: 800; color: var(--primaria); font-family: monospace; letter-spacing: 1px; }
         .cronometro-controles { display: flex; align-items: center; gap: 10px; font-size: 12px; justify-content: center; width: 100%; }
@@ -106,7 +105,6 @@
         .jogador-item.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.1); }
         .jogador-item.lider { border-left: 4px solid #ffaa00; }
         
-        /* Avatar Preview CSS restaurado para evitar quebras visuais */
         .avatar-preview { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .jogador-info { display: flex; justify-content: space-between; width: 100%; font-size: 13px; align-items: center; }
 
@@ -320,7 +318,7 @@
             <div id="subPerfilAmigos" class="modal-form">
                 <span style="font-size:12px; font-weight:bold;">🔍 Buscar por ID ou Username</span>
                 <div class="input-add-grupo">
-                    <input type="text" id="txtBuscaAmigo" placeholder="Ex: #1234567 ou username...">
+                    <input type="text" id="txtBuscaAmigo" placeholder="Ex: #1234567 or username...">
                     <button class="btn-acao" onclick="buscarEAdicionarAmigo()">Adicionar</button>
                 </div>
                 <div id="listaAmigosBox" style="display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; margin-top:10px;"></div>
@@ -364,6 +362,7 @@
             let logadoSalvo = localStorage.getItem('roleta_logado');
             if(logadoSalvo) {
                 usuarioLogado = JSON.parse(logadoSalvo);
+                sanitizarContaFaltante(usuarioLogado);
                 document.body.setAttribute('data-theme', usuarioLogado.temaAtivo || 'default');
             } else {
                 if(!localStorage.getItem('roleta_visitado_antes')) {
@@ -382,6 +381,19 @@
             desenharRoleta();
             atualizarDisplayTempo();
         });
+
+        // Garante que contas antigas ou sem propriedades ganhem os dados padrões corretos
+        function sanitizarContaFaltante(userObj) {
+            let alterou = false;
+            if(!userObj.id) { userObj.id = "#" + Math.floor(1000000 + Math.random() * 9000000).toString(); alterou = true; }
+            if(userObj.nivel === undefined || userObj.nivel === null) { userObj.nivel = 1; alterou = true; }
+            if(userObj.xp === undefined || userObj.xp === null) { userObj.xp = 0; alterou = true; }
+            if(userObj.xpDiario === undefined || userObj.xpDiario === null) { userObj.xpDiario = 0; alterou = true; }
+            if(!userObj.codigoSala) { userObj.codigoSala = Math.floor(100000 + Math.random() * 900000).toString(); alterou = true; }
+            if(!userObj.amigos) { userObj.amigos = []; alterou = true; }
+            if(!userObj.roletasSalvas) { userObj.roletasSalvas = []; alterou = true; }
+            if(alterou) { salvarUsuarioNoBanco(userObj); }
+        }
 
         function checarCalendarioSazonal() {
             const agora = new Date(); const dia = agora.getDate(); const mes = agora.getMonth() + 1;
@@ -472,8 +484,9 @@
 
             if(!conta) { alert("Incorreto!"); return; }
             usuarioLogado = conta;
-            localStorage.setItem('roleta_logado', JSON.stringify(conta));
-            document.body.setAttribute('data-theme', conta.temaAtivo || 'default');
+            sanitizarContaFaltante(usuarioLogado);
+            localStorage.setItem('roleta_logado', JSON.stringify(usuarioLogado));
+            document.body.setAttribute('data-theme', usuarioLogado.temaAtivo || 'default');
             fecharModalAuth();
             atualizarInterfaceLogado();
             atualizarJogadores();
@@ -496,6 +509,7 @@
             let divSalvar = document.getElementById('secaoSalvarRoleta');
 
             if(usuarioLogado) {
+                sanitizarContaFaltante(usuarioLogado);
                 pBox.style.display = 'block';
                 btnAuth.style.display = 'none';
                 btnOut.style.display = 'block';
@@ -534,6 +548,7 @@
             document.getElementById('subPerfilAmigos').style.display = aba==='amigos' ? 'flex' : 'none';
 
             if(aba === 'editar') {
+                sanitizarContaFaltante(usuarioLogado);
                 document.getElementById('editEmoji').value = usuarioLogado.emoji;
                 document.getElementById('editFundoAvatar').value = usuarioLogado.fundoAvatar || "#4facfe";
                 document.getElementById('lblCodigoSala').innerText = usuarioLogado.codigoSala || "------";
@@ -557,6 +572,7 @@
         }
 
         function mudarTemaPerfil(tema) {
+            sanitizarContaFaltante(usuarioLogado);
             if(tema === 'roxo-preto' && usuarioLogado.nivel < 3) return;
             if(tema === 'rosa-preto' && usuarioLogado.nivel < 7) return;
             if(tema === 'azul-preto' && usuarioLogado.nivel < 11) return;
@@ -606,16 +622,14 @@
         function renderizarSlotsRoleta() {
             let container = document.getElementById('containerSlotsRoleta');
             container.innerHTML = '';
-            let nv = usuarioLogado.nivel;
+            let nv = usuarioLogado.nivel || 1;
 
-            // 2 Slots Gratuitos Base
             for(let i = 1; i <= 2; i++) {
                 let jaTem = usuarioLogado.roletasSalvas && usuarioLogado.roletasSalvas[i - 1];
                 let lbl = jaTem ? `Carregar Rlt ${i}` : `Salvar Slot ${i} (Grátis)`;
                 container.innerHTML += `<button class="btn-header" style="font-size:11px; padding:4px 8px; border-color:#2ecc71;" onclick="acaoSlotRoleta(${i - 1})">💾 ${lbl}</button>`;
             }
 
-            // Slots Travados por Nível (A partir do Nível 5)
             let slotIndexGlobal = 2;
             for(let i = 5; i <= 30; i += 5) {
                 if(nv >= i) {
@@ -692,14 +706,17 @@
         // --- SISTEMA INTERNO DA ROLETA & CANVASES ---
         function obterDesafiosFiltrados() { return desafios.filter(d => filtrosAtivos[d.dif]); }
 
+        document.getElementById('girosInput').addEventListener('input', function() {
+            let val = parseInt(this.value);
+            if(isNaN(val) || val < 1) this.value = 1;
+        });
+
         function desenharRoleta() {
             let lista = obterDesafiosFiltrados();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if(lista.length === 0) return;
 
             let tamAng = (2 * Math.PI) / lista.length;
-            
-            // Lendo dinamicamente as variáveis do documentElement para atualizar as fatias
             let rStyle = getComputedStyle(document.documentElement);
 
             lista.forEach((d, i) => {
@@ -722,9 +739,15 @@
 
         function girarRoleta() {
             if(estaGirando) return;
+            
+            let gInput = document.getElementById('girosInput');
+            let girosRestantes = parseInt(gInput.value) || 0;
+            if(girosRestantes <= 0) { alert("Você não possui mais giros disponíveis!"); return; }
+
             let lista = obterDesafiosFiltrados(); if(lista.length === 0) return;
             estaGirando = true;
             
+            gInput.value = girosRestantes - 1;
             clearInterval(cronometroInterval); 
 
             let voltas = 6 + Math.floor(Math.random() * 5); let graus = Math.floor(Math.random() * 360);
@@ -737,10 +760,11 @@
                 let idx = Math.floor(grFin / (360 / lista.length)) % lista.length;
                 let desafioSorteado = lista[idx];
 
-                if(usuarioLogado && (usuarioLogado.xpDiario || 0) < 25 && usuarioLogado.nivel < 30) {
-                    usuarioLogado.xp += 1; usuarioLogado.xpDiario = (usuarioLogado.xpDiario || 0) + 1;
-                    let max = 50 + (usuarioLogado.nivel - 1) * 25;
-                    if(usuarioLogado.xp >= max) { usuarioLogado.xp = 0; usuarioLogado.nivel += 1; }
+                if(usuarioLogado && (usuarioLogado.xpDiario || 0) < 25 && (usuarioLogado.nivel || 1) < 30) {
+                    usuarioLogado.xp = (usuarioLogado.xp || 0) + 1; 
+                    usuarioLogado.xpDiario = (usuarioLogado.xpDiario || 0) + 1;
+                    let max = 50 + ((usuarioLogado.nivel || 1) - 1) * 25;
+                    if(usuarioLogado.xp >= max) { usuarioLogado.xp = 0; usuarioLogado.nivel = (usuarioLogado.nivel || 1) + 1; }
                     salvarUsuarioNoBanco(usuarioLogado);
                     atualizarInterfaceLogado();
                 }
@@ -782,7 +806,6 @@
             if(listaCompleta.length > 0) {
                 let j = listaCompleta[jugadorAtualIndex];
                 
-                // Trata a pontuação local ou na conta global logada
                 if(cumpriu) {
                     if (usuarioLogado && jugadorAtualIndex === 0) {
                         usuarioLogado.pontos = (usuarioLogado.pontos || 0) + 10;
