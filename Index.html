@@ -1,342 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roleta de Desafios Ultra Pro v3</title>
-    <style>
-        :root {
-            --bg-principal: #121420;
-            --bg-painel: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --texto: #f0f2f5;
-            --primaria: #00f2fe;
-            --secundaria: #4facfe;
-            --botao-girar: #ff2a5f;
-            
-            --cor-facil: #00f2fe;
-            --cor-txt-facil: #121420;
-            --cor-medio: #ffcc00;
-            --cor-txt-medio: #121420;
-            --cor-dificil: #ff2a5f;
-            --cor-txt-dificil: #ffffff;
-        }
-
-        [data-theme="light"] {
-            --bg-principal: #f4f6f9;
-            --bg-painel: #ffffff;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --texto: #1a1d24;
-            --primaria: #0072ff;
-            --secundaria: #00c6ff;
-        }
-
-        [data-theme="roxo-preto"] {
-            --bg-principal: linear-gradient(135deg, #2e0854 0%, #000000 100%) !important;
-            --bg-painel: rgba(255, 255, 255, 0.08);
-            --border-color: rgba(184, 0, 255, 0.3);
-            --texto: #ffffff; --primaria: #b800ff; --secundaria: #da70d6;
-        }
-        [data-theme="rosa-preto"] {
-            --bg-principal: linear-gradient(135deg, #4a001f 0%, #000000 100%) !important;
-            --bg-painel: rgba(255, 255, 255, 0.08);
-            --border-color: rgba(255, 42, 95, 0.3);
-            --texto: #ffffff; --primaria: #ff2a5f; --secundaria: #ff85a2;
-        }
-        [data-theme="azul-preto"] {
-            --bg-principal: linear-gradient(135deg, #002244 0%, #000000 100%) !important;
-            --bg-painel: rgba(255, 255, 255, 0.08);
-            --border-color: rgba(0, 242, 254, 0.3);
-            --texto: #ffffff; --primaria: #00f2fe; --secundaria: #4facfe;
-        }
-
-        [data-sazonal="true"][data-event="sao-joao"] { --bg-principal: #361700 !important; --primaria: #ffaa00; --texto: #fff3e0; }
-        [data-sazonal="true"][data-event="ano-novo"] { --bg-principal: #1c1a17 !important; --primaria: #d4af37; --texto: #ffffff; }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; }
-        body { background: var(--bg-principal); color: var(--texto); min-height: 100vh; display: flex; flex-direction: column; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; border-bottom: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.2); }
-        .header-controles { display: flex; gap: 12px; align-items: center; }
-        
-        .btn-header { background: var(--bg-painel); border: 1px solid var(--border-color); color: var(--texto); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-        .btn-header:hover { border-color: var(--primaria); }
-
-        .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; }
-        .area-roleta { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        
-        .cronometro-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--bg-painel); padding: 15px 30px; border-radius: 20px; border: 1px solid var(--border-color); min-width: 200px; text-align: center; }
-        .cronometro-container { font-size: 36px; font-weight: 800; color: var(--primaria); font-family: monospace; letter-spacing: 1px; }
-        .cronometro-controles { display: flex; align-items: center; gap: 10px; font-size: 12px; justify-content: center; width: 100%; }
-        .cronometro-controles input[type="number"] { width: 55px; padding: 4px; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--texto); border-radius: 6px; }
-
-        .giros-contador { font-size: 14px; background: rgba(0,0,0,0.2); padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border-color); }
-        .giros-contador input { width: 45px; background: transparent; border: none; text-align: center; color: var(--primaria); font-weight: bold; font-size: 14px; }
-
-        .roleta-wrapper { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
-        .marcador-topo { position: absolute; top: -10px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid var(--botao-girar); z-index: 10; }
-        canvas { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 3.5s cubic-bezier(0.1, 0.8, 0.1, 1); }
-        .btn-centro-girar { position: absolute; width: 75px; height: 75px; background: var(--botao-girar); border: 4px solid #fff; border-radius: 50%; color: white; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 12; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
-        .painel-validacao { width: 100%; max-width: 500px; display: none; flex-direction: column; gap: 12px; text-align: center; background: var(--bg-painel); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; }
-        .btn-validar { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn-validar.sucesso { background: #00f2fe; color: #121420; }
-        .btn-validar.falha { background: #ff2a5f; color: white; }
-
-        .secao-configuracoes { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .secao-configuracoes { grid-template-columns: 1fr; } }
-
-        .card { background: var(--bg-painel); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .card-titulo { font-size: 15px; font-weight: 600; color: var(--primaria); display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-        
-        .perfil-mini-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: 12px; cursor: pointer; }
-        .perfil-mini-box:hover { border-color: var(--primaria); }
-        .perfil-topo { display: flex; align-items: center; gap: 12px; }
-        .perfil-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid var(--primaria); }
-        .perfil-meta { display: flex; flex-direction: column; }
-        .perfil-id { font-size: 11px; opacity: 0.6; font-family: monospace; }
-        .perfil-nivel-tag { background: var(--primaria); color: #121420; padding: 1px 6px; border-radius: 6px; font-size: 10px; font-weight: bold; width: fit-content; margin-top: 2px; }
-        
-        .xp-barra-fundo { background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 5px; }
-        .xp-barra-progresso { background: linear-gradient(90deg, var(--primaria), var(--secundaria)); height: 100%; width: 0%; }
-
-        .lista-jogadores { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
-        .jogador-item { display: flex; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 10px; border: 1px solid transparent; }
-        .jogador-item.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.1); }
-        .jogador-item.lider { border-left: 4px solid #ffaa00; }
-        
-        .avatar-preview { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .jogador-info { display: flex; justify-content: space-between; width: 100%; font-size: 13px; align-items: center; }
-
-        .item-badge { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 5px; }
-        .item-badge.bloqueado { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
-        .item-badge.ativo { border-color: var(--primaria); background: rgba(0,242,254,0.1); }
-
-        .botoes-dificuldade { display: flex; gap: 8px; }
-        .btn-dif { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: var(--texto); cursor: pointer; font-size: 11px; }
-        .btn-dif.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.15); }
-
-        .grid-cores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .cor-seletor-bloco { background: rgba(0,0,0,0.2); padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; font-size: 11px; }
-
-        select, input { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); color: var(--texto); padding: 10px; border-radius: 8px; font-size: 13px; outline: none; width: 100%; }
-        .input-add-grupo { display: flex; gap: 8px; width: 100%; }
-        .btn-acao { background: var(--primaria); color: #121420; border: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; white-space: nowrap; }
-        .btn-acao.apagar { background: #ff4a4a; color: white; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-        .modal-card { background: #1a1d24; border: 1px solid var(--border-color); width: 100%; max-width: 420px; border-radius: 16px; padding: 22px; color: #f0f2f5; position: relative; max-height: 90vh; overflow-y: auto; }
-        .modal-fechar { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; opacity: 0.7; }
-        
-        .modal-abas { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-        .modal-aba-btn { background: transparent; border: none; color: #f0f2f5; font-size: 14px; font-weight: bold; cursor: pointer; opacity: 0.5; padding-bottom: 6px; }
-        .modal-aba-btn.ativa { opacity: 1; color: var(--primaria); border-bottom: 2px solid var(--primaria); }
-        .modal-form { display: none; flex-direction: column; gap: 12px; }
-        .modal-form.ativo { display: flex; }
-        
-        .modal-btn-submeter { background: var(--primaria); color: #121420; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 8px; }
-
-        .historico-caixa { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; height: 70px; overflow-y: auto; font-size: 12px; }
-        #bannerSazonal { display: none; background: var(--primaria); color: #121420; width: 100%; text-align: center; padding: 6px; font-size: 12px; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-    <div id="bannerSazonal">🎉 EVENTO ESPECIAL DISPONÍVEL! 🎉</div>
-
-    <header>
-        <div class="header-controles">
-            <button class="btn-header" onclick="alternarModo()">🌓 Modo</button>
-            <button class="btn-header" id="btnSazonalToggle" style="display: none; background: #ffaa00; color: #000;" onclick="alternarSazonalidade()">🎉 Tema do Evento</button>
-        </div>
-        <div class="header-controles">
-            <button class="btn-header" id="btnAuthHeader" onclick="abrirModalAuth()">👤 Login / Cadastro</button>
-            <button class="btn-header btn-logout" id="btnLogoutHeader" style="display: none;" onclick="executarLogout()">供 Sair</button>
-        </div>
-    </header>
-
-    <main class="dashboard">
-        <section class="area-roleta">
-            <div class="cronometro-wrapper">
-                <div class="cronometro-container" id="cronometro">00:30</div>
-                <div class="cronometro-controles">
-                    <label>Tempo (s): <input type="number" id="tempoInput" value="30" min="5" max="300" onchange="atualizarDisplayTempo()"></label>
-                    <label><input type="checkbox" id="ativarTempo" checked> Ativo</label>
-                </div>
-            </div>
-
-            <div class="giros-contador">Giros: <input type="number" id="girosInput" value="5"></div>
-
-            <div class="roleta-wrapper">
-                <div class="marcador-topo"></div>
-                <canvas id="roletaCanvas" width="500" height="500"></canvas>
-                <button class="btn-centro-girar" onclick="girarRoleta()">Girar</button>
-            </div>
-
-            <div class="painel-validacao" id="painelValidacao">
-                <div class="desafio-atual-texto" id="desafioAtualTexto" style="font-weight: bold; margin-bottom: 10px;"></div>
-                <div class="input-add-grupo">
-                    <button class="btn-validar sucesso" onclick="validarResultado(true)">Cumpriu 👍</button>
-                    <button class="btn-validar falha" onclick="validarResultado(false)">Não Cumpriu 👎</button>
-                </div>
-            </div>
-
-            <div class="card" style="width:100%; max-width:500px;"><div class="historico-caixa" id="historico">Painel iniciado.</div></div>
-        </section>
-
-        <section class="secao-configuracoes">
-            <div class="card">
-                <div class="card-titulo">👥 Jogadores da Sala</div>
-                
-                <div id="perfilLogadoBox" class="perfil-mini-box" style="display: none;" onclick="abrirModalEdicaoPerfil()">
-                    <div class="perfil-topo">
-                        <div class="perfil-avatar" id="perfAvatar">👑</div>
-                        <div class="perfil-meta">
-                            <span class="perfil-nome" id="perfNome">Dono</span>
-                            <span class="perfil-id" id="perfID">#0000000</span>
-                            <span class="perfil-nivel-tag" id="perfNivel">Nível 1</span>
-                        </div>
-                    </div>
-                    <div class="xp-wrapper" style="margin-top: 8px;">
-                        <div style="display:flex; justify-content:space-between; font-size: 11px;"><span id="perfXpTexto">XP: 0/50</span><span id="perfXpLimite">0/25 XP Diário</span></div>
-                        <div class="xp-barra-fundo"><div class="xp-barra-progresso" id="perfBarraProgresso"></div></div>
-                    </div>
-                </div>
-
-                <div class="input-add-grupo">
-                    <button class="btn-acao" id="btnCriarSala" style="background:#ffaa00; display:none; width:100%;" onclick="criarSalaOnline()">🌐 Criar Sala Online (Líder)</button>
-                </div>
-
-                <div class="input-add-grupo">
-                    <input type="text" id="nome-jogador" placeholder="Convidado Local...">
-                    <select id="emoji-jogador" style="width:75px;">
-                        <option value="🤍">🤍</option><option value="👑">👑</option><option value="⚔️">⚔️</option><option value="🔥">🔥</option>
-                        <option value="💀">💀</option><option value="👻">👻</option><option value="😎">😎</option><option value="👽">👽</option>
-                        <option value="🤖">🤖</option><option value="🎃">🎃</option><option value="🍀">🍀</option><option value="💎">💎</option>
-                        <option value="🦊">🦊</option><option value="🦁">🦁</option><option value="🦄">🦄</option><option value="🍕">🍕</option>
-                        <option value="🎮">🎮</option><option value="🚀">🚀</option><option value="✨">✨</option><option value="🎯">🎯</option>
-                    </select>
-                    <button class="btn-acao" onclick="adicionarJogador()">+ Add</button>
-                </div>
-
-                <div class="input-add-grupo">
-                    <input type="text" id="codigoConviteInput" placeholder="Código Convite Sala (6 dígitos)" maxlength="6">
-                    <button class="btn-acao" style="background:#4facfe;" onclick="entrarPorCodigo()">Entrar</button>
-                </div>
-
-                <div class="lista-jogadores" id="listaJogadoresContainer"></div>
-            </div>
-
-            <div class="card">
-                <div class="card-titulo">🎨 Customização & Fatias</div>
-                <div class="grid-cores">
-                    <div class="cor-seletor-bloco"><span>Fácil 🟢</span>
-                        <select id="corFundoFacil" onchange="atualizarCoresCustomizadas()"><option value="#00f2fe">Ciano</option><option value="#ffffff">Branco</option><option value="#2ecc71">Verde</option></select>
-                    </div>
-                    <div class="cor-seletor-bloco"><span>Médio 🟡</span>
-                        <select id="corFundoMedio" onchange="atualizarCoresCustomizadas()"><option value="#ffcc00">Amarelo</option><option value="#ffaa00">Laranja</option><option value="#3498db">Azul</option></select>
-                    </div>
-                    <div class="cor-seletor-bloco"><span>Difícil 🔴</span>
-                        <select id="corFundoDificil" onchange="atualizarCoresCustomizadas()"><option value="#ff2a5f">Vermelho</option><option value="#121420">Preto</option><option value="#9b59b6">Roxo</option></select>
-                    </div>
-                </div>
-                <div class="botoes-dificuldade">
-                    <button class="btn-dif ativo" id="filtro-facil" onclick="mudarFiltro('Fácil')">Fácil</button>
-                    <button class="btn-dif ativo" id="filtro-medio" onclick="mudarFiltro('Médio')">Médio</button>
-                    <button class="btn-dif ativo" id="filtro-dificil" onclick="mudarFiltro('Difícil')">Difícil</button>
-                </div>
-                <div class="input-add-grupo">
-                    <input type="text" id="texto-desafio" placeholder="Nova Missão...">
-                    <select id="dificuldade-desafio" style="width: 90px;"><option value="Fácil">Fácil</option><option value="Médio">Médio</option><option value="Difícil">Difícil</option></select>
-                    <button class="btn-acao" onclick="adicionarDesafio()">Add</button>
-                </div>
-                <div class="input-add-grupo"><select id="seletor-remover"></select><button class="btn-acao apagar" onclick="removerDesafio()">Apagar</button></div>
-                
-                <div id="secaoSalvarRoleta" style="display:none; border-top:1px solid var(--border-color); padding-top:10px;">
-                    <span style="font-size:12px; font-weight:bold; opacity:0.7;">💾 Salvar/Carregar Layout da Roleta</span>
-                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;" id="containerSlotsRoleta"></div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div class="modal-overlay" id="modalAuth">
-        <div class="modal-card">
-            <button class="modal-fechar" onclick="fecharModalAuth()">✕</button>
-            <div class="modal-abas">
-                <button class="modal-aba-btn ativa" id="abaLogin" onclick="mudarAbaAuth('login')">Login</button>
-                <button class="modal-aba-btn" id="abaCadastro" onclick="mudarAbaAuth('cadastro')">Cadastro</button>
-            </div>
-            <form id="formLogin" class="modal-form ativo" onsubmit="executarLogin(event)">
-                <input type="text" id="loginUser" placeholder="Usuário ou E-mail" required>
-                <input type="password" id="loginSenha" placeholder="Senha" required>
-                <button type="submit" class="modal-btn-submeter">Entrar</button>
-            </form>
-            <form id="formCadastro" class="modal-form" onsubmit="executarCadastro(event)">
-                <input type="text" id="cadNome" placeholder="Nome Completo" required>
-                <input type="text" id="cadUser" placeholder="Username" required>
-                <input type="email" id="cadEmail" placeholder="E-mail" required>
-                <input type="password" id="cadSenha" placeholder="Senha (max 8 car.)" maxlength="8" required>
-                <button type="submit" class="modal-btn-submeter">Criar Conta e Jogar! 🚀</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modalEdicaoPerfil">
-        <div class="modal-card">
-            <button class="modal-fechar" onclick="fecharModalEdicaoPerfil()">✕</button>
-            <div class="modal-abas">
-                <button class="modal-aba-btn" id="abaA" onclick="mudarAbaPerfil('editar')">✏️ Perfil</button>
-                <button class="modal-aba-btn" id="abaB" onclick="mudarAbaPerfil('amigos')">👥 Amigos (<span id="lblQtdAmigos">0</span>/30)</button>
-            </div>
-
-            <div id="subPerfilEditar" class="modal-form">
-                <div class="input-add-grupo">
-                    <label style="font-size:12px; width:100px;">Emoji Avatar:</label>
-                    <select id="editEmoji" onchange="salvarEdicaoPerfil()">
-                        <option value="🤍">🤍</option><option value="👑">👑</option><option value="⚔️">⚔️</option><option value="🔥">🔥</option>
-                        <option value="💀">💀</option><option value="👻">👻</option><option value="😎">😎</option><option value="👽">👽</option>
-                        <option value="🤖">🤖</option><option value="🎃">🎃</option><option value="🍀">🍀</option><option value="💎">💎</option>
-                        <option value="🦊">🦊</option><option value="🦁">🦁</option><option value="🦄">🦄</option><option value="🍕">🍕</option>
-                        <option value="🎮">🎮</option><option value="🚀">🚀</option><option value="✨">✨</option><option value="🎯">🎯</option>
-                    </select>
-                </div>
-                <div class="input-add-grupo">
-                    <label style="font-size:12px; width:100px;">Fundo Avatar:</label>
-                    <select id="editFundoAvatar" onchange="salvarEdicaoPerfil()"><option value="#4facfe">Azul</option><option value="#ff2a5f">Rosa</option><option value="#ffcc00">Amarelo</option><option value="#b800ff">Roxo</option></select>
-                </div>
-                <div style="margin-top:10px;">
-                    <span style="font-size:12px; font-weight:bold; opacity:0.7;">🎨 Escolha o Fundo da Página</span>
-                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:5px;" id="editTemasItens"></div>
-                </div>
-                <div style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; text-align:center;">
-                    <span style="font-size:11px; opacity:0.6;">Código Online da sua Sala:</span>
-                    <div id="lblCodigoSala" style="font-weight:bold; font-size:18px; color:var(--primaria);">------</div>
-                </div>
-            </div>
-
-            <div id="subPerfilAmigos" class="modal-form">
-                <span style="font-size:12px; font-weight:bold;">🔍 Buscar por ID ou Username</span>
-                <div class="input-add-grupo">
-                    <input type="text" id="txtBuscaAmigo" placeholder="Ex: #1234567 or username...">
-                    <button class="btn-acao" onclick="buscarEAdicionarAmigo()">Adicionar</button>
-                </div>
-                <div id="listaAmigosBox" style="display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; margin-top:10px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modalTutorial" style="display:none;">
-        <div class="modal-card" style="text-align:center;">
-            <button class="modal-fechar" onclick="fecharTutorial()">✕</button>
-            <h2 style="color:var(--primaria); margin-bottom:10px;">✨ Bem-vindo à Roleta Pro!</h2>
-            <p style="font-size:14px; line-height:1.5; margin-bottom:15px; opacity:0.9;">
-                Gire a roleta, ganhe pontos e suba de nível para desbloquear fundos degradê incríveis e novos slots de salvamento. Crie sua conta para salvar seu progresso automático!
-            </p>
-            <button class="modal-btn-submeter" style="width:100%;" onclick="fecharTutorial()">Vamos Começar! 🚀</button>
-        </div>
-    </div>
-
     <script>
         let jogadoresLocais = [];
         let jugadorAtualIndex = 0;
@@ -382,7 +43,6 @@
             atualizarDisplayTempo();
         });
 
-        // Garante que contas antigas ou sem propriedades ganhem os dados padrões corretos
         function sanitizarContaFaltante(userObj) {
             let alterou = false;
             if(!userObj.id) { userObj.id = "#" + Math.floor(1000000 + Math.random() * 9000000).toString(); alterou = true; }
@@ -428,7 +88,6 @@
 
         function fecharTutorial() { document.getElementById('modalTutorial').style.display = 'none'; }
 
-        // --- CONTAS ---
         function obterContas() { return JSON.parse(localStorage.getItem('roleta_contas')) || []; }
         function salvarUsuarioNoBanco(userObj) {
             let contas = obterContas();
@@ -492,7 +151,7 @@
             atualizarJogadores();
         }
 
-        function ejecutarLogout() {
+        function executarLogout() {
             usuarioLogado = null;
             localStorage.removeItem('roleta_logado');
             document.body.removeAttribute('data-theme');
@@ -537,7 +196,6 @@
             }
         }
 
-        // --- ABAS & AMIGOS ---
         function abrirModalEdicaoPerfil() { if(!usuarioLogado) return; mudarAbaPerfil('editar'); document.getElementById('modalEdicaoPerfil').style.display = 'flex'; }
         function fecharModalEdicaoPerfil() { document.getElementById('modalEdicaoPerfil').style.display = 'none'; }
         
@@ -590,16 +248,18 @@
             if(usuarioLogado.amigos.length >= 30) { alert("Limite de 30 amigos alcançado!"); return; }
 
             let contas = obterContas();
-            let encontrado = contas.find(c => c.user === busca.toLowerCase() || c.id === busca);
+            // Correção da busca: aceita com ou sem a hashtag '#' no ID
+            let encontrado = contas.find(c => c.user === busca.toLowerCase() || c.id === busca || c.id === "#" + busca);
 
-            if(!encontrado) { alert("Não localizado!"); return; }
+            if(!encontrado) { alert("Usuário ou ID não localizado no banco de dados local!"); return; }
             if(encontrado.user === usuarioLogado.user) { alert("Não pode adicionar você mesmo!"); return; }
-            if(usuarioLogado.amigos.some(a => a.user === encontrado.user)) { alert("Já adicionado!"); return; }
+            if(usuarioLogado.amigos.some(a => a.user === encontrado.user)) { alert("Este amigo já está na sua lista!"); return; }
 
             usuarioLogado.amigos.push({ nome: encontrado.nome, user: encontrado.user, id: encontrado.id, emoji: encontrado.emoji });
             salvarUsuarioNoBanco(usuarioLogado);
             document.getElementById('txtBuscaAmigo').value = '';
             atualizarListaAmigos();
+            alert("Amigo adicionado com sucesso!");
         }
 
         function atualizarListaAmigos() {
@@ -618,7 +278,6 @@
 
         function removerAmigo(user) { usuarioLogado.amigos = usuarioLogado.amigos.filter(a => a.user !== user); salvarUsuarioNoBanco(usuarioLogado); atualizarListaAmigos(); }
 
-        // --- SISTEMA DE SLOTS (2 GRATUITOS INCLUÍDOS) ---
         function renderizarSlotsRoleta() {
             let container = document.getElementById('containerSlotsRoleta');
             container.innerHTML = '';
@@ -658,16 +317,37 @@
             }
         }
 
-        // --- ENGENHARIA DA SALA ---
         function criarSalaOnline() { salaOnlineCriada = true; atualizarJogadores(); alert(`Sala Online Ativa! Código: ${usuarioLogado.codigoSala}`); }
+        
         function entrarPorCodigo() {
             let cod = document.getElementById('codigoConviteInput').value.trim();
-            if(cod.length !== 6) return;
+            if(cod.length !== 6) { alert("O código precisa ter exatamente 6 dígitos."); return; }
+            
             let sala = obterContas().find(c => c.codigoSala === cod);
-            if(!sala) { alert("Não achou!"); return; }
+            if(!sala) { alert("Sala não localizada! Certifique-se de que o líder criou a conta neste navegador."); return; }
+            
+            // Impede entrar na própria sala
+            if(usuarioLogado && sala.user === usuarioLogado.user) { alert("Você já é o dono desta sala!"); return; }
+            
+            // Impede duplicar o mesmo jogador na lista
+            if(jogadoresLocais.some(j => j.nome === sala.nome)) { alert("Este jogador já está na sala!"); return; }
+
             jogadoresLocais.push({ nome: sala.nome, avatar: sala.emoji, bg: sala.fundoAvatar, pontos: 0 });
             localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
             document.getElementById('codigoConviteInput').value = '';
+            atualizarJogadores();
+            alert(`Você entrou na sala de ${sala.nome}!`);
+        }
+
+        function removerJogadorLocal(index) {
+            // Remove o jogador com base no índice da array local
+            jogadoresLocais.splice(index, 1);
+            localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
+            
+            // Reajusta o ponteiro do turno para não quebrar o jogo
+            if (jugadorAtualIndex >= obterListaTotalJogadores().length) {
+                jugadorAtualIndex = 0;
+            }
             atualizarJogadores();
         }
 
@@ -675,9 +355,11 @@
             let lista = [];
             if(usuarioLogado) {
                 let sufixo = salaOnlineCriada ? " 👑 (Líder)" : " (Você)";
-                lista.push({ nome: usuarioLogado.nome + sufixo, avatar: usuarioLogado.emoji, bg: usuarioLogado.fundoAvatar, pontos: usuarioLogado.pontos || 0, lider: salaOnlineCriada });
+                lista.push({ nome: usuarioLogado.nome + sufixo, avatar: usuarioLogado.emoji, bg: usuarioLogado.fundoAvatar, pontos: usuarioLogado.pontos || 0, lider: salaOnlineCriada, principal: true });
             }
-            jogadoresLocais.forEach(j => lista.push(j));
+            jogadoresLocais.forEach((j, idx) => {
+                lista.push({ ...j, indexLocal: idx, principal: false });
+            });
             return lista;
         }
 
@@ -685,13 +367,26 @@
             let container = document.getElementById('listaJogadoresContainer');
             container.innerHTML = '';
             let listaCompleta = obterListaTotalJogadores();
+            
             listaCompleta.forEach((j, idx) => {
                 let ativo = idx === jugadorAtualIndex ? 'ativo' : '';
                 let liderCls = j.lider ? 'lider' : '';
+                
+                // Criação dinâmica do botão de remover apenas para convidados
+                let botaoRemover = !j.principal 
+                    ? `<button onclick="removerJogadorLocal(${j.indexLocal})" style="background: rgba(255,42,95,0.2); border: 1px solid #ff2a5f; color: #ff2a5f; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 10px;">✕</button>` 
+                    : '';
+
                 container.innerHTML += `
                     <div class="jogador-item ${ativo} ${liderCls}">
                         <div class="avatar-preview" style="background:${j.bg || 'rgba(255,255,255,0.1)'}">${j.avatar}</div>
-                        <div class="jogador-info"><span>${j.nome}</span><span><strong>${j.pontos || 0} pts</strong></span></div>
+                        <div class="jogador-info">
+                            <span>${j.nome}</span>
+                            <div style="display: flex; align-items: center;">
+                                <span><strong>${j.pontos || 0} pts</strong></span>
+                                ${botaoRemover}
+                            </div>
+                        </div>
                     </div>`;
             });
         }
@@ -703,7 +398,6 @@
             atualizarJogadores();
         }
 
-        // --- SISTEMA INTERNO DA ROLETA & CANVASES ---
         function obterDesafiosFiltrados() { return desafios.filter(d => filtrosAtivos[d.dif]); }
 
         document.getElementById('girosInput').addEventListener('input', function() {
@@ -845,5 +539,3 @@
         function atualizarSeletores() { let s = document.getElementById('seletor-remover'); s.innerHTML=''; desafios.forEach((d,i)=>s.innerHTML+=`<option value="${i}">${d.texto}</option>`); }
         function removerDesafio() { desafios.splice(document.getElementById('seletor-remover').value,1); atualizarSeletores(); desenharRoleta(); }
     </script>
-</body>
-</html>
