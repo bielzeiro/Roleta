@@ -56,8 +56,9 @@
             --roleta-fundo-1: #2d240a; --roleta-fundo-2: #423511; --roleta-texto: #d4af37; --roleta-borda: #d4af37;
         }
 
-        [data-sazonal="true"][data-event="sao-joao"] { --roleta-fundo-1: #361700; --roleta-fundo-2: #5c2900; --roleta-texto: #ffaa00; --roleta-borda: #ffaa00; }
-        [data-sazonal="true"][data-event="ano-novo"] { --roleta-fundo-1: #1c1a17; --roleta-fundo-2: #2d2924; --roleta-texto: #d4af37; --roleta-borda: #d4af37; }
+        /* SAZONALIDADE DESATIVADA TEMPORARIAMENTE NO CSS */
+        /* [data-sazonal="true"][data-event="sao-joao"] { --roleta-fundo-1: #361700; --roleta-fundo-2: #5c2900; --roleta-texto: #ffaa00; --roleta-borda: #ffaa00; } */
+        /* [data-sazonal="true"][data-event="ano-novo"] { --roleta-fundo-1: #1c1a17; --roleta-fundo-2: #2d2924; --roleta-texto: #d4af37; --roleta-borda: #d4af37; } */
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; }
         body { background: var(--bg-principal); color: var(--texto); min-height: 100vh; display: flex; flex-direction: column; }
@@ -71,13 +72,14 @@
         .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; }
         .area-roleta { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
-        .cronometro-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--bg-painel); padding: 15px 30px; border-radius: 20px; border: 1px solid var(--border-color); min-width: 200px; text-align: center; }
-        .cronometro-container { font-size: 36px; font-weight: 800; color: var(--primaria); font-family: monospace; letter-spacing: 1px; }
+        /* Modificado para integrar dentro da caixa unificada */
+        .cronometro-caixa-interna { font-size: 42px; font-weight: 800; color: var(--primaria); font-family: monospace; letter-spacing: 1px; text-align: center; margin: 5px 0; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 5px; border: 1px solid var(--border-color); }
 
-        .painel-controle-partida { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 12px; }
-        .controle-linha { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; }
-        .controle-linha label { display: flex; align-items: center; gap: 6px; }
+        .painel-controle-partida { background: var(--bg-painel); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .controle-linha { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap; }
+        .controle-linha label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .controle-linha input[type="number"] { width: 60px; padding: 4px; text-align: center; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--texto); border-radius: 6px; }
+        .controle-linha select { width: auto; padding: 4px 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--texto); border-radius: 6px; }
 
         .roleta-wrapper { position: relative; width: 100%; max-width: 380px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
         .marcador-topo { position: absolute; top: -10px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid var(--botao-girar); z-index: 10; }
@@ -149,7 +151,7 @@
     <header>
         <div class="header-controles">
             <button class="btn-header" onclick="alternarModo()">🌓 Modo Base</button>
-            <button class="btn-header" id="btnSazonalToggle" style="display: none; background: #ffaa00; color: #000;" onclick="alternarSazonalidade()">🎉 Tema do Evento</button>
+            <button class="btn-header" id="btnSazonalToggle" style="display: none !important; background: #ffaa00; color: #000;" onclick="alternarSazonalidade()">🎉 Tema do Evento</button>
         </div>
         <div class="header-controles">
             <button class="btn-header" id="btnAuthHeader" onclick="abrirModalAuth()">👤 Login / Cadastro</button>
@@ -159,17 +161,26 @@
 
     <main class="dashboard">
         <section class="area-roleta">
-            <div class="cronometro-wrapper">
-                <div class="cronometro-container" id="cronometro">00:30</div>
-            </div>
 
             <div class="painel-controle-partida">
                 <div class="controle-linha">
                     <span style="font-weight: bold; color: var(--primaria);">⚙️ Painel de Controle de Partida</span>
                 </div>
+                
+                <div class="cronometro-caixa-interna" id="cronometro">00:30</div>
+
                 <div class="controle-linha">
                     <label>Tempo (s): <input type="number" id="tempoInput" value="30" min="5" max="300" onchange="atualizarDisplayTempo()"></label>
-                    <label><input type="checkbox" id="ativarTempo" checked> Contagem Ativa</label>
+                    <label><input type="checkbox" id="ativarTempo" checked onchange="toggleTemporizadorVisivel()"> Temporizador Ativo</label>
+                </div>
+                <div class="controle-linha">
+                    <label>Modo Tempo: 
+                        <select id="modoTempoSelect">
+                            <option value="automatico">Automático</option>
+                            <option value="manual">Manual</option>
+                        </select>
+                    </label>
+                    <label><input type="checkbox" id="mutarSomCheck"> Desativar Som</label>
                 </div>
                 <div class="controle-linha">
                     <label><input type="checkbox" id="autoGirarCheck"> Giro Automático contínuo</label>
@@ -363,7 +374,9 @@
             let jogSalvos = localStorage.getItem('roleta_jogadores_locais');
             if(jogSalvos) jogadoresLocais = JSON.parse(jogSalvos);
 
-            checarCalendarioSazonal();
+            // Sazonalidade temporariamente bypassada/desativada
+            // checarCalendarioSazonal();
+            
             atualizarInterfaceLogado();
             atualizarJogadores();
             atualizarSeletores();
@@ -385,21 +398,13 @@
         }
 
         function checarCalendarioSazonal() {
-            const agora = new Date(); const dia = agora.getDate(); const mes = agora.getMonth() + 1;
-            if (mes === 6 && dia >= 1) eventoAtivoChave = "sao-joao";
-            else if (mes === 12 || (mes === 1 && dia <= 5)) eventoAtivoChave = "ano-novo";
-            if (eventoAtivoChave) { 
-                document.getElementById('bannerSazonal').style.display = "block"; 
-                document.getElementById('btnSazonalToggle').style.display = "block"; 
-            }
+            // Desativado a pedido
+            return;
         }
 
         function alternarSazonalidade() {
-            let el = document.documentElement;
-            let ativo = el.getAttribute('data-sazonal') === 'true';
-            if(ativo) { el.removeAttribute('data-sazonal'); el.removeAttribute('data-event'); } 
-            else { el.setAttribute('data-sazonal', 'true'); el.setAttribute('data-event', eventoAtivoChave); }
-            desenharRoleta();
+            // Desativado temporariamente
+            return;
         }
 
         function alternarModo() {
@@ -667,6 +672,11 @@
             let voltas = 6 + Math.floor(Math.random() * 5); let graus = Math.floor(Math.random() * 360);
             anguloAtual += (voltas * 360) + graus; canvas.style.transform = `rotate(${anguloAtual}deg)`;
 
+            // Executa som se não estiver mutado
+            if(!document.getElementById('mutarSomCheck').checked){
+                console.log("Efeito Sonoro: Roleta girando...");
+            }
+
             setTimeout(() => {
                 estaGirando = false;
                 let grFin = (360 - (anguloAtual % 360) + 270) % 360;
@@ -684,7 +694,17 @@
                 let ptsValor = desafioSorteadoGlobal.dif === 'Fácil' ? 5 : desafioSorteadoGlobal.dif === 'Médio' ? 10 : 20;
                 document.getElementById('desafioAtualTexto').innerText = `Missão: "${desafioSorteadoGlobal.texto}" valendo ${ptsValor} Pontos!`;
                 document.getElementById('painelValidacao').style.display = 'flex';
-                if(document.getElementById('ativarTempo').checked) iniciarCronometroRegressivo();
+                
+                // Só roda se o temporizador estiver marcado como ativo
+                if(document.getElementById('ativarTempo').checked) {
+                    let modo = document.getElementById('modoTempoSelect').value;
+                    if (modo === 'automatico') {
+                        iniciarCronometroRegressivo();
+                    } else {
+                        // Modo Manual: Apenas exibe o tempo definido sem decrescer sozinho
+                        atualizarDisplayTempo();
+                    }
+                }
             }, 3500);
         }
 
@@ -695,11 +715,29 @@
                 tempoRestante--;
                 if(tempoRestante <= 0) {
                     clearInterval(cronometroInterval); document.getElementById('cronometro').innerText = "00:00";
+                    
+                    if(!document.getElementById('mutarSomCheck').checked) {
+                        console.log("Efeito Sonoro: Tempo esgotado!");
+                    }
+
                     if(document.getElementById('autoGirarCheck').checked) setTimeout(() => validarResultado(false), 1500);
                 } else { document.getElementById('cronometro').innerText = formatarTempo(tempoRestante); }
             }, 1000);
         }
+        
         function formatarTempo(s) { let min = Math.floor(s/60); let seg = s%60; return `${min<10?'0'+min:min}:${seg<10?'0'+seg:seg}`; }
+
+        function toggleTemporizadorVisivel() {
+            let ativo = document.getElementById('ativarTempo').checked;
+            let cronoEl = document.getElementById('cronometro');
+            if(!ativo) {
+                clearInterval(cronometroInterval);
+                cronoEl.style.opacity = "0.3";
+            } else {
+                cronoEl.style.opacity = "1";
+                atualizarDisplayTempo();
+            }
+        }
 
         function validarResultado(cumpriu) {
             clearInterval(cronometroInterval); document.getElementById('painelValidacao').style.display = 'none';
