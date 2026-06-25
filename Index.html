@@ -105,6 +105,10 @@
         .jogador-item { display: flex; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 10px; border: 1px solid transparent; }
         .jogador-item.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.1); }
         .jogador-item.lider { border-left: 4px solid #ffaa00; }
+        
+        /* Avatar Preview CSS restaurado para evitar quebras visuais */
+        .avatar-preview { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .jogador-info { display: flex; justify-content: space-between; width: 100%; font-size: 13px; align-items: center; }
 
         .item-badge { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 5px; }
         .item-badge.bloqueado { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
@@ -131,6 +135,8 @@
         .modal-aba-btn.ativa { opacity: 1; color: var(--primaria); border-bottom: 2px solid var(--primaria); }
         .modal-form { display: none; flex-direction: column; gap: 12px; }
         .modal-form.ativo { display: flex; }
+        
+        .modal-btn-submeter { background: var(--primaria); color: #121420; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 8px; }
 
         .historico-caixa { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; height: 70px; overflow-y: auto; font-size: 12px; }
         #bannerSazonal { display: none; background: var(--primaria); color: #121420; width: 100%; text-align: center; padding: 6px; font-size: 12px; font-weight: bold; }
@@ -290,7 +296,11 @@
                 <div class="input-add-grupo">
                     <label style="font-size:12px; width:100px;">Emoji Avatar:</label>
                     <select id="editEmoji" onchange="salvarEdicaoPerfil()">
-                        <option value="👑">👑</option><option value="⚡">⚡</option><option value="💎">💎</option><option value="🦊">🦊</option><option value="👽">👽</option>
+                        <option value="🤍">🤍</option><option value="👑">👑</option><option value="⚔️">⚔️</option><option value="🔥">🔥</option>
+                        <option value="💀">💀</option><option value="👻">👻</option><option value="😎">😎</option><option value="👽">👽</option>
+                        <option value="🤖">🤖</option><option value="🎃">🎃</option><option value="🍀">🍀</option><option value="💎">💎</option>
+                        <option value="🦊">🦊</option><option value="🦁">🦁</option><option value="🦄">🦄</option><option value="🍕">🍕</option>
+                        <option value="🎮">🎮</option><option value="🚀">🚀</option><option value="✨">✨</option><option value="🎯">🎯</option>
                     </select>
                 </div>
                 <div class="input-add-grupo">
@@ -651,7 +661,7 @@
             let lista = [];
             if(usuarioLogado) {
                 let sufixo = salaOnlineCriada ? " 👑 (Líder)" : " (Você)";
-                lista.push({ nome: usuarioLogado.nome + sufixo, avatar: usuarioLogado.emoji, bg: usuarioLogado.fundoAvatar, pontos: 0, lider: salaOnlineCriada });
+                lista.push({ nome: usuarioLogado.nome + sufixo, avatar: usuarioLogado.emoji, bg: usuarioLogado.fundoAvatar, pontos: usuarioLogado.pontos || 0, lider: salaOnlineCriada });
             }
             jogadoresLocais.forEach(j => lista.push(j));
             return lista;
@@ -689,7 +699,7 @@
 
             let tamAng = (2 * Math.PI) / lista.length;
             
-            // Puxa as cores corretas setadas nas variáveis do root
+            // Lendo dinamicamente as variáveis do documentElement para atualizar as fatias
             let rStyle = getComputedStyle(document.documentElement);
 
             lista.forEach((d, i) => {
@@ -698,7 +708,7 @@
                 else if(d.dif === 'Médio') bg = rStyle.getPropertyValue('--cor-medio').trim() || "#ffcc00";
                 else bg = rStyle.getPropertyValue('--cor-dificil').trim() || "#ff2a5f";
 
-                let txtColor = (d.dif === 'Difícil' && bg === '#121420') ? '#ffffff' : '#121420';
+                let txtColor = (d.dif === 'Difícil' && (bg === '#121420' || bg.toLowerCase() === 'preto')) ? '#ffffff' : '#121420';
 
                 ctx.beginPath(); ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, i * tamAng, (i + 1) * tamAng);
@@ -715,7 +725,7 @@
             let lista = obterDesafiosFiltrados(); if(lista.length === 0) return;
             estaGirando = true;
             
-            clearInterval(cronometroInterval); // Trava contador se estiver rodando
+            clearInterval(cronometroInterval); 
 
             let voltas = 6 + Math.floor(Math.random() * 5); let graus = Math.floor(Math.random() * 360);
             anguloAtual += (voltas * 360) + graus;
@@ -738,14 +748,20 @@
                 document.getElementById('desafioAtualTexto').innerText = `Missão: "${desafioSorteado.texto}" [${desafioSorteado.dif}]`;
                 document.getElementById('painelValidacao').style.display = 'flex';
                 
-                // Dispara o cronômetro assim que o desafio cai na tela
                 if(document.getElementById('ativarTempo').checked) iniciarCronometroRegressivo();
             }, 3500);
         }
 
         function iniciarCronometroRegressivo() {
             let tempoRestante = parseInt(document.getElementById('tempoInput').value) || 30;
-            document.getElementById('cronometro').innerText = `00:${tempoRestante < 10 ? '0' + tempoRestante : tempoRestante}`;
+            
+            function formatarTempo(s) {
+                let min = Math.floor(s / 60);
+                let seg = s % 60;
+                return `${min < 10 ? '0'+min : min}:${seg < 10 ? '0'+seg : seg}`;
+            }
+
+            document.getElementById('cronometro').innerText = formatarTempo(tempoRestante);
             
             cronometroInterval = setInterval(() => {
                 tempoRestante--;
@@ -754,7 +770,7 @@
                     document.getElementById('cronometro').innerText = "00:00";
                     document.getElementById('historico').innerText = "💥 O tempo acabou para o desafio atual!";
                 } else {
-                    document.getElementById('cronometro').innerText = `00:${tempoRestante < 10 ? '0' + tempoRestante : tempoRestante}`;
+                    document.getElementById('cronometro').innerText = formatarTempo(tempoRestante);
                 }
             }, 1000);
         }
@@ -765,15 +781,34 @@
             let listaCompleta = obterListaTotalJogadores();
             if(listaCompleta.length > 0) {
                 let j = listaCompleta[jugadorAtualIndex];
-                if(cumpriu) j.pontos = (j.pontos || 0) + 10;
+                
+                // Trata a pontuação local ou na conta global logada
+                if(cumpriu) {
+                    if (usuarioLogado && jugadorAtualIndex === 0) {
+                        usuarioLogado.pontos = (usuarioLogado.pontos || 0) + 10;
+                        salvarUsuarioNoBanco(usuarioLogado);
+                    } else {
+                        let idxLocal = usuarioLogado ? jugadorAtualIndex - 1 : jugadorAtualIndex;
+                        if(jogadoresLocais[idxLocal]) jogadoresLocais[idxLocal].pontos = (jogadoresLocais[idxLocal].pontos || 0) + 10;
+                    }
+                }
+
                 document.getElementById('historico').innerText = cumpriu ? `${j.nome} completou e ganhou 10 pts!` : `${j.nome} não cumpriu.`;
                 jugadorAtualIndex = (jugadorAtualIndex + 1) % listaCompleta.length;
+                
+                localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
                 atualizarJogadores();
                 atualizarDisplayTempo();
             }
         }
 
-        function atualizarDisplayTempo() { let t = document.getElementById('tempoInput').value; document.getElementById('cronometro').innerText = `00:${t < 10 ? '0'+t : t}`; }
+        function atualizarDisplayTempo() { 
+            let t = parseInt(document.getElementById('tempoInput').value) || 30; 
+            let min = Math.floor(t / 60);
+            let seg = t % 60;
+            document.getElementById('cronometro').innerText = `${min < 10 ? '0'+min : min}:${seg < 10 ? '0'+seg : seg}`; 
+        }
+        
         function mudarFiltro(d) { filtrosAtivos[d] = !filtrosAtivos[d]; document.getElementById(`filtro-${d.toLowerCase()}`).classList.toggle('ativo', filtrosAtivos[d]); desenharRoleta(); }
         
         function atualizarCoresCustomizadas() {
