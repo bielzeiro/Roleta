@@ -70,6 +70,27 @@
         .titulo-roleta { font-size: 42px; font-weight: bold; font-family: 'Georgia', serif; background: linear-gradient(135deg, #a855f7, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; drop-shadow: 0 2px 10px rgba(168, 85, 247, 0.3); margin-bottom: 5px; }
         .subtitulo-sazonal { font-size: 20px; font-weight: bold; font-family: 'Segoe UI', sans-serif; }
 
+        /* Animação Degradê Movimento de Junho LGBT */
+        .titulo-lgbt-movimento {
+            font-size: 42px; font-weight: bold; font-family: 'Georgia', serif;
+            background: linear-gradient(90deg, #E40303, #FF8C00, #FFED00, #008026, #004CFF, #732982);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradienteMovimento 8s ease infinite;
+        }
+        @keyframes gradienteMovimento {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Emoji central gigante para o orgulho */
+        .emoji-central-bg-lgbt {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 25vw; opacity: 0.15; pointer-events: none; z-index: 0; display: none;
+        }
+
         .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; position: relative; z-index: 10; }
         .area-roleta { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
@@ -148,6 +169,11 @@
         .btn-sazonal-flutuante { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border-color); font-size: 28px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 90; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
         .btn-sazonal-flutuante:hover { transform: translateY(-50%) scale(1.1); }
 
+        /* Container do Menu Multi-Eventos de Junho */
+        .menu-junho-container { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: none; flex-direction: column; gap: 10px; z-index: 90; }
+        .btn-junho-opcao { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .btn-junho-opcao:hover { transform: scale(1.1); }
+
         /* Animação de Queda Diagonal de Emojis */
         .emoji-sazonal-bg { position: fixed; top: -50px; font-size: 24px; pointer-events: none; opacity: 0.75; z-index: 1; animation: quedaDiagonal 6s linear infinite; }
         @keyframes quedaDiagonal {
@@ -162,8 +188,15 @@
 <body>
 
     <div id="containerEmojisSazonais"></div>
+    <div class="emoji-central-bg-lgbt" id="emojiLgbtCentral">🏳️‍🌈</div>
 
     <button id="btnSazonalFlutuante" class="btn-sazonal-flutuante" onclick="ativarCliqueSazonal()"></button>
+
+    <div class="menu-junho-container" id="menuJunhoCont">
+        <button class="btn-junho-opcao" style="background: linear-gradient(45deg, #ff004c, #7900ff);" title="Mês do Orgulho" onclick="forcarSubEventoJunho('jun_orgulho')">🌈</button>
+        <button class="btn-junho-opcao" style="background: #ffc2c7;" title="Dia dos Namorados" onclick="forcarSubEventoJunho('jun_namorados')">🏹</button>
+        <button class="btn-junho-opcao" style="background: #de0f3f;" title="São João" onclick="forcarSubEventoJunho('jun_saojoao')">🔥</button>
+    </div>
 
     <header>
         <div class="header-controles">
@@ -191,10 +224,15 @@
                         <option value="jan_1_15">Jan (1-15) - Ano Novo</option>
                         <option value="jan_16_31">Jan (16-31) - Festival de Fogos</option>
                         <option value="fev_1_15">Fev (1-15) - Escolar</option>
-                        <option value="fev_16_29">Fev (16-29) - Padrão</option>
                         <option value="mar_1_5">Mar (1-5) - Carnaval</option>
                         <option value="mar_6_15">Mar (6-15) - Dia da Mulher</option>
                         <option value="abr_1_30">Abr (1-30) - Páscoa</option>
+                        <option value="maio_1_20">Maio (1-20) - Dia das Mães 🌹</option>
+                        <option value="jun_orgulho">Junho (1-30) - Orgulho LGBT 🌈</option>
+                        <option value="jun_namorados">Junho (1-15) - Namorados 🏹</option>
+                        <option value="jun_saojoao">Junho (16-30) - São João 🔥</option>
+                        <option value="julho_padrao">Julho (1-31) - Padrão Normal 🏖️</option>
+                        <option value="agosto_pais">Agosto (1-15) - Dia dos Pais 👔</option>
                     </select>
                 </label>
             </div>
@@ -405,6 +443,7 @@
         let desafioSorteadoGlobal = null;
         let eventoForcadoChave = "";
         let idIntervalAnimacaoSazonal = null;
+        let subEventoJunhoForcado = "";
 
         let desafios = [
             { texto: "Equilibrar num pé só", dif: "Fácil" },
@@ -419,72 +458,21 @@
 
         const emojisNovasContas = ["A҉","B҉","c҉","D҉","E҉","F҉","G҉","H҉","I҉","J҉","K҉","L҉","M҉","N҉","O҉","P҉","Q҉","R҉","S҉","T҉","U҉","V҉","W҉","X҉","Y҉","Z҉"];
 
-        // Configurações completas e mapeadas dos novos Eventos Sazonais
+        // Configurações completas e mapeadas dos Eventos Sazonais (Blocos 1 e 2)
         const configuracoesSazonais = {
-            jan_1_15: {
-                subtitulo: "Feliz ano novo",
-                subtituloGrad: "#fad430",
-                fatia: "#fad430",
-                borda: "#e18b22",
-                letras: "#953f10",
-                bg: "#FFFFFF",
-                emojis: ["🍾", "🥂"],
-                botaoEmoji: "✨",
-                acaoBotao: () => {}
-            },
-            jan_16_31: {
-                subtitulo: "",
-                fatia: "#fc0000",
-                borda: "#f9e830",
-                letras: "#000000",
-                bg: "#7a0000",
-                emojis: ["🏮", "🧧"],
-                botaoEmoji: "🪭",
-                acaoBotao: () => {}
-            },
-            fev_1_15: {
-                subtitulo: "",
-                fatia: "#00167a",
-                borda: "#70cbff",
-                letras: "#FFFFFF",
-                bg: "#FFFFFF",
-                emojis: ["📖", "✏️"],
-                botaoEmoji: "🎒",
-                acaoBotao: () => {}
-            },
-            mar_1_5: {
-                subtitulo: "",
-                letrasTituloEspeciais: true, // Aciona coloração letra por letra em Roleta
-                fatia: "#ECE14A",
-                borda: "#FB0106",
-                letras: "#000000",
-                bg: "#28E96C",
-                emojis: ["🎉", "🪁"],
-                botaoEmoji: "🥳",
-                acaoBotao: () => {}
-            },
-            mar_6_15: {
-                subtitulo: "",
-                tituloCor: "#FF1FA9",
-                fatia: "#ff1fa9",
-                borda: "#64007d",
-                letras: "#000000",
-                bg: "#f2caee",
-                emojis: ["👩🏾‍🦱", "👩🏻‍🦳"],
-                botaoEmoji: "👸🏼",
-                acaoBotao: () => {}
-            },
-            abr_1_30: {
-                subtitulo: "",
-                tituloCor: "#FFFFFF",
-                fatia: "#ff7df2",
-                borda: "#d9d9d9",
-                letras: "#000000",
-                bg: "#6492d8",
-                emojis: ["🐰", "🪺"],
-                botaoEmoji: "🕊️",
-                acaoBotao: () => { abrirModalPascoa(); }
-            }
+            jan_1_15: { subtitulo: "Feliz ano novo", fatia: "#fad430", borda: "#e18b22", letras: "#953f10", bg: "#FFFFFF", emojis: ["🍾", "🥂"], botaoEmoji: "✨" },
+            jan_16_31: { subtitulo: "", fatia: "#fc0000", borda: "#f9e830", letras: "#000000", bg: "#7a0000", emojis: ["🏮", "🧧"], botaoEmoji: "🪭" },
+            fev_1_15: { subtitulo: "", fatia: "#00167a", borda: "#70cbff", letras: "#FFFFFF", bg: "#FFFFFF", emojis: ["📖", "✏️"], botaoEmoji: "🎒" },
+            mar_1_5: { subtitulo: "", letrasTituloEspeciais: true, fatia: "#ECE14A", borda: "#FB0106", letras: "#000000", bg: "#28E96C", emojis: ["🎉", "🪁"], botaoEmoji: "🥳" },
+            mar_6_15: { subtitulo: "", tituloCor: "#FF1FA9", fatia: "#ff1fa9", borda: "#64007d", letras: "#000000", bg: "#f2caee", emojis: ["👩🏾‍🦱", "👩🏻‍🦳"], botaoEmoji: "👸🏼" },
+            abr_1_30: { subtitulo: "", tituloCor: "#FFFFFF", fatia: "#ff7df2", borda: "#d9d9d9", letras: "#000000", bg: "#6492d8", emojis: ["🐰", "🪺"], botaoEmoji: "🕊️", acaoBotao: () => { abrirModalPascoa(); } },
+            
+            // --- BLOCO 2 ADICIONADO ---
+            maio_1_20: { subtitulo: "Dia das Mães 👩‍👦", fatia: "#9e3dff", borda: "#aa8bb1", letras: "#000000", bg: "#cd51ec", emojis: ["👩‍👦", "👩‍👧"], botaoEmoji: "🌹" },
+            jun_orgulho: { subtitulo: "Mês do Orgulho 🏳️‍🌈", animarTituloLgbt: true, emojiCentralLgbt: true, fatia: "multi", borda: "#ffffff", letras: "#ffffff", bg: "linear-gradient(180deg, #1a0221, #021226)", emojis: ["❤️","🧡","💛","💚","💙","💜"], botaoEmoji: "🌈" },
+            jun_namorados: { subtitulo: "Dia dos Namorados ♾️", fatia: "#ff2768", borda: "#f88f8f", letras: "#FFFFFF", bg: "#ffc2c7", emojis: ["♾️", "💍"], botaoEmoji: "🏹" },
+            jun_saojoao: { subtitulo: "Festa de São João 🌽", fatia: "#fc4c00", borda: "#f7e135", letras: "#000000", bg: "#de0f3f", emojis: ["🫔", "🌽"], botaoEmoji: "🔥" },
+            agosto_pais: { subtitulo: "Dia dos Pais 👨‍👦", fatia: "#00063d", borda: "#bdc3ff", letras: "#FFFFFF", bg: "#341bca", emojis: ["👨‍👦", "👨‍👧"], botaoEmoji: "👔" }
         };
 
         window.addEventListener('load', () => {
@@ -517,11 +505,10 @@
             if(alterou) { salvarUsuarioNoBanco(userObj); }
         }
 
-        // Motor de Eventos Sazonais Síncrono e Adaptável
         function verificarEExecutarEventosSazonais() {
-            // Limpa instâncias de animações anteriores para não pesar
             clearInterval(idIntervalAnimacaoSazonal);
             document.getElementById('containerEmojisSazonais').innerHTML = "";
+            document.getElementById('emojiLgbtCentral').style.display = "none";
             
             let chaveEvento = "";
 
@@ -529,7 +516,7 @@
                 chaveEvento = eventoForcadoChave;
             } else {
                 let agora = new Date();
-                let mes = agora.getMonth() + 1; // Jan = 1, Fev = 2...
+                let mes = agora.getMonth() + 1;
                 let dia = agora.getDate();
 
                 if (mes === 1 && dia >= 1 && dia <= 15) chaveEvento = "jan_1_15";
@@ -538,50 +525,55 @@
                 else if (mes === 3 && dia >= 1 && dia <= 5) chaveEvento = "mar_1_5";
                 else if (mes === 3 && dia >= 6 && dia <= 15) chaveEvento = "mar_6_15";
                 else if (mes === 4 && dia >= 1 && dia <= 30) chaveEvento = "abr_1_30";
+                // Bloco 2 - Mapeamento Automático de Datas
+                else if (mes === 5 && dia >= 1 && dia <= 20) chaveEvento = "maio_1_20";
+                else if (mes === 6) {
+                    if (subEventoJunhoForcado !== "") {
+                        chaveEvento = subEventoJunhoForcado;
+                    } else {
+                        if (dia >= 1 && dia <= 15) chaveEvento = "jun_namorados";
+                        else if (dia >= 16 && dia <= 30) chaveEvento = "jun_saojoao";
+                        else chaveEvento = "jun_orgulho"; 
+                    }
+                }
+                else if (mes === 8 && dia >= 1 && dia <= 15) chaveEvento = "agosto_pais";
             }
 
             const btnFlutuante = document.getElementById('btnSazonalFlutuante');
+            const menuJunho = document.getElementById('menuJunhoCont');
             const txtSub = document.getElementById('txtSubtituloSazonal');
             const txtTitulo = document.getElementById('txtTituloRoleta');
 
-            // Reset de estilos adaptativos básicos antes da aplicação do evento
+            // Reset Geral de Classes/Estilos
+            txtTitulo.className = "titulo-roleta";
             txtTitulo.innerHTML = "ℛℴ𝓁ℯ𝓉𝒶";
             txtTitulo.style.background = "";
             txtTitulo.style.webkitBackgroundClip = "";
             txtTitulo.style.webkitTextFillColor = "";
             txtTitulo.style.color = "";
             txtSub.innerText = "";
-            txtSub.style.background = "";
-            txtSub.style.webkitBackgroundClip = "";
-            txtSub.style.webkitTextFillColor = "";
+            txtSub.style.color = "";
             document.body.style.background = "";
             document.body.style.color = "";
             btnFlutuante.style.display = "none";
+            menuJunho.style.display = "none";
             
-            // Força a adaptação de cores de todos os textos informativos principais da UI
             ajustarCoresInterfaceTexto("#f0f2f5"); 
 
             if (chaveEvento !== "" && configuracoesSazonais[chaveEvento]) {
                 let conf = configuracoesSazonais[chaveEvento];
 
-                // Aplica Background
                 document.body.style.background = conf.bg;
                 
-                // Adapta cor do texto geral baseado no brilho do background recebido
                 let corTextoAdaptada = verificarBrilhoCorHex(conf.bg) ? "#1a1d24" : "#f0f2f5";
                 document.body.style.color = corTextoAdaptada;
                 ajustarCoresInterfaceTexto(corTextoAdaptada);
 
-                // Configuração do Título e Subtítulo
-                if(conf.subtitulo) {
-                    txtSub.innerText = conf.subtitulo;
-                    if(conf.subtituloGrad) {
-                        txtSub.style.color = conf.subtituloGrad;
-                    }
-                }
+                if(conf.subtitulo) txtSub.innerText = conf.subtitulo;
 
-                if(conf.letrasTituloEspeciais) {
-                    // Carnaval brasileiro: R e E (#F911A0), O e T (#9716A4), L e A (#00C8D8)
+                if (conf.animarTituloLgbt) {
+                    txtTitulo.className = "titulo-lgbt-movimento";
+                } else if(conf.letrasTituloEspeciais) {
                     txtTitulo.innerHTML = '<span style="color:#F911A0">ℛ</span><span style="color:#9716A4">ℴ</span><span style="color:#00C8D8">𝓁</span><span style="color:#9716A4">ℯ</span><span style="color:#F911A0">𝓉</span><span style="color:#00C8D8">𝒶</span>';
                 } else if(conf.tituloCor) {
                     txtTitulo.style.color = conf.tituloCor;
@@ -591,20 +583,24 @@
                     txtTitulo.style.webkitTextFillColor = "transparent";
                 }
 
-                // Configuração do Botão Flutuante Lateral Direito
-                btnFlutuante.innerText = conf.botaoEmoji;
-                btnFlutuante.style.background = conf.fatia;
-                btnFlutuante.style.color = conf.letras;
-                btnFlutuante.style.borderColor = conf.borda;
-                btnFlutuante.style.display = "flex";
+                if (conf.emojiCentralLgbt) {
+                    document.getElementById('emojiLgbtCentral').style.display = "block";
+                }
 
-                // Inicializa Chuva Diagonal de Emojis
+                // Gerenciamento de Botões (Junho exibe Menu completo de escolhas, outros exibem flutuante unitário)
+                if (chaveEvento.startsWith("jun_") || new Date().getMonth() + 1 === 6) {
+                    menuJunho.style.display = "flex";
+                } else {
+                    btnFlutuante.innerText = conf.botaoEmoji;
+                    btnFlutuante.style.background = conf.fatia;
+                    btnFlutuante.style.color = conf.letras;
+                    btnFlutuante.style.borderColor = conf.borda;
+                    btnFlutuante.style.display = "flex";
+                }
+
                 inicializarChuvaEmojis(conf.emojis);
-
-                // Passa dados customizados para renderização dinâmica no Canvas
                 window.sazonalAtivoDados = conf;
             } else {
-                // Caso não tenha evento rolando ativa o modelo padrão do site
                 window.sazonalAtivoDados = null;
                 txtTitulo.style.background = "linear-gradient(135deg, #a855f7, #6366f1)";
                 txtTitulo.style.webkitBackgroundClip = "text";
@@ -612,6 +608,16 @@
             }
 
             desenharRoleta();
+        }
+
+        function forcarSubEventoJunho(subChave) {
+            subEventoJunhoForcado = subChave;
+            if (eventoForcadoChave === "") {
+                eventoForcadoChave = subChave; 
+            } else {
+                eventoForcadoChave = subChave;
+            }
+            verificarEExecutarEventosSazonais();
         }
 
         function ajustarCoresInterfaceTexto(cor) {
@@ -626,6 +632,7 @@
         }
 
         function verificarBrilhoCorHex(hex) {
+            if (!hex || hex.startsWith("linear-gradient")) return false;
             let c = hex.substring(1);
             if(c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
             let rgb = parseInt(c, 16);
@@ -633,7 +640,7 @@
             let g = (rgb >>  8) & 0xff;
             let b = (rgb >>  0) & 0xff;
             let luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-            return luma > 128; // Retorna true para backgrounds muito claros
+            return luma > 128;
         }
 
         function inicializarChuvaEmojis(listaEmojis) {
@@ -651,26 +658,13 @@
         }
 
         function ativarCliqueSazonal() {
-            let chave = "";
-            if (eventoForcadoChave !== "") {
-                chave = eventoForcadoChave;
-            } else {
-                let agora = new Date();
-                let mes = agora.getMonth() + 1;
-                let dia = agora.getDate();
-                if (mes === 1 && dia >= 1 && dia <= 15) chave = "jan_1_15";
-                else if (mes === 1 && dia >= 16 && dia <= 31) chave = "jan_16_31";
-                else if (mes === 2 && dia >= 1 && dia <= 15) chave = "fev_1_15";
-                else if (mes === 3 && dia >= 1 && dia <= 5) chave = "mar_1_5";
-                else if (mes === 3 && dia >= 6 && dia <= 15) chave = "mar_6_15";
-                else if (mes === 4 && dia >= 1 && dia <= 30) chave = "abr_1_30";
-            }
-            if(chave && configuracoesSazonais[chave]) {
-                configuracoesSazonais[chave].acaoBotao();
+            if(window.sazonalAtivoDados && window.sazonalAtivoDados.acaoBotao) {
+                window.sazonalAtivoDados.acaoBotao();
             }
         }
 
         function forcarEventoManual(valorChave) {
+            subEventoJunhoForcado = "";
             eventoForcadoChave = valorChave;
             verificarEExecutarEventosSazonais();
         }
@@ -727,7 +721,7 @@
             fecharModalAuth(); atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
         }
 
-        function executarLogin(e) {
+        function ejecutarLogin(e) {
             e.preventDefault();
             let inp = document.getElementById('loginUser').value.trim().toLowerCase();
             let pass = document.getElementById('loginSenha').value;
@@ -743,7 +737,7 @@
         function executarLogout() {
             usuarioLogado = null; localStorage.removeItem('roleta_logado');
             document.body.setAttribute('data-roleta-theme', 'verde-neon'); salaOnlineCriada = false;
-            eventoForcadoChave = ""; 
+            eventoForcadoChave = ""; subEventoJunhoForcado = "";
             document.getElementById('painelTesteAdmin').style.display = "none";
             document.getElementById('selectForcarEvento').value = "";
             atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
@@ -769,14 +763,13 @@
                 document.getElementById('perfXpLimite').innerText = `${usuarioLogado.xpDiario || 0}/25 Diário`;
                 document.getElementById('perfBarraProgresso').style.width = `${(usuarioLogado.xp / max) * 100}%`;
                 
-                // Concede privilégios completos ao ID de teste especificado
                 if (usuarioLogado.id === "#1122264") {
                     pAdmin.style.display = "flex";
                 } else {
                     pAdmin.style.display = "none";
                 }
             } else {
-                pBox.style.display = 'none'; btnAuth.style.display = 'block'; btnOut.style.display = 'none'; btnCriar.style.display = 'none'; divSalvar.style.display = 'none'; pAdmin.style.display = "none";
+                pBox.style.display = 'none'; btnAuth.style.display = 'block'; btnOut.style.display = 'none'; btnCriar.style.display = 'none'; pAdmin.style.display = "none";
             }
         }
 
@@ -864,16 +857,36 @@
             let tamAng = (2 * Math.PI) / lista.length;
             let bodyStyle = getComputedStyle(document.body);
             
-            // Injeção dinâmica de propriedades de cores ou fallback nativo do tema ativo
-            let c1 = window.sazonalAtivoDados ? window.sazonalAtivoDados.fatia : (bodyStyle.getPropertyValue('--roleta-fundo-1').trim() || "#1a1d2d");
-            let c2 = window.sazonalAtivoDados ? window.sazonalAtivoDados.fatia : (bodyStyle.getPropertyValue('--roleta-fundo-2').trim() || "#24293e");
+            let c1 = "#1a1d2d", c2 = "#24293e";
             let txtC = window.sazonalAtivoDados ? window.sazonalAtivoDados.letras : (bodyStyle.getPropertyValue('--roleta-texto').trim() || "#ffffff");
             let bordaC = window.sazonalAtivoDados ? window.sazonalAtivoDados.borda : (bodyStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)");
+
+            // Cores da bandeira LGBT para as fatias se o evento ativo for 'jun_orgulho'
+            const coresLgbtFatias = ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"];
+
+            if (window.sazonalAtivoDados) {
+                if (window.sazonalAtivoDados.fatia === "multi") {
+                    c1 = "multi";
+                } else {
+                    c1 = window.sazonalAtivoDados.fatia;
+                    c2 = window.sazonalAtivoDados.fatia;
+                }
+            } else {
+                c1 = bodyStyle.getPropertyValue('--roleta-fundo-1').trim() || "#1a1d2d";
+                c2 = bodyStyle.getPropertyValue('--roleta-fundo-2').trim() || "#24293e";
+            }
 
             lista.forEach((d, i) => {
                 ctx.beginPath(); ctx.moveTo(250, 250);
                 ctx.arc(250, 250, 240, i * tamAng, (i + 1) * tamAng);
-                ctx.fillStyle = (i % 2 === 0) ? c1 : c2; ctx.fill(); 
+                
+                if (c1 === "multi") {
+                    ctx.fillStyle = coresLgbtFatias[i % coresLgbtFatias.length];
+                } else {
+                    ctx.fillStyle = (i % 2 === 0) ? c1 : c2;
+                }
+                
+                ctx.fill(); 
                 ctx.strokeStyle = bordaC; ctx.stroke();
 
                 ctx.save(); ctx.translate(250, 250); ctx.rotate(i * tamAng + tamAng/2);
