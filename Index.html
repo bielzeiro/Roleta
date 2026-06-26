@@ -57,19 +57,20 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; transition: background 0.3s, color 0.3s; }
-        body { background: var(--bg-principal); color: var(--texto); min-height: 100vh; display: flex; flex-direction: column; }
+        body { background: var(--bg-principal); color: var(--texto); min-height: 100vh; display: flex; flex-direction: column; position: relative; overflow-x: hidden; }
         
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; border-bottom: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.2); }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; border-bottom: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.2); position: relative; z-index: 10; }
         .header-controles { display: flex; gap: 12px; align-items: center; }
         
         .btn-header { background: var(--bg-painel); border: 1px solid var(--border-color); color: var(--texto); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
         .btn-header:hover { border-color: var(--primaria); }
 
         /* Estilo do Titulo em Degradê Roxo */
-        .titulo-roleta-container { width: 100%; text-align: center; padding-top: 20px; }
-        .titulo-roleta { font-size: 42px; font-weight: bold; font-family: 'Georgia', serif; background: linear-gradient(135deg, #a855f7, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; drop-shadow: 0 2px 10px rgba(168, 85, 247, 0.3); }
+        .titulo-roleta-container { width: 100%; text-align: center; padding-top: 20px; position: relative; z-index: 10; }
+        .titulo-roleta { font-size: 42px; font-weight: bold; font-family: 'Georgia', serif; background: linear-gradient(135deg, #a855f7, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; drop-shadow: 0 2px 10px rgba(168, 85, 247, 0.3); margin-bottom: 5px; }
+        .subtitulo-sazonal { font-size: 20px; font-weight: bold; font-family: 'Segoe UI', sans-serif; }
 
-        .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; }
+        .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; position: relative; z-index: 10; }
         .area-roleta { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
         .cronometro-caixa-interna { font-size: 42px; font-weight: 800; color: var(--primaria); font-family: monospace; letter-spacing: 1px; text-align: center; margin: 5px 0; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 5px; border: 1px solid var(--border-color); }
@@ -130,7 +131,7 @@
         .btn-acao.apagar { background: #ff4a4a; color: white; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-        .modal-card { background: #1a1d24; border: 1px solid var(--border-color); width: 100%; max-width: 420px; border-radius: 16px; padding: 22px; color: #f0f2f5; position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-card { background: #1a1d24; border: 1px solid var(--border-color); width: 100%; max-width: 420px; border-radius: 166px; padding: 22px; color: #f0f2f5; position: relative; max-height: 90vh; overflow-y: auto; border-radius: 16px; }
         .modal-fechar { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; opacity: 0.7; }
         
         .modal-abas { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); }
@@ -142,17 +143,31 @@
         .modal-btn-submeter { background: var(--primaria); color: #121420; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 8px; }
 
         .historico-caixa { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; height: 70px; overflow-y: auto; font-size: 12px; }
-        #bannerSazonal { display: none; background: var(--primaria); color: #121420; width: 100%; text-align: center; padding: 6px; font-size: 12px; font-weight: bold; }
+
+        /* Estilos do Botão Sazonal Flutuante Lateral */
+        .btn-sazonal-flutuante { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border-color); font-size: 28px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 90; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .btn-sazonal-flutuante:hover { transform: translateY(-50%) scale(1.1); }
+
+        /* Animação de Queda Diagonal de Emojis */
+        .emoji-sazonal-bg { position: fixed; top: -50px; font-size: 24px; pointer-events: none; opacity: 0.75; z-index: 1; animation: quedaDiagonal 6s linear infinite; }
+        @keyframes quedaDiagonal {
+            0% { transform: translate(0, 0) rotate(0deg); top: -50px; }
+            100% { transform: translate(-300px, 105vh) rotate(360deg); }
+        }
+
+        /* Seletor Especial para Conta de Avaliação #1122264 */
+        .seletor-teste-container { background: rgba(255, 170, 0, 0.1); border: 1px dashed #ffaa00; border-radius: 8px; padding: 10px; margin-bottom: 15px; display: none; flex-direction: column; gap: 5px; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div id="bannerSazonal">🎉 EVENTO ESPECIAL DISPONÍVEL! 🎉</div>
+    <div id="containerEmojisSazonais"></div>
+
+    <button id="btnSazonalFlutuante" class="btn-sazonal-flutuante" onclick="ativarCliqueSazonal()"></button>
 
     <header>
         <div class="header-controles">
             <button class="btn-header" onclick="alternarModo()">🌓 Modo Base</button>
-            <button class="btn-header" id="btnSazonalToggle" style="display: none !important; background: #ffaa00; color: #000;" onclick="alternarSazonalidade()">🎉 Tema do Evento</button>
         </div>
         <div class="header-controles">
             <button class="btn-header" id="btnAuthHeader" onclick="abrirModalAuth()">👤 Login / Cadastro</button>
@@ -161,35 +176,52 @@
     </header>
 
     <div class="titulo-roleta-container">
-        <h1 class="titulo-roleta">ℛℴ𝓁ℯ𝓉𝒶</h1>
+        <h1 class="titulo-roleta" id="txtTituloRoleta">ℛℴ𝓁ℯ𝓉𝒶</h1>
+        <div class="subtitulo-sazonal" id="txtSubtituloSazonal"></div>
     </div>
 
     <main class="dashboard">
         <section class="area-roleta">
 
+            <div class="seletor-teste-container" id="painelTesteAdmin">
+                <span style="color:#ffaa00; font-weight:bold;">🛠️ Painel do Avaliador (ID: #1122264)</span>
+                <label>Forçar Evento para Teste: 
+                    <select id="selectForcarEvento" onchange="forcarEventoManual(this.value)">
+                        <option value="">-- Usar Data Atual do Sistema --</option>
+                        <option value="jan_1_15">Jan (1-15) - Ano Novo</option>
+                        <option value="jan_16_31">Jan (16-31) - Festival de Fogos</option>
+                        <option value="fev_1_15">Fev (1-15) - Escolar</option>
+                        <option value="fev_16_29">Fev (16-29) - Padrão</option>
+                        <option value="mar_1_5">Mar (1-5) - Carnaval</option>
+                        <option value="mar_6_15">Mar (6-15) - Dia da Mulher</option>
+                        <option value="abr_1_30">Abr (1-30) - Páscoa</option>
+                    </select>
+                </label>
+            </div>
+
             <div class="painel-controle-partida">
                 <div class="controle-linha">
-                    <span style="font-weight: bold; color: var(--primaria);">⚙️ Painel de Controle de Partida</span>
+                    <span style="font-weight: bold; color: var(--primaria);" id="lblPainelControle">⚙️ Painel de Controle de Partida</span>
                 </div>
                 
                 <div class="cronometro-caixa-interna" id="cronometro">00:30</div>
 
                 <div class="controle-linha">
-                    <label>Tempo (s): <input type="number" id="tempoInput" value="30" min="5" max="300" onchange="atualizarDisplayTempo()"></label>
-                    <label><input type="checkbox" id="ativarTempo" checked onchange="toggleTemporizadorVisivel()"> Temporizador Ativo</label>
+                    <label id="lblTempoS">Tempo (s): <input type="number" id="tempoInput" value="30" min="5" max="300" onchange="atualizarDisplayTempo()"></label>
+                    <label id="lblTempAtivo"><input type="checkbox" id="ativarTempo" checked onchange="toggleTemporizadorVisivel()"> Temporizador Ativo</label>
                 </div>
                 <div class="controle-linha">
-                    <label>Modo Tempo: 
+                    <label id="lblModoTempo">Modo Tempo: 
                         <select id="modoTempoSelect">
                             <option value="automatico">Automático</option>
                             <option value="manual">Manual</option>
                         </select>
                     </label>
-                    <label><input type="checkbox" id="mutarSomCheck"> Desativar Som</label>
+                    <label id="lblMutarSom"><input type="checkbox" id="mutarSomCheck"> Desativar Som</label>
                 </div>
                 <div class="controle-linha">
-                    <label><input type="checkbox" id="autoGirarCheck"> Giro Automático contínuo</label>
-                    <label>Qtd Giros: <input type="number" id="girosInput" value="5" min="1"></label>
+                    <label id="lblGiroAuto"><input type="checkbox" id="autoGirarCheck"> Giro Automático contínuo</label>
+                    <label id="lblQtdGiros">Qtd Giros: <input type="number" id="girosInput" value="5" min="1"></label>
                 </div>
                 <div class="controle-linha" style="margin-top: 5px;">
                     <div class="botoes-dificuldade" id="boxFiltrosRapidos">
@@ -219,7 +251,7 @@
 
         <section class="secao-configuracoes">
             <div class="card">
-                <div class="card-titulo">👥 Jogadores da Sala</div>
+                <div class="card-titulo" id="lblJogadoresSala">👥 Jogadores da Sala</div>
                 
                 <div id="perfilLogadoBox" class="perfil-mini-box" style="display: none;" onclick="abrirModalEdicaoPerfil()">
                     <div class="perfil-topo">
@@ -263,7 +295,7 @@
             </div>
 
             <div class="card">
-                <div class="card-titulo">🎯 Gestão de Missões & Slots</div>
+                <div class="card-titulo" id="lblGestaoMissoes">🎯 Gestão de Missões & Slots</div>
                 <div class="input-add-grupo">
                     <input type="text" id="texto-desafio" placeholder="Nova Missão...">
                     <select id="dificuldade-desafio" style="width: 100px;"><option value="Fácil">Fácil (5pts)</option><option value="Médio">Médio (10pts)</option><option value="Difícil">Difícil (20pts)</option></select>
@@ -278,6 +310,16 @@
             </div>
         </section>
     </main>
+
+    <div class="modal-overlay" id="modalPascoa">
+        <div class="modal-card" style="text-align: center; max-width: 450px; padding: 30px; border: 2px solid #ff7df2;">
+            <button class="modal-fechar" onclick="fecharModalPascoa()">✕</button>
+            <div style="font-size: 40px; margin-bottom: 15px;">🕊️🤍</div>
+            <p style="font-size: 16px; font-style: italic; line-height: 1.6; color: #fff;" id="txtPascoaMensagem">
+                "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.<br><br>João 3:16 🤍🕊️"
+            </p>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="modalAuth">
         <div class="modal-card">
@@ -358,10 +400,11 @@
         let estaGirando = false;
         let anguloAtual = 0;
         let usuarioLogado = null;
-        let eventoAtivoChave = "";
         let salaOnlineCriada = false;
         let cronometroInterval = null;
         let desafioSorteadoGlobal = null;
+        let eventoForcadoChave = "";
+        let idIntervalAnimacaoSazonal = null;
 
         let desafios = [
             { texto: "Equilibrar num pé só", dif: "Fácil" },
@@ -374,26 +417,90 @@
         const canvas = document.getElementById('roletaCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Vetor contendo a lista nova para distribuição no momento do cadastro
         const emojisNovasContas = ["A҉","B҉","c҉","D҉","E҉","F҉","G҉","H҉","I҉","J҉","K҉","L҉","M҉","N҉","O҉","P҉","Q҉","R҉","S҉","T҉","U҉","V҉","W҉","X҉","Y҉","Z҉"];
+
+        // Configurações completas e mapeadas dos novos Eventos Sazonais
+        const configuracoesSazonais = {
+            jan_1_15: {
+                subtitulo: "Feliz ano novo",
+                subtituloGrad: "#fad430",
+                fatia: "#fad430",
+                borda: "#e18b22",
+                letras: "#953f10",
+                bg: "#FFFFFF",
+                emojis: ["🍾", "🥂"],
+                botaoEmoji: "✨",
+                acaoBotao: () => {}
+            },
+            jan_16_31: {
+                subtitulo: "",
+                fatia: "#fc0000",
+                borda: "#f9e830",
+                letras: "#000000",
+                bg: "#7a0000",
+                emojis: ["🏮", "🧧"],
+                botaoEmoji: "🪭",
+                acaoBotao: () => {}
+            },
+            fev_1_15: {
+                subtitulo: "",
+                fatia: "#00167a",
+                borda: "#70cbff",
+                letras: "#FFFFFF",
+                bg: "#FFFFFF",
+                emojis: ["📖", "✏️"],
+                botaoEmoji: "🎒",
+                acaoBotao: () => {}
+            },
+            mar_1_5: {
+                subtitulo: "",
+                letrasTituloEspeciais: true, // Aciona coloração letra por letra em Roleta
+                fatia: "#ECE14A",
+                borda: "#FB0106",
+                letras: "#000000",
+                bg: "#28E96C",
+                emojis: ["🎉", "🪁"],
+                botaoEmoji: "🥳",
+                acaoBotao: () => {}
+            },
+            mar_6_15: {
+                subtitulo: "",
+                tituloCor: "#FF1FA9",
+                fatia: "#ff1fa9",
+                borda: "#64007d",
+                letras: "#000000",
+                bg: "#f2caee",
+                emojis: ["👩🏾‍🦱", "👩🏻‍🦳"],
+                botaoEmoji: "👸🏼",
+                acaoBotao: () => {}
+            },
+            abr_1_30: {
+                subtitulo: "",
+                tituloCor: "#FFFFFF",
+                fatia: "#ff7df2",
+                borda: "#d9d9d9",
+                letras: "#000000",
+                bg: "#6492d8",
+                emojis: ["🐰", "🪺"],
+                botaoEmoji: "🕊️",
+                acaoBotao: () => { abrirModalPascoa(); }
+            }
+        };
 
         window.addEventListener('load', () => {
             let logadoSalvo = localStorage.getItem('roleta_logado');
             if(logadoSalvo) {
                 usuarioLogado = JSON.parse(logadoSalvo);
                 sanitizarContaFaltante(usuarioLogado);
-                document.body.setAttribute('data-roleta-theme', usuarioLogado.temaAtivo || 'verde-neon');
-            } else {
-                document.body.setAttribute('data-roleta-theme', 'verde-neon');
             }
             
             let jogSalvos = localStorage.getItem('roleta_jogadores_locais');
             if(jogSalvos) jogadoresLocais = JSON.parse(jogSalvos);
             
             atualizarInterfaceLogado();
+            verificarEExecutarEventosSazonais();
             atualizarJogadores();
             atualizarSeletores();
-            desenharRoleta();
             atualizarDisplayTempo();
         });
 
@@ -409,6 +516,167 @@
             if(!userObj.temaAtivo || userObj.temaAtivo === 'default') { userObj.temaAtivo = 'verde-neon'; alterou = true; }
             if(alterou) { salvarUsuarioNoBanco(userObj); }
         }
+
+        // Motor de Eventos Sazonais Síncrono e Adaptável
+        function verificarEExecutarEventosSazonais() {
+            // Limpa instâncias de animações anteriores para não pesar
+            clearInterval(idIntervalAnimacaoSazonal);
+            document.getElementById('containerEmojisSazonais').innerHTML = "";
+            
+            let chaveEvento = "";
+
+            if (eventoForcadoChave !== "") {
+                chaveEvento = eventoForcadoChave;
+            } else {
+                let agora = new Date();
+                let mes = agora.getMonth() + 1; // Jan = 1, Fev = 2...
+                let dia = agora.getDate();
+
+                if (mes === 1 && dia >= 1 && dia <= 15) chaveEvento = "jan_1_15";
+                else if (mes === 1 && dia >= 16 && dia <= 31) chaveEvento = "jan_16_31";
+                else if (mes === 2 && dia >= 1 && dia <= 15) chaveEvento = "fev_1_15";
+                else if (mes === 3 && dia >= 1 && dia <= 5) chaveEvento = "mar_1_5";
+                else if (mes === 3 && dia >= 6 && dia <= 15) chaveEvento = "mar_6_15";
+                else if (mes === 4 && dia >= 1 && dia <= 30) chaveEvento = "abr_1_30";
+            }
+
+            const btnFlutuante = document.getElementById('btnSazonalFlutuante');
+            const txtSub = document.getElementById('txtSubtituloSazonal');
+            const txtTitulo = document.getElementById('txtTituloRoleta');
+
+            // Reset de estilos adaptativos básicos antes da aplicação do evento
+            txtTitulo.innerHTML = "ℛℴ𝓁ℯ𝓉𝒶";
+            txtTitulo.style.background = "";
+            txtTitulo.style.webkitBackgroundClip = "";
+            txtTitulo.style.webkitTextFillColor = "";
+            txtTitulo.style.color = "";
+            txtSub.innerText = "";
+            txtSub.style.background = "";
+            txtSub.style.webkitBackgroundClip = "";
+            txtSub.style.webkitTextFillColor = "";
+            document.body.style.background = "";
+            document.body.style.color = "";
+            btnFlutuante.style.display = "none";
+            
+            // Força a adaptação de cores de todos os textos informativos principais da UI
+            ajustarCoresInterfaceTexto("#f0f2f5"); 
+
+            if (chaveEvento !== "" && configuracoesSazonais[chaveEvento]) {
+                let conf = configuracoesSazonais[chaveEvento];
+
+                // Aplica Background
+                document.body.style.background = conf.bg;
+                
+                // Adapta cor do texto geral baseado no brilho do background recebido
+                let corTextoAdaptada = verificarBrilhoCorHex(conf.bg) ? "#1a1d24" : "#f0f2f5";
+                document.body.style.color = corTextoAdaptada;
+                ajustarCoresInterfaceTexto(corTextoAdaptada);
+
+                // Configuração do Título e Subtítulo
+                if(conf.subtitulo) {
+                    txtSub.innerText = conf.subtitulo;
+                    if(conf.subtituloGrad) {
+                        txtSub.style.color = conf.subtituloGrad;
+                    }
+                }
+
+                if(conf.letrasTituloEspeciais) {
+                    // Carnaval brasileiro: R e E (#F911A0), O e T (#9716A4), L e A (#00C8D8)
+                    txtTitulo.innerHTML = '<span style="color:#F911A0">ℛ</span><span style="color:#9716A4">ℴ</span><span style="color:#00C8D8">𝓁</span><span style="color:#9716A4">ℯ</span><span style="color:#F911A0">𝓉</span><span style="color:#00C8D8">𝒶</span>';
+                } else if(conf.tituloCor) {
+                    txtTitulo.style.color = conf.tituloCor;
+                } else {
+                    txtTitulo.style.background = "linear-gradient(135deg, #a855f7, #6366f1)";
+                    txtTitulo.style.webkitBackgroundClip = "text";
+                    txtTitulo.style.webkitTextFillColor = "transparent";
+                }
+
+                // Configuração do Botão Flutuante Lateral Direito
+                btnFlutuante.innerText = conf.botaoEmoji;
+                btnFlutuante.style.background = conf.fatia;
+                btnFlutuante.style.color = conf.letras;
+                btnFlutuante.style.borderColor = conf.borda;
+                btnFlutuante.style.display = "flex";
+
+                // Inicializa Chuva Diagonal de Emojis
+                inicializarChuvaEmojis(conf.emojis);
+
+                // Passa dados customizados para renderização dinâmica no Canvas
+                window.sazonalAtivoDados = conf;
+            } else {
+                // Caso não tenha evento rolando ativa o modelo padrão do site
+                window.sazonalAtivoDados = null;
+                txtTitulo.style.background = "linear-gradient(135deg, #a855f7, #6366f1)";
+                txtTitulo.style.webkitBackgroundClip = "text";
+                txtTitulo.style.webkitTextFillColor = "transparent";
+            }
+
+            desenharRoleta();
+        }
+
+        function ajustarCoresInterfaceTexto(cor) {
+            const idsCores = [
+                'lblPainelControle', 'lblTempoS', 'lblTempAtivo', 'lblModoTempo', 'lblMutarSom', 
+                'lblGiroAuto', 'lblQtdGiros', 'lblJogadoresSala', 'lblGestaoMissoes'
+            ];
+            idsCores.forEach(id => {
+                let el = document.getElementById(id);
+                if(el) el.style.color = cor;
+            });
+        }
+
+        function verificarBrilhoCorHex(hex) {
+            let c = hex.substring(1);
+            if(c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+            let rgb = parseInt(c, 16);
+            let r = (rgb >> 16) & 0xff;
+            let g = (rgb >>  8) & 0xff;
+            let b = (rgb >>  0) & 0xff;
+            let luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            return luma > 128; // Retorna true para backgrounds muito claros
+        }
+
+        function inicializarChuvaEmojis(listaEmojis) {
+            const container = document.getElementById('containerEmojisSazonais');
+            idIntervalAnimacaoSazonal = setInterval(() => {
+                if(document.hidden) return;
+                let emojiEl = document.createElement('div');
+                emojiEl.className = 'emoji-sazonal-bg';
+                emojiEl.innerText = listaEmojis[Math.floor(Math.random() * listaEmojis.length)];
+                emojiEl.style.left = (Math.random() * 100 + 10) + "vw";
+                emojiEl.style.animationDuration = (Math.random() * 3 + 4) + "s";
+                container.appendChild(emojiEl);
+                setTimeout(() => { emojiEl.remove(); }, 7000);
+            }, 400);
+        }
+
+        function ativarCliqueSazonal() {
+            let chave = "";
+            if (eventoForcadoChave !== "") {
+                chave = eventoForcadoChave;
+            } else {
+                let agora = new Date();
+                let mes = agora.getMonth() + 1;
+                let dia = agora.getDate();
+                if (mes === 1 && dia >= 1 && dia <= 15) chave = "jan_1_15";
+                else if (mes === 1 && dia >= 16 && dia <= 31) chave = "jan_16_31";
+                else if (mes === 2 && dia >= 1 && dia <= 15) chave = "fev_1_15";
+                else if (mes === 3 && dia >= 1 && dia <= 5) chave = "mar_1_5";
+                else if (mes === 3 && dia >= 6 && dia <= 15) chave = "mar_6_15";
+                else if (mes === 4 && dia >= 1 && dia <= 30) chave = "abr_1_30";
+            }
+            if(chave && configuracoesSazonais[chave]) {
+                configuracoesSazonais[chave].acaoBotao();
+            }
+        }
+
+        function forcarEventoManual(valorChave) {
+            eventoForcadoChave = valorChave;
+            verificarEExecutarEventosSazonais();
+        }
+
+        function abrirModalPascoa() { document.getElementById('modalPascoa').style.display = 'flex'; }
+        function fecharModalPascoa() { document.getElementById('modalPascoa').style.display = 'none'; }
 
         function alternarModo() {
             let m = document.body.getAttribute('data-theme');
@@ -443,7 +711,6 @@
             if(contas.some(c => c.user === user || c.email === email)) { alert("Dados indisponíveis!"); return; }
 
             let geradoID = "#" + Math.floor(1000000 + Math.random() * 9000000).toString();
-            // Atribui um emoji aleatório da nova lista "A҉ a Z҉" para quem se cadastrar
             let emojiSorteado = emojisNovasContas[Math.floor(Math.random() * emojisNovasContas.length)];
 
             let novoUser = {
@@ -457,7 +724,7 @@
             usuarioLogado = novoUser; localStorage.setItem('roleta_logado', JSON.stringify(novoUser));
             document.body.setAttribute('data-roleta-theme', 'verde-neon');
             if (USAR_SERVIDOR_REAL) db.collection("usuarios").doc(user).set(novoUser);
-            fecharModalAuth(); atualizarInterfaceLogado(); atualizarJogadores(); desenharRoleta();
+            fecharModalAuth(); atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
         }
 
         function executarLogin(e) {
@@ -470,13 +737,16 @@
             usuarioLogado = conta;
             sanitizarContaFaltante(usuarioLogado);
             document.body.setAttribute('data-roleta-theme', usuarioLogado.temaAtivo);
-            fecharModalAuth(); atualizarInterfaceLogado(); atualizarJogadores(); desenharRoleta();
+            fecharModalAuth(); atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
         }
 
         function executarLogout() {
             usuarioLogado = null; localStorage.removeItem('roleta_logado');
             document.body.setAttribute('data-roleta-theme', 'verde-neon'); salaOnlineCriada = false;
-            atualizarInterfaceLogado(); atualizarJogadores(); desenharRoleta();
+            eventoForcadoChave = ""; 
+            document.getElementById('painelTesteAdmin').style.display = "none";
+            document.getElementById('selectForcarEvento').value = "";
+            atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
         }
 
         function atualizarInterfaceLogado() {
@@ -485,6 +755,7 @@
             let btnOut = document.getElementById('btnLogoutHeader');
             let btnCriar = document.getElementById('btnCriarSala');
             let divSalvar = document.getElementById('secaoSalvarRoleta');
+            let pAdmin = document.getElementById('painelTesteAdmin');
 
             if(usuarioLogado) {
                 pBox.style.display = 'block'; btnAuth.style.display = 'none'; btnOut.style.display = 'block'; btnCriar.style.display = 'block'; divSalvar.style.display = 'none'; 
@@ -497,8 +768,15 @@
                 document.getElementById('perfXpTexto').innerText = `XP: ${usuarioLogado.xp}/${max}`;
                 document.getElementById('perfXpLimite').innerText = `${usuarioLogado.xpDiario || 0}/25 Diário`;
                 document.getElementById('perfBarraProgresso').style.width = `${(usuarioLogado.xp / max) * 100}%`;
+                
+                // Concede privilégios completos ao ID de teste especificado
+                if (usuarioLogado.id === "#1122264") {
+                    pAdmin.style.display = "flex";
+                } else {
+                    pAdmin.style.display = "none";
+                }
             } else {
-                pBox.style.display = 'none'; btnAuth.style.display = 'block'; btnOut.style.display = 'none'; btnCriar.style.display = 'none'; divSalvar.style.display = 'none';
+                pBox.style.display = 'none'; btnAuth.style.display = 'block'; btnOut.style.display = 'none'; btnCriar.style.display = 'none'; divSalvar.style.display = 'none'; pAdmin.style.display = "none";
             }
         }
 
@@ -516,11 +794,10 @@
             } else { atualizarListaAmigos(); }
         }
 
-        // Popula as opções dinamicamente com base na nova lista
         const selectEditEmoji = document.getElementById('editEmoji');
         if(selectEditEmoji) {
             selectEditEmoji.innerHTML = '';
-            ["𝓐","𝓑","𝓬","𝓓","𝓔","𝓕","","𝓗","𝓘","𝓙","𝓚","𝓛","𝓜","𝓝","𝓞","𝓟","𝓠","𝓡","𝓢","𝓣","𝓤","𝓥","𝓦","𝓧","𝓨","𝓩"].forEach(em => {
+            ["𝓐","𝓑","𝓬","𝓓","𝓔","𝓕","𝓖","𝓗","𝓘","𝓙","𝓚","𝓛","𝓜","𝓝","𝓞","𝓟","𝓠","𝓡","𝓢","𝓣","𝓤","𝓥","𝓦","𝓧","𝓨","𝓩"].forEach(em => {
                 selectEditEmoji.innerHTML += `<option value="${em}">${em}</option>`;
             });
         }
@@ -587,10 +864,11 @@
             let tamAng = (2 * Math.PI) / lista.length;
             let bodyStyle = getComputedStyle(document.body);
             
-            let c1 = bodyStyle.getPropertyValue('--roleta-fundo-1').trim() || "#1a1d2d";
-            let c2 = bodyStyle.getPropertyValue('--roleta-fundo-2').trim() || "#24293e";
-            let txtC = bodyStyle.getPropertyValue('--roleta-texto').trim() || "#ffffff";
-            let bordaC = bodyStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)";
+            // Injeção dinâmica de propriedades de cores ou fallback nativo do tema ativo
+            let c1 = window.sazonalAtivoDados ? window.sazonalAtivoDados.fatia : (bodyStyle.getPropertyValue('--roleta-fundo-1').trim() || "#1a1d2d");
+            let c2 = window.sazonalAtivoDados ? window.sazonalAtivoDados.fatia : (bodyStyle.getPropertyValue('--roleta-fundo-2').trim() || "#24293e");
+            let txtC = window.sazonalAtivoDados ? window.sazonalAtivoDados.letras : (bodyStyle.getPropertyValue('--roleta-texto').trim() || "#ffffff");
+            let bordaC = window.sazonalAtivoDados ? window.sazonalAtivoDados.borda : (bodyStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)");
 
             lista.forEach((d, i) => {
                 ctx.beginPath(); ctx.moveTo(250, 250);
