@@ -67,53 +67,66 @@
 
         /* Estilo do Titulo em Degradê Roxo */
         .titulo-roleta-container { width: 100%; text-align: center; padding-top: 20px; position: relative; z-index: 10; }
-        .titulo-roleta { font-size: 42px; font-weight: bold; font-family: 'Georgia', serif; background: linear-gradient(135deg, #a855f7, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 10px rgba(168, 85, 247, 0.3)); margin-bottom: 5px; }
+        .titulo-roleta { font-size: 42px; font-weight: bold; font-family: 'Georgia', serif; background: linear-gradient(135deg, #a855f7, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; drop-shadow: 0 2px 10px rgba(168, 85, 247, 0.3); margin-bottom: 5px; }
         .subtitulo-sazonal { font-size: 20px; font-weight: bold; font-family: 'Segoe UI', sans-serif; }
 
-        /* Animações de Degradê em Movimento */
+        /* Animação Degradê Movimento de Junho LGBT */
         .titulo-lgbt-movimento {
             font-size: 42px; font-weight: bold; font-family: 'Georgia', serif;
             background: linear-gradient(90deg, #E40303, #FF8C00, #FFED00, #008026, #004CFF, #732982);
-            background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             animation: gradienteMovimento 8s ease infinite;
         }
+
+        /* Animação Degradê Movimento Setembro Brasil */
         .titulo-brasil-movimento {
             font-size: 42px; font-weight: bold; font-family: 'Georgia', serif;
-            background: linear-gradient(90deg, #0c7016, #ffff00, #233dff, #0c7016);
-            background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: gradienteMovimento 6s ease infinite;
+            background: linear-gradient(90deg, #009c3b, #ffdf00, #002776, #009c3b);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradienteMovimento 6s linear infinite;
         }
+
+        /* Animação Degradê Movimento Dezembro Natal */
         .titulo-natal-movimento {
             font-size: 42px; font-weight: bold; font-family: 'Georgia', serif;
-            background: linear-gradient(90deg, #FFFFFF, #e90808, #FFFFFF);
-            background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: gradienteMovimento 5s ease infinite;
+            background: linear-gradient(90deg, #ffffff, #e90808, #ffffff, #e90808);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradienteMovimento 5s linear infinite;
         }
+
         @keyframes gradienteMovimento {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* Efeitos Especiais de Background Sazonal */
+        /* Elementos de Destaque Centrais do Background */
         .emoji-central-bg-lgbt {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 25vw; opacity: 0.15; pointer-events: none; z-index: 0; display: none;
         }
-        
-        /* Corações saindo de trás da bandeira */
-        .container-coracoes-circulo {
+
+        .bg-especial-brasil {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 1px; height: 1px; z-index: 0; pointer-events: none; display: none;
+            display: none; justify-content: center; align-items: center; pointer-events: none; z-index: 0; width: 100vw; height: 100vh;
         }
-        .coracao-radial {
-            position: absolute; font-size: 24px; pointer-events: none; opacity: 0;
-            animation: explosaoCirculo 4s linear infinite;
+        .bandeira-central { font-size: 22vw; position: relative; z-index: 2; opacity: 0.25; }
+        
+        .coracao-circulo-container {
+            position: absolute; width: 45vw; height: 45vw; animation: rodarCirculo 20s linear infinite; display: flex; justify-content: center; align-items: center;
         }
-        @keyframes explosaoCirculo {
-            0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
-            10% { opacity: 0.8; }
-            100% { transform: translate(var(--x), var(--y)) scale(1.2); opacity: 0; }
+        @keyframes rodarCirculo {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .coracao-surgindo {
+            position: absolute; font-size: 4vw; opacity: 0.35;
         }
 
         .dashboard { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 25px; max-width: 1100px; margin: 0 auto; width: 100%; position: relative; z-index: 10; }
@@ -161,6 +174,10 @@
         .avatar-preview { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .jogador-info { display: flex; justify-content: space-between; width: 100%; font-size: 13px; align-items: center; }
 
+        .item-badge { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 5px; }
+        .item-badge.bloqueado { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; border-color: rgba(255,0,0,0.3); }
+        .item-badge.ativo { border-color: var(--primaria); background: rgba(0,242,254,0.1); }
+
         .botoes-dificuldade { display: flex; gap: 8px; width: 100%; }
         .btn-dif { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: var(--texto); cursor: pointer; font-size: 11px; opacity: 0.4; }
         .btn-dif.ativo { border-color: var(--primaria); background: rgba(0, 242, 254, 0.25); opacity: 1; font-weight: bold; }
@@ -175,6 +192,14 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
         .modal-card { background: #1a1d24; border: 1px solid var(--border-color); width: 100%; max-width: 420px; border-radius: 16px; padding: 22px; color: #f0f2f5; position: relative; max-height: 90vh; overflow-y: auto; }
         .modal-fechar { position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; opacity: 0.7; }
+        
+        .modal-abas { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .modal-aba-btn { background: transparent; border: none; color: #f0f2f5; font-size: 14px; font-weight: bold; cursor: pointer; opacity: 0.5; padding-bottom: 6px; }
+        .modal-aba-btn.ativa { opacity: 1; color: var(--primaria); border-bottom: 2px solid var(--primaria); }
+        .modal-form { display: none; flex-direction: column; gap: 12px; }
+        .modal-form.ativo { display: flex; }
+        
+        .modal-btn-submeter { background: var(--primaria); color: #121420; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 8px; }
 
         .historico-caixa { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; height: 70px; overflow-y: auto; font-size: 12px; }
 
@@ -202,8 +227,11 @@
 
     <div id="containerEmojisSazonais"></div>
     <div class="emoji-central-bg-lgbt" id="emojiLgbtCentral">🏳️‍🌈</div>
-    <div class="emoji-central-bg-lgbt" id="bandeiraBrasilCentral" style="font-size: 22vw;">🇧🇷</div>
-    <div class="container-coracoes-circulo" id="contCoracoesCirculo"></div>
+
+    <div class="bg-especial-brasil" id="bgEspecialBrasil">
+        <span class="bandeira-central">🇧🇷</span>
+        <div class="coracao-circulo-container" id="circuloCoracoesBrasil"></div>
+    </div>
 
     <button id="btnSazonalFlutuante" class="btn-sazonal-flutuante" onclick="ativarCliqueSazonal()"></button>
 
@@ -236,11 +264,6 @@
                 <label>Forçar Evento para Teste: 
                     <select id="selectForcarEvento" onchange="forcarEventoManual(this.value)">
                         <option value="">-- Usar Data Atual do Sistema --</option>
-                        <option value="desativar">❌ Desativar Evento Atual</option>
-                        <option value="set_1_30">Set (1-30) - Independência do Brasil 🇧🇷</option>
-                        <option value="out_1_15">Out (1-15) - Dia das Crianças 🧸</option>
-                        <option value="out_16_31">Out (16-31) - Halloween 🎃</option>
-                        <option value="dez_1_31">Dez (1-31) - Natal 🎄</option>
                         <option value="jan_1_15">Jan (1-15) - Ano Novo</option>
                         <option value="jan_16_31">Jan (16-31) - Festival de Fogos</option>
                         <option value="fev_1_15">Fev (1-15) - Escolar</option>
@@ -251,7 +274,13 @@
                         <option value="jun_orgulho">Junho (1-30) - Orgulho LGBT 🌈</option>
                         <option value="jun_namorados">Junho (1-15) - Namorados 🏹</option>
                         <option value="jun_saojoao">Junho (16-30) - São João 🔥</option>
+                        <option value="julho_padrao">Julho (1-31) - Padrão Normal 🏖️</option>
                         <option value="agosto_pais">Agosto (1-15) - Dia dos Pais 👔</option>
+                        <option value="set_1_30">Setembro (1-30) - Independência do Brasil 🇧🇷</option>
+                        <option value="out_1_15">Outubro (1-15) - Dia das Crianças 🧸</option>
+                        <option value="out_16_31">Outubro (16-31) - Halloween 🎃</option>
+                        <option value="nov_1_30">Novembro (1-30) - Interface Normal 🍂</option>
+                        <option value="dez_1_31">Dezembro (1-31) - Feliz Natal 🎄</option>
                     </select>
                 </label>
             </div>
@@ -292,7 +321,7 @@
             <div class="roleta-wrapper">
                 <div class="marcador-topo"></div>
                 <canvas id="roletaCanvas" width="500" height="500"></canvas>
-                <button class="btn-centro-girar" onclick="gridGirarEvent()">Girar</button>
+                <button class="btn-centro-girar" onclick="girarRoleta()">Girar</button>
             </div>
 
             <div class="painel-validacao" id="painelValidacao">
@@ -331,8 +360,23 @@
 
                 <div class="input-add-grupo">
                     <input type="text" id="nome-jogador" placeholder="Convidado Local...">
+                    <select id="emoji-jogador" style="width:75px;">
+                        <option value="𝓐">𝓐</option><option value="𝓑">𝓑</option><option value="𝓬">𝓬</option><option value="𝓓">𝓓</option>
+                        <option value="𝓔">="𝓔"</option><option value="𝓕">𝓕</option><option value="𝓖">𝓖</option><option value="𝓗">𝓗</option>
+                        <option value="𝓘">𝓘</option><option value="𝓙">𝓙</option><option value="𝓚">𝓚</option><option value="𝓛">𝓛</option>
+                        <option value="𝓜">𝓜</option><option value="𝓝">𝓝</option><option value="𝓞">𝓞</option><option value="𝓟">𝓟</option>
+                        <option value="𝓠">𝓠</option><option value="𝓡">𝓡</option><option value="𝓢">𝓢</option><option value="𝓣">𝓣</option>
+                        <option value="𝓤">𝓤</option><option value="𝓥">𝓥</option><option value="𝓦">𝓦</option><option value="𝓧">𝓧</option>
+                        <option value="𝓨">𝓨</option><option value="𝓩">𝓩</option>
+                    </select>
                     <button class="btn-acao" onclick="adicionarJogador()">+ Add</button>
                 </div>
+
+                <div class="input-add-grupo">
+                    <input type="text" id="codigoConviteInput" placeholder="Código Convite Sala (6 dígitos)" maxlength="6">
+                    <button class="btn-acao" style="background:#4facfe;" onclick="entrarPorCodigo()">Entrar</button>
+                </div>
+
                 <div class="lista-jogadores" id="listaJogadoresContainer"></div>
             </div>
 
@@ -340,83 +384,249 @@
                 <div class="card-titulo" id="lblGestaoMissoes">🎯 Gestão de Missões & Slots</div>
                 <div class="input-add-grupo">
                     <input type="text" id="texto-desafio" placeholder="Nova Missão...">
-                    <select id="dificuldade-desafio" style="width: 100px;"><option value="Fácil">Fácil</option><option value="Médio">Médio</option><option value="Difícil">Difícil</option></select>
+                    <select id="dificuldade-desafio" style="width: 100px;"><option value="Fácil">Fácil (5pts)</option><option value="Médio">Médio (10pts)</option><option value="Difícil">Difícil (20pts)</option></select>
                     <button class="btn-acao" onclick="adicionarDesafio()">Add</button>
                 </div>
                 <div class="input-add-grupo"><select id="seletor-remover"></select><button class="btn-acao apagar" onclick="removerDesafio()">Apagar</button></div>
+                
+                <div id="secaoSalvarRoleta" style="display:none !important; border-top:1px solid var(--border-color); padding-top:10px;">
+                    <span style="font-size:12px; font-weight:bold; opacity:0.7;">💾 Salvar/Carregar Layout com Configurações</span>
+                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;" id="containerSlotsRoleta"></div>
+                </div>
             </div>
         </section>
     </main>
 
     <div class="modal-overlay" id="modalSazonalPopup">
-        <div class="modal-card" style="text-align: center; max-width: 450px; padding: 30px; border: 2px solid var(--primaria);">
-            <button class="modal-fechar" onclick="fecharSazonalPopup()">✕</button>
-            <div style="font-size: 40px; margin-bottom: 15px;" id="popupSazonalEmoji">🔔</div>
-            <p style="font-size: 18px; font-weight: bold; line-height: 1.6; color: #fff;" id="popupSazonalTexto"></p>
+        <div class="modal-card" style="text-align: center; max-width: 460px; padding: 30px; border: 3px solid var(--primaria);">
+            <button class="modal-fechar" onclick="fecharModalSazonalPopup()">✕</button>
+            <div style="font-size: 45px; margin-bottom: 15px;" id="txtSazonalPopupEmoji">🔔</div>
+            <p style="font-size: 18px; font-weight: bold; line-height: 1.6; color: #fff; white-space: pre-line;" id="txtSazonalPopupMensagem"></p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalPascoa">
+        <div class="modal-card" style="text-align: center; max-width: 450px; padding: 30px; border: 2px solid #ff7df2;">
+            <button class="modal-fechar" onclick="fecharModalPascoa()">✕</button>
+            <div style="font-size: 40px; margin-bottom: 15px;">🕊️🤍</div>
+            <p style="font-size: 16px; font-style: italic; line-height: 1.6; color: #fff;" id="txtPascoaMensagem">
+                "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.<br><br>João 3:16 🤍🕊️"
+            </p>
         </div>
     </div>
 
     <div class="modal-overlay" id="modalAuth">
         <div class="modal-card">
             <button class="modal-fechar" onclick="fecharModalAuth()">✕</button>
-            <form id="formLogin" onsubmit="executarLogin(event)">
-                <input type="text" id="loginUser" placeholder="Usuário ou E-mail" required><br><br>
-                <input type="password" id="loginSenha" placeholder="Senha" required><br><br>
-                <button type="submit" class="btn-acao" style="width: 100%;">Entrar</button>
+            <div class="modal-abas">
+                <button class="modal-aba-btn ativa" id="abaLogin" onclick="mudarAbaAuth('login')">Login</button>
+                <button class="modal-aba-btn" id="abaCadastro" onclick="mudarAbaAuth('cadastro')">Cadastro</button>
+            </div>
+            <form id="formLogin" class="modal-form ativo" onsubmit="executarLogin(event)">
+                <input type="text" id="loginUser" placeholder="Usuário ou E-mail" required>
+                <input type="password" id="loginSenha" placeholder="Senha" required>
+                <button type="submit" class="modal-btn-submeter">Entrar</button>
+            </form>
+            <form id="formCadastro" class="modal-form" onsubmit="executarCadastro(event)">
+                <input type="text" id="cadNome" placeholder="Nome Completo" required>
+                <input type="text" id="cadUser" placeholder="Username" required>
+                <input type="email" id="cadEmail" placeholder="E-mail" required>
+                <input type="password" id="cadSenha" placeholder="Senha (max 8 car.)" maxlength="8" required>
+                <button type="submit" class="modal-btn-submeter">Criar Conta e Ganhar Estilo Néon! 🚀</button>
             </form>
         </div>
     </div>
 
-    <script>
-        const USAR_SERVIDOR_REAL = false; let db;
-        let jogadoresLocais = [], jugadorAtualIndex = 0, estaGirando = false, anguloAtual = 0, usuarioLogado = null, salaOnlineCriada = false, cronometroInterval = null, desafioSorteadoGlobal = null;
-        let eventoForcadoChave = "", idIntervalAnimacaoSazonal = null, subEventoJunhoForcado = "", idIntervalCoracoes = null;
-        let desafios = [{ texto: "Equilibrar num pé só", dif: "Fácil" }, { texto: "Ficar estátua por 20s", dif: "Fácil" }, { texto: "Imitar um macaco", dif: "Médio" }, { texto: "Pagar 10 flexões", dif: "Difícil" }];
-        let filtrosAtivos = { "Fácil": true, "Médio": true, "Difícil": true };
-        const canvas = document.getElementById('roletaCanvas'), ctx = canvas.getContext('2d');
+    <div class="modal-overlay" id="modalEdicaoPerfil">
+        <div class="modal-card">
+            <button class="modal-fechar" onclick="fecharModalEdicaoPerfil()">✕</button>
+            <div class="modal-abas">
+                <button class="modal-aba-btn" id="abaA" onclick="mudarAbaPerfil('editar')">✏️ Estilos & Conta</button>
+                <button class="modal-aba-btn" id="abaB" onclick="mudarAbaPerfil('amigos')">👥 Amigos (<span id="lblQtdAmigos">0</span>/30)</button>
+            </div>
 
+            <div id="subPerfilEditar" class="modal-form">
+                <div class="input-add-grupo">
+                    <label style="font-size:12px; width:100px;">Emoji Avatar:</label>
+                    <select id="editEmoji" onchange="salvarEdicaoPerfil()">
+                        <option value="𝓐">𝓐</option><option value="𝓑">𝓑</option><option value="𝓬">𝓬</option><option value="𝓓">𝓓</option>
+                        <option value="𝓔">𝓔</option><option value="𝓕">𝓕</option>
+                    </select>
+                </div>
+                <div class="input-add-grupo">
+                    <label style="font-size:12px; width:100px;">Fundo Avatar:</label>
+                    <select id="editFundoAvatar" onchange="salvarEdicaoPerfil()"><option value="#4facfe">Azul</option><option value="#ff2a5f">Rosa</option><option value="#39ff14">Néon</option></select>
+                </div>
+                
+                <div style="margin-top:10px; display:none !important;">
+                    <span style="font-size:12px; font-weight:bold; opacity:0.7;">🎨 Seus Estilos Desbloqueados por Nível</span>
+                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:5px;" id="editTemasItens"></div>
+                </div>
+                
+                <div style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; text-align:center;">
+                    <span style="font-size:11px; opacity:0.6;">Código Online da sua Sala:</span>
+                    <div id="lblCodigoSala" style="font-weight:bold; font-size:18px; color:var(--primaria);">------</div>
+                </div>
+            </div>
+
+            <div id="subPerfilAmigos" class="modal-form">
+                <span style="font-size:12px; font-weight:bold;">🔍 Buscar por ID ou Username</span>
+                <div class="input-add-grupo">
+                    <input type="text" id="txtBuscaAmigo" placeholder="Ex: #1234567...">
+                    <button class="btn-acao" onclick="buscarEAdicionarAmigo()">Adicionar</button>
+                </div>
+                <div id="listaAmigosBox" style="display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; margin-top:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const USAR_SERVIDOR_REAL = false; 
+        let db;
+        
+        if (USAR_SERVIDOR_REAL) {
+            const firebaseConfig = { apiKey: "SUA_API_KEY", authDomain: "SEU_DOMINIO.firebaseapp.com", projectId: "SEU_PROJECT_ID", storageBucket: "SEU_BUCKET.appspot.com", messagingSenderId: "SEU_SENDER_ID", appId: "SUA_APP_ID" };
+            firebase.initializeApp(firebaseConfig); db = firebase.firestore();
+        }
+
+        let jogadoresLocais = [];
+        let jugadorAtualIndex = 0;
+        let estaGirando = false;
+        let anguloAtual = 0;
+        let usuarioLogado = null;
+        let salaOnlineCriada = false;
+        let cronometroInterval = null;
+        let desafioSorteadoGlobal = null;
+        let eventoForcadoChave = "";
+        let idIntervalAnimacaoSazonal = null;
+        let subEventoJunhoForcado = "";
+
+        let desafios = [
+            { texto: "Equilibrar num pé só", dif: "Fácil" },
+            { texto: "Ficar estátua por 20s", dif: "Fácil" },
+            { texto: "Imitar um macaco", dif: "Médio" },
+            { texto: "Pagar 10 flexões", dif: "Difícil" }
+        ];
+        let filtrosAtivos = { "Fácil": true, "Médio": true, "Difícil": true };
+
+        const canvas = document.getElementById('roletaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const emojisNovasContas = ["A҉","B҉","c҉","D҉","E҉","F҉","G҉","H҉","I҉","J҉","K҉","L҉","M҉","N҉","O҉","P҉","Q҉","R҉","S҉","T҉","U҉","V҉","W҉","X҉","Y҉","Z҉"];
+
+        // Configurações completas e mapeadas dos Eventos Sazonais atualizados
         const configuracoesSazonais = {
-            set_1_30: { subtitulo: "7 de Setembro 🇧🇷", animarTituloBrasil: true, bandeiraCentral: true, fatia: "#0c7016", borda: "#ffff00", letras: "#FFFFFF", bg: "#233dff", emojis: [], botaoEmoji: "🇧🇷", acaoBotao: () => mostrarPopupSazonal("🇧🇷", "INDEDPENDÊNCIA OU MORTE?") },
-            out_1_15: { subtitulo: "Dia das Crianças 🧸", tonsPasteis: true, fatia: "#ffb3ba", fatia2: "#baffc9", borda: "#bae1ff", letras: "#6d6d6d", bg: "#ffffba", emojis: ["🧸","🪅","💭","🪇","🏎️"], botaoEmoji: "🍭", acaoBotao: () => { tocarSomConfete(); } },
-            out_16_31: { subtitulo: "Halloween 🎃", fatia: "#3e1964", borda: "#fc4c00", letras: "#FFFFFF", bg: "#000000", emojis: ["🎃","💀"], botaoEmoji: "🦇" },
-            dez_1_31: { subtitulo: "Feliz Natal 🎄", animarTituloNatal: true, fatia: "#e90808", borda: "#d9d9d9", letras: "#FFFFFF", bg: "#00bf63", emojis: ["🦌","🛷","🎁"], botaoEmoji: "🎄", acaoBotao: () => mostrarPopupSazonal("✝️🛐", '"E o Verbo se fez carne e habitou entre nós, cheio de graça e de verdade, e vimos a sua glória, glória como do unigênito do Pai."<br><br>João 1.14 ✝️🛐') },
             jan_1_15: { subtitulo: "Feliz ano novo", fatia: "#fad430", borda: "#e18b22", letras: "#953f10", bg: "#FFFFFF", emojis: ["🍾", "🥂"], botaoEmoji: "✨" },
             jan_16_31: { subtitulo: "", fatia: "#fc0000", borda: "#f9e830", letras: "#000000", bg: "#7a0000", emojis: ["🏮", "🧧"], botaoEmoji: "🪭" },
             fev_1_15: { subtitulo: "", fatia: "#00167a", borda: "#70cbff", letras: "#FFFFFF", bg: "#FFFFFF", emojis: ["📖", "✏️"], botaoEmoji: "🎒" },
             mar_1_5: { subtitulo: "", letrasTituloEspeciais: true, fatia: "#ECE14A", borda: "#FB0106", letras: "#000000", bg: "#28E96C", emojis: ["🎉", "🪁"], botaoEmoji: "🥳" },
             mar_6_15: { subtitulo: "", tituloCor: "#FF1FA9", fatia: "#ff1fa9", borda: "#64007d", letras: "#000000", bg: "#f2caee", emojis: ["👩🏾‍🦱", "👩🏻‍🦳"], botaoEmoji: "👸🏼" },
-            abr_1_30: { subtitulo: "", tituloCor: "#FFFFFF", fatia: "#ff7df2", borda: "#d9d9d9", letras: "#000000", bg: "#6492d8", emojis: ["🐰", "🪺"], botaoEmoji: "🕊️" },
-            maio_1_20: { subtitulo: "Dia das Mães 🌹", fatia: "#9e3dff", borda: "#aa8bb1", letras: "#000000", bg: "#cd51ec", emojis: ["👩‍👦", "👩‍👧"], botaoEmoji: "🌹" },
+            abr_1_30: { subtitulo: "", tituloCor: "#FFFFFF", fatia: "#ff7df2", borda: "#d9d9d9", letras: "#000000", bg: "#6492d8", emojis: ["🐰", "🪺"], botaoEmoji: "🕊️", acaoBotao: () => { abrirModalPascoa(); } },
+            maio_1_20: { subtitulo: "Dia das Mães 👩‍👦", fatia: "#9e3dff", borda: "#aa8bb1", letras: "#000000", bg: "#cd51ec", emojis: ["👩‍👦", "👩‍👧"], botaoEmoji: "🌹" },
             jun_orgulho: { subtitulo: "Mês do Orgulho 🏳️‍🌈", animarTituloLgbt: true, emojiCentralLgbt: true, fatia: "multi", borda: "#ffffff", letras: "#ffffff", bg: "linear-gradient(180deg, #1a0221, #021226)", emojis: ["❤️","🧡","💛","💚","💙","💜"], botaoEmoji: "🌈" },
-            jun_namorados: { subtitulo: "Dia dos Namorados 🏹", fatia: "#ff2768", borda: "#f88f8f", letras: "#FFFFFF", bg: "#ffc2c7", emojis: ["#", "💍"], botaoEmoji: "🏹" },
-            jun_saojoao: { subtitulo: "Festa de São João 🔥", fatia: "#fc4c00", borda: "#f7e135", letras: "#000000", bg: "#de0f3f", emojis: ["🫔", "🌽"], botaoEmoji: "🔥" },
-            agosto_pais: { subtitulo: "Dia dos Pais 👔", fatia: "#00063d", borda: "#bdc3ff", letras: "#FFFFFF", bg: "#341bca", emojis: ["👨‍👦", "👨‍👧"], botaoEmoji: "👔" }
+            jun_namorados: { subtitulo: "Dia dos Namorados ♾️", fatia: "#ff2768", borda: "#f88f8f", letras: "#FFFFFF", bg: "#ffc2c7", emojis: ["♾️", "💍"], botaoEmoji: "🏹" },
+            jun_saojoao: { subtitulo: "Festa de São João 🌽", fatia: "#fc4c00", borda: "#f7e135", letras: "#000000", bg: "#de0f3f", emojis: ["🫔", "🌽"], botaoEmoji: "🔥" },
+            agosto_pais: { subtitulo: "Dia dos Pais 👨‍👦", fatia: "#00063d", borda: "#bdc3ff", letras: "#FFFFFF", bg: "#341bca", emojis: ["👨‍👦", "👨‍👧"], botaoEmoji: "👔" },
+            
+            // --- NOVOS EVENTOS SAZONAIS ADICIONADOS ---
+            set_1_30: { 
+                subtitulo: "Independência do Brasil 🇧🇷", 
+                animarTituloBrasil: true, 
+                fatia: "#0c7016", 
+                borda: "#ffff00", 
+                letras: "#FFFFFF", 
+                bg: "#233dff", 
+                emojis: ["💚", "💛", "💙"], 
+                botaoEmoji: "🇧🇷",
+                destaqueBrasil: true,
+                acaoBotao: () => { abrirModalSazonalPopup("🇧🇷", "INDEPENDÊNCIA OU MORTE?"); }
+            },
+            out_1_15: { 
+                subtitulo: "Dia das Crianças 🧸", 
+                fatia: "#ffb7b2", 
+                borda: "#ffdac1", 
+                letras: "#ffffff", 
+                bg: "linear-gradient(135deg, #ffeffe, #e8f0fe)", 
+                emojis: ["🧸", "🪅", "💭", "🪇", "🏎️"], 
+                botaoEmoji: "🍭",
+                somConfete: true,
+                acaoBotao: () => { 
+                    executarExplosaoConfetesSom();
+                    abrirModalSazonalPopup("🍭", "Feliz Dia das Crianças! 🎉\nDivirta-se muito girando a roleta!"); 
+                }
+            },
+            out_16_31: { 
+                subtitulo: "Halloween 🎃", 
+                fatia: "#3e1964", 
+                borda: "#fc4c00", 
+                letras: "#FFFFFF", 
+                bg: "#000000", 
+                emojis: ["🎃", "💀"], 
+                botaoEmoji: "🦇",
+                acaoBotao: () => { abrirModalSazonalPopup("🦇", "Gostosuras ou Travessuras? 🎃💀"); }
+            },
+            nov_1_30: {
+                isNormal: true
+            },
+            dez_1_31: {
+                subtitulo: "Feliz Natal 🎄",
+                animarTituloNatal: true,
+                fatia: "#e90808",
+                borda: "#d9d9d9",
+                letras: "#FFFFFF",
+                bg: "#00bf63",
+                emojis: ["🦌", "🛷", "🎁"],
+                botaoEmoji: "🎄",
+                acaoBotao: () => { abrirModalSazonalPopup("✝️", '"E o Verbo se fez carne e habitou entre nós, cheio de graça e de verdade, e vimos a sua glória, glória como do unigênito do Pai."\n\nJoão 1.14 ✝️🛐'); }
+            }
         };
 
         window.addEventListener('load', () => {
             let logadoSalvo = localStorage.getItem('roleta_logado');
-            if(logadoSalvo) { usuarioLogado = JSON.parse(logadoSalvo); }
-            atualizarInterfaceLogado(); verificarEExecutarEventosSazonais(); atualizarJogadores(); atualizarSeletores(); atualizarDisplayTempo();
+            if(logadoSalvo) {
+                usuarioLogado = JSON.parse(logadoSalvo);
+                sanitizarContaFaltante(usuarioLogado);
+            }
+            
+            let jogSalvos = localStorage.getItem('roleta_jogadores_locais');
+            if(jogSalvos) jogadoresLocais = JSON.parse(jogSalvos);
+            
+            atualizarInterfaceLogado();
+            verificarEExecutarEventosSazonais();
+            atualizarJogadores();
+            atualizarSeletores();
+            atualizarDisplayTempo();
         });
 
+        function sanitizarContaFaltante(userObj) {
+            let alterou = false;
+            if(!userObj.id) { userObj.id = "#" + Math.floor(1000000 + Math.random() * 9000000).toString(); alterou = true; }
+            if(userObj.nivel === undefined) { userObj.nivel = 1; alterou = true; }
+            if(userObj.xp === undefined) { userObj.xp = 0; alterou = true; }
+            if(userObj.xpDiario === undefined) { userObj.xpDiario = 0; alterou = true; }
+            if(!userObj.codigoSala) { userObj.codigoSala = Math.floor(100000 + Math.random() * 900000).toString(); alterou = true; }
+            if(!userObj.amigos) { userObj.amigos = []; alterou = true; }
+            if(!userObj.roletasSalvas) { userObj.roletasSalvas = []; alterou = true; }
+            if(!userObj.temaAtivo || userObj.temaAtivo === 'default') { userObj.temaAtivo = 'verde-neon'; alterou = true; }
+            if(alterou) { salvarUsuarioNoBanco(userObj); }
+        }
+
         function verificarEExecutarEventosSazonais() {
-            clearInterval(idIntervalAnimacaoSazonal); clearInterval(idIntervalCoracoes);
+            clearInterval(idIntervalAnimacaoSazonal);
             document.getElementById('containerEmojisSazonais').innerHTML = "";
             document.getElementById('emojiLgbtCentral').style.display = "none";
-            document.getElementById('bandeiraBrasilCentral').style.display = "none";
-            document.getElementById('contCoracoesCirculo').style.display = "none";
-            document.getElementById('contCoracoesCirculo').innerHTML = "";
+            document.getElementById('bgEspecialBrasil').style.display = "none";
             
             let chaveEvento = "";
-            if (eventoForcadoChave === "desativar") { chaveEvento = ""; }
-            else if (eventoForcadoChave !== "") { chaveEvento = eventoForcadoChave; }
-            else {
-                let agora = new Date(), mes = agora.getMonth() + 1, dia = agora.getDate();
-                if (mes === 9) chaveEvento = "set_1_30";
-                else if (mes === 10 && dia >= 1 && dia <= 15) chaveEvento = "out_1_15";
-                else if (mes === 10 && dia >= 16 && dia <= 31) chaveEvento = "out_16_31";
-                else if (mes === 12) chaveEvento = "dez_1_31";
-                else if (mes === 1 && dia >= 1 && dia <= 15) chaveEvento = "jan_1_15";
+
+            if (eventoForcadoChave !== "") {
+                chaveEvento = eventoForcadoChave;
+            } else {
+                let agora = new Date();
+                let mes = agora.getMonth() + 1;
+                let dia = agora.getDate();
+
+                if (mes === 1 && dia >= 1 && dia <= 15) chaveEvento = "jan_1_15";
                 else if (mes === 1 && dia >= 16 && dia <= 31) chaveEvento = "jan_16_31";
                 else if (mes === 2 && dia >= 1 && dia <= 15) chaveEvento = "fev_1_15";
                 else if (mes === 3 && dia >= 1 && dia <= 5) chaveEvento = "mar_1_5";
@@ -424,12 +634,21 @@
                 else if (mes === 4 && dia >= 1 && dia <= 30) chaveEvento = "abr_1_30";
                 else if (mes === 5 && dia >= 1 && dia <= 20) chaveEvento = "maio_1_20";
                 else if (mes === 6) {
-                    if (subEventoJunhoForcado !== "") chaveEvento = subEventoJunhoForcado;
-                    else if (dia >= 1 && dia <= 15) chaveEvento = "jun_namorados";
-                    else if (dia >= 16 && dia <= 30) chaveEvento = "jun_saojoao";
-                    else chaveEvento = "jun_orgulho";
+                    if (subEventoJunhoForcado !== "") {
+                        chaveEvento = subEventoJunhoForcado;
+                    } else {
+                        if (dia >= 1 && dia <= 15) chaveEvento = "jun_namorados";
+                        else if (dia >= 16 && dia <= 30) chaveEvento = "jun_saojoao";
+                        else chaveEvento = "jun_orgulho"; 
+                    }
                 }
                 else if (mes === 8 && dia >= 1 && dia <= 15) chaveEvento = "agosto_pais";
+                // Checagem das novas datas automáticas do sistema
+                else if (mes === 9 && dia >= 1 && dia <= 30) chaveEvento = "set_1_30";
+                else if (mes === 10 && dia >= 1 && dia <= 15) chaveEvento = "out_1_15";
+                else if (mes === 10 && dia >= 16 && dia <= 31) chaveEvento = "out_16_31";
+                else if (mes === 11 && dia >= 1 && dia <= 30) chaveEvento = "nov_1_30";
+                else if (mes === 12 && dia >= 1 && dia <= 31) chaveEvento = "dez_1_31";
             }
 
             const btnFlutuante = document.getElementById('btnSazonalFlutuante');
@@ -437,74 +656,169 @@
             const txtSub = document.getElementById('txtSubtituloSazonal');
             const txtTitulo = document.getElementById('txtTituloRoleta');
 
-            txtTitulo.className = "titulo-roleta"; txtTitulo.innerHTML = "ℛℴ𝓁ℯ𝓉𝒶";
-            txtTitulo.style.background = ""; txtTitulo.style.webkitBackgroundClip = ""; txtTitulo.style.webkitTextFillColor = ""; txtTitulo.style.color = "";
-            txtSub.innerText = ""; txtSub.style.color = ""; document.body.style.background = ""; document.body.style.color = "";
-            btnFlutuante.style.display = "none"; menuJunho.style.display = "none";
+            // Reset Geral
+            txtTitulo.className = "titulo-roleta";
+            txtTitulo.innerHTML = "ℛℴ𝓁ℯ𝓉𝒶";
+            txtTitulo.style.background = "";
+            txtTitulo.style.webkitBackgroundClip = "";
+            txtTitulo.style.webkitTextFillColor = "";
+            txtTitulo.style.color = "";
+            txtSub.innerText = "";
+            txtSub.style.color = "";
+            document.body.style.background = "";
+            document.body.style.color = "";
+            btnFlutuante.style.display = "none";
+            menuJunho.style.display = "none";
             
-            // Força a remoção de botões se não for administrador logado
-            let isAdmin = usuarioLogado && usuarioLogado.id === "#1122264";
-            
-            if (chaveEvento !== "" && configuracoesSazonais[chaveEvento]) {
+            ajustarCoresInterfaceTexto("#f0f2f5"); 
+
+            if (chaveEvento !== "" && configuracoesSazonais[chaveEvento] && !configuracoesSazonais[chaveEvento].isNormal) {
                 let conf = configuracoesSazonais[chaveEvento];
+
                 document.body.style.background = conf.bg;
-                document.body.style.color = (conf.bg === "#FFFFFF" || conf.bg === "#ffffba") ? "#1a1d24" : "#f0f2f5";
+                
+                let corTextoAdaptada = verificarBrilhoCorHex(conf.bg) ? "#1a1d24" : "#f0f2f5";
+                document.body.style.color = corTextoAdaptada;
+                ajustarCoresInterfaceTexto(corTextoAdaptada);
 
                 if(conf.subtitulo) txtSub.innerText = conf.subtitulo;
 
-                if (conf.animarTituloLgbt) txtTitulo.className = "titulo-lgbt-movimento";
-                else if (conf.animarTituloBrasil) txtTitulo.className = "titulo-brasil-movimento";
-                else if (conf.animarTituloNatal) txtTitulo.className = "titulo-natal-movimento";
-                else if (conf.tituloCor) txtTitulo.style.color = conf.tituloCor;
-                else {
+                if (conf.animarTituloLgbt) {
+                    txtTitulo.className = "titulo-lgbt-movimento";
+                } else if (conf.animarTituloBrasil) {
+                    txtTitulo.className = "titulo-brasil-movimento";
+                } else if (conf.animarTituloNatal) {
+                    txtTitulo.className = "titulo-natal-movimento";
+                } else if(conf.letrasTituloEspeciais) {
+                    txtTitulo.innerHTML = '<span style="color:#F911A0">ℛ</span><span style="color:#9716A4">ℴ</span><span style="color:#00C8D8">𝓁</span><span style="color:#9716A4">ℯ</span><span style="color:#F911A0">𝓉</span><span style="color:#00C8D8">𝒶</span>';
+                } else if(conf.tituloCor) {
+                    txtTitulo.style.color = conf.tituloCor;
+                } else {
                     txtTitulo.style.background = "linear-gradient(135deg, #a855f7, #6366f1)";
-                    txtTitulo.style.webkitBackgroundClip = "text"; txtTitulo.style.webkitTextFillColor = "transparent";
+                    txtTitulo.style.webkitBackgroundClip = "text";
+                    txtTitulo.style.webkitTextFillColor = "transparent";
                 }
 
-                if (conf.emojiCentralLgbt) document.getElementById('emojiLgbtCentral').style.display = "block";
-                if (conf.bandeiraCentral) {
-                    document.getElementById('bandeiraBrasilCentral').style.display = "block";
-                    inicializarCoracoesRadiais();
+                if (conf.emojiCentralLgbt) {
+                    document.getElementById('emojiLgbtCentral').style.display = "block";
                 }
 
-                if (chaveEvento.startsWith("jun_")) {
+                if (conf.destaqueBrasil) {
+                    document.getElementById('bgEspecialBrasil').style.display = "flex";
+                    gerarCirculoCoresBrasil();
+                }
+
+                if (chaveEvento.startsWith("jun_") || (eventoForcadoChave === "" && new Date().getMonth() + 1 === 6)) {
                     menuJunho.style.display = "flex";
-                } else if (conf.botaoEmoji) {
+                } else {
                     btnFlutuante.innerText = conf.botaoEmoji;
-                    btnFlutuante.style.background = conf.fatia;
+                    btnFlutuante.style.background = conf.fatia.startsWith("linear") ? "#ffb7b2" : conf.fatia;
                     btnFlutuante.style.color = conf.letras;
                     btnFlutuante.style.borderColor = conf.borda;
                     btnFlutuante.style.display = "flex";
                 }
 
-                if(conf.emojis && conf.emojis.length > 0) inicializarChuvaEmojis(conf.emojis);
+                inicializarChuvaEmojis(conf.emojis);
                 window.sazonalAtivoDados = conf;
             } else {
                 window.sazonalAtivoDados = null;
                 txtTitulo.style.background = "linear-gradient(135deg, #a855f7, #6366f1)";
-                txtTitulo.style.webkitBackgroundClip = "text"; txtTitulo.style.webkitTextFillColor = "transparent";
+                txtTitulo.style.webkitBackgroundClip = "text";
+                txtTitulo.style.webkitTextFillColor = "transparent";
             }
+
             desenharRoleta();
         }
 
-        function inicializarCoracoesRadiais() {
-            const container = document.getElementById('contCoracoesCirculo');
-            container.style.display = "block";
-            const cores = ["💚", "💛", "💙"];
-            idIntervalCoracoes = setInterval(() => {
-                if(document.hidden) return;
-                for(let i=0; i<3; i++) {
-                    let coracao = document.createElement('div');
-                    coracao.className = 'coracao-radial';
-                    coracao.innerText = cores[Math.floor(Math.random() * cores.length)];
-                    let angulo = Math.random() * Math.PI * 2;
-                    let raio = 200 + Math.random() * 150;
-                    coracao.style.setProperty('--x', `${Math.cos(angulo) * raio}px`);
-                    coracao.style.setProperty('--y', `${Math.sin(angulo) * raio}px`);
-                    container.appendChild(coracao);
-                    setTimeout(() => coracao.remove(), 4000);
-                }
-            }, 600);
+        function gerarCirculoCoresBrasil() {
+            const container = document.getElementById('circuloCoracoesBrasil');
+            container.innerHTML = "";
+            const coresCora = ["💚", "💛", "💙"];
+            const totalCora = 16;
+            for(let i=0; i<totalCora; i++) {
+                let ang = (i * (360 / totalCora)) * Math.PI / 180;
+                let raio = 16; 
+                let x = Math.cos(ang) * raio;
+                let y = Math.sin(ang) * raio;
+                let el = document.createElement('div');
+                el.className = "coracao-surgindo";
+                el.innerText = coresCora[i % coresCora.length];
+                el.style.left = `calc(50% + ${x}vw - 2vw)`;
+                el.style.top = `calc(50% + ${y}vw - 2vw)`;
+                container.appendChild(el);
+            }
+        }
+
+        function executarExplosaoConfetesSom() {
+            // Criação de efeito de som via AudioContext Nativo do Navegador
+            try {
+                let ctxSom = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = ctxSom.createOscillator();
+                let gain = ctxSom.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, ctxSom.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, ctxSom.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.3, ctxSom.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctxSom.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(ctxSom.destination);
+                osc.start();
+                osc.stop(ctxSom.currentTime + 0.4);
+            } catch(e) { console.log("Som bloqueado pela política do navegador."); }
+
+            // Explosão Visual de Confetes Rápidos na Tela
+            const container = document.getElementById('containerEmojisSazonais');
+            const coresConfete = ["✨", "🎉", "🍬", "🎈", "🍭"];
+            for (let i = 0; i < 30; i++) {
+                let conf = document.createElement('div');
+                conf.style.position = 'fixed';
+                conf.style.left = '85vw';
+                conf.style.top = '50vh';
+                conf.style.fontSize = '24px';
+                conf.style.pointerEvents = 'none';
+                conf.style.zIndex = '99';
+                conf.innerText = coresConfete[Math.floor(Math.random() * coresConfete.length)];
+                
+                let velX = (Math.random() - 0.7) * 25;
+                let velY = (Math.random() - 0.5) * 25;
+                conf.style.transition = 'all 0.8s cubic-bezier(0.1, 0.8, 0.2, 1)';
+                
+                container.appendChild(conf);
+                setTimeout(() => {
+                    conf.style.transform = `translate(${velX}vw, ${velY}vh) scale(0.5)`;
+                    conf.style.opacity = '0';
+                }, 50);
+                setTimeout(() => conf.remove(), 900);
+            }
+        }
+
+        function forcarSubEventoJunho(subChave) {
+            subEventoJunhoForcado = subChave;
+            eventoForcadoChave = subChave;
+            verificarEExecutarEventosSazonais();
+        }
+
+        function ajustarCoresInterfaceTexto(cor) {
+            const idsCores = [
+                'lblPainelControle', 'lblTempoS', 'lblTempAtivo', 'lblModoTempo', 'lblMutarSom', 
+                'lblGiroAuto', 'lblQtdGiros', 'lblJogadoresSala', 'lblGestaoMissoes'
+            ];
+            idsCores.forEach(id => {
+                let el = document.getElementById(id);
+                if(el) el.style.color = cor;
+            });
+        }
+
+        function verificarBrilhoCorHex(hex) {
+            if (!hex || hex.startsWith("linear-gradient")) return false;
+            let c = hex.substring(1);
+            if(c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+            let rgb = parseInt(c, 16);
+            let r = (rgb >> 16) & 0xff;
+            let g = (rgb >>  8) & 0xff;
+            let b = (rgb >>  0) & 0xff;
+            let luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            return luma > 128;
         }
 
         function inicializarChuvaEmojis(listaEmojis) {
@@ -514,162 +828,391 @@
                 let emojiEl = document.createElement('div');
                 emojiEl.className = 'emoji-sazonal-bg';
                 emojiEl.innerText = listaEmojis[Math.floor(Math.random() * listaEmojis.length)];
-                emojiEl.style.left = (Math.random() * 100) + "vw";
-                emojiEl.style.animationDuration = (Math.random() * 2 + 4) + "s";
-                if(window.sazonalAtivoDados && window.sazonalAtivoDados.tonsPasteis) emojiEl.style.opacity = "0.75";
+                emojiEl.style.left = (Math.random() * 100 + 10) + "vw";
+                emojiEl.style.animationDuration = (Math.random() * 3 + 4) + "s";
                 container.appendChild(emojiEl);
-                setTimeout(() => emojiEl.remove(), 6000);
-            }, 500);
+                setTimeout(() => { emojiEl.remove(); }, 7000);
+            }, 400);
         }
 
-        function tocarSomConfete() {
-            try {
-                let context = new (window.AudioContext || window.webkitAudioContext)();
-                let osc = context.createOscillator(), gain = context.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(600, context.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(150, context.currentTime + 0.4);
-                gain.gain.setValueAtTime(0.3, context.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.4);
-                osc.connect(gain); gain.connect(context.destination);
-                osc.start(); osc.stop(context.currentTime + 0.4);
-            } catch(e){}
-            alert("🎉 BOOM! Explosão de Confetes Coloridos! 🍬🪅");
+        function ativarCliqueSazonal() {
+            if(window.sazonalAtivoDados && window.sazonalAtivoDados.acaoBotao) {
+                window.sazonalAtivoDados.acaoBotao();
+            }
         }
 
-        function mostrarPopupSazonal(emoji, texto) {
-            document.getElementById('popupSazonalEmoji').innerHTML = emoji;
-            document.getElementById('popupSazonalTexto').innerHTML = texto;
-            document.getElementById('modalSazonalPopup').style.display = "flex";
+        function forcarEventoManual(valorChave) {
+            subEventoJunhoForcado = "";
+            eventoForcadoChave = valorChave;
+            verificarEExecutarEventosSazonais();
         }
-        function fecharSazonalPopup() { document.getElementById('modalSazonalPopup').style.display = "none"; }
-        function ativarCliqueSazonal() { if(window.sazonalAtivoDados && window.sazonalAtivoDados.acaoBotao) window.sazonalAtivoDados.acaoBotao(); }
-        function forcarEventoManual(valorChave) { subEventoJunhoForcado = ""; eventoForcadoChave = valorChave; verificarEExecutarEventosSazonais(); }
-        function forcarSubEventoJunho(subChave) { subEventoJunhoForcado = subChave; eventoForcadoChave = subChave; verificarEExecutarEventosSazonais(); }
+
+        function abrirModalSazonalPopup(emoji, texto) {
+            document.getElementById('txtSazonalPopupEmoji').innerText = emoji;
+            document.getElementById('txtSazonalPopupMensagem').innerText = texto;
+            document.getElementById('modalSazonalPopup').style.display = 'flex';
+        }
+        function fecharModalSazonalPopup() { document.getElementById('modalSazonalPopup').style.display = 'none'; }
+
+        function abrirModalPascoa() { document.getElementById('modalPascoa').style.display = 'flex'; }
+        function fecharModalPascoa() { document.getElementById('modalPascoa').style.display = 'none'; }
 
         function alternarModo() {
-            if(window.sazonalAtivoDados) return; // Não afeta os eventos sazonais ativos
             let m = document.body.getAttribute('data-theme');
-            document.body.setAttribute('data-theme', m === 'light' ? 'default' : 'light');
+            let novo = m === 'light' ? 'default' : 'light';
+            document.body.setAttribute('data-theme', novo);
             desenharRoleta();
         }
 
-        function atualizarInterfaceLogado() {
-            let pAdmin = document.getElementById('painelTesteAdmin');
-            if(usuarioLogado && usuarioLogado.id === "#1122264") {
-                pAdmin.style.display = "flex";
-            } else {
-                pAdmin.style.display = "none";
-                if(eventoForcadoChave !== "") { eventoForcadoChave = ""; verificarEExecutarEventosSazonais(); }
-            }
-            document.getElementById('btnAuthHeader').style.display = usuarioLogado ? 'none' : 'block';
-            document.getElementById('btnLogoutHeader').style.display = usuarioLogado ? 'block' : 'none';
-        }
-
-        function ejecutarLogin(e) {
-            e.preventDefault();
-            let u = document.getElementById('loginUser').value.trim();
-            if(u === "admin" || u === "#1122264") {
-                usuarioLogado = { id: "#1122264", nome: "Avaliador Oficial", emoji: "🛠️", pontos: 0 };
-            } else {
-                usuarioLogado = { id: "#user_" + Math.floor(Math.random()*100), nome: u, emoji: "👤", pontos: 0 };
-            }
-            localStorage.setItem('roleta_logado', JSON.stringify(usuarioLogado));
-            fecharModalAuth(); atualizarInterfaceLogado(); verificarEExecutarEventosSazonais(); atualizarJogadores();
-        }
-
-        function executarLogout() {
-            usuarioLogado = null; localStorage.removeItem('roleta_logado');
-            eventoForcadoChave = ""; subEventoJunhoForcado = "";
-            atualizarInterfaceLogado(); verificarEExecutarEventosSazonais(); atualizarJogadores();
+        function obterContas() { return JSON.parse(localStorage.getItem('roleta_contas')) || []; }
+        
+        function salvarUsuarioNoBanco(userObj) {
+            let contas = obterContas();
+            let idx = contas.findIndex(c => c.user === userObj.user);
+            if(idx !== -1) contas[idx] = userObj;
+            localStorage.setItem('roleta_contas', JSON.stringify(contas));
+            if(usuarioLogado && usuarioLogado.user === userObj.user) { usuarioLogado = userObj; localStorage.setItem('roleta_logado', JSON.stringify(userObj)); }
+            if (USAR_SERVIDOR_REAL) db.collection("usuarios").doc(userObj.user).set(userObj, { merge: true });
         }
 
         function abrirModalAuth() { document.getElementById('modalAuth').style.display = 'flex'; }
         function fecharModalAuth() { document.getElementById('modalAuth').style.display = 'none'; }
+        function mudarAbaAuth(tipo) {
+            document.getElementById('abaLogin').classList.toggle('ativa', tipo==='login'); document.getElementById('abaCadastro').classList.toggle('ativa', tipo==='cadastro');
+            document.getElementById('formLogin').classList.toggle('ativo', tipo==='login'); document.getElementById('formCadastro').classList.toggle('ativo', tipo==='cadastro');
+        }
 
-        function desenharRoleta() {
-            let lista = desafios.filter(d => filtrosAtivos[d.dif]); ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if(lista.length === 0) return;
+        function executarCadastro(e) {
+            e.preventDefault();
+            let user = document.getElementById('cadUser').value.trim().toLowerCase();
+            let email = document.getElementById('cadEmail').value.trim();
+            let contas = obterContas();
+            if(contas.some(c => c.user === user || c.email === email)) { alert("Dados indisponíveis!"); return; }
 
-            let tamAng = (2 * Math.PI) / lista.length;
-            let c1 = "#1a1d2d", c2 = "#24293e", txtC = "#ffffff", bordaC = "rgba(255,255,255,0.1)";
+            let geradoID = "#" + Math.floor(1000000 + Math.random() * 9000000).toString();
+            let emojiSorteado = emojisNovasContas[Math.floor(Math.random() * emojisNovasContas.length)];
 
-            if (window.sazonalAtivoDados) {
-                c1 = window.sazonalAtivoDados.fatia === "multi" ? "multi" : window.sazonalAtivoDados.fatia;
-                c2 = window.sazonalAtivoDados.fatia2 ? window.sazonalAtivoDados.fatia2 : c1;
-                txtC = window.sazonalAtivoDados.letras;
-                bordaC = window.sazonalAtivoDados.borda;
+            let novoUser = {
+                id: geradoID, nome: document.getElementById('cadNome').value.trim(), user, email,
+                senha: document.getElementById('cadSenha').value, emoji: emojiSorteado, fundoAvatar: "#39ff14",
+                nivel: 1, xp: 0, xpDiario: 0, temaAtivo: "verde-neon", pontos: 0,
+                codigoSala: Math.floor(100000 + Math.random() * 900000).toString(), amigos: [], roletasSalvas: []
+            };
+
+            contas.push(novoUser); localStorage.setItem('roleta_contas', JSON.stringify(contas));
+            usuarioLogado = novoUser; localStorage.setItem('roleta_logado', JSON.stringify(novoUser));
+            document.body.setAttribute('data-roleta-theme', 'verde-neon');
+            if (USAR_SERVIDOR_REAL) db.collection("usuarios").doc(user).set(novoUser);
+            fecharModalAuth(); atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
+        }
+
+        function ejecutarLogin(e) {
+            e.preventDefault();
+            let inp = document.getElementById('loginUser').value.trim().toLowerCase();
+            let pass = document.getElementById('loginSenha').value;
+
+            let conta = obterContas().find(c => (c.user === inp || c.email === inp) && c.senha === pass);
+            if(!conta) { alert("Incorreto!"); return; }
+            usuarioLogado = conta;
+            sanitizarContaFaltante(usuarioLogado);
+            document.body.setAttribute('data-roleta-theme', usuarioLogado.temaAtivo);
+            fecharModalAuth(); atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
+        }
+
+        function executarLogout() {
+            usuarioLogado = null; localStorage.removeItem('roleta_logado');
+            document.body.setAttribute('data-roleta-theme', 'verde-neon'); salaOnlineCriada = false;
+            eventoForcadoChave = ""; subEventoJunhoForcado = "";
+            document.getElementById('painelTesteAdmin').style.display = "none";
+            document.getElementById('selectForcarEvento').value = "";
+            atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
+        }
+
+        function atualizarInterfaceLogado() {
+            let pBox = document.getElementById('perfilLogadoBox');
+            let btnAuth = document.getElementById('btnAuthHeader');
+            let btnOut = document.getElementById('btnLogoutHeader');
+            let btnCriar = document.getElementById('btnCriarSala');
+            let divSalvar = document.getElementById('secaoSalvarRoleta');
+            let pAdmin = document.getElementById('painelTesteAdmin');
+
+            if(usuarioLogado) {
+                pBox.style.display = 'block'; btnAuth.style.display = 'none'; btnOut.style.display = 'block'; btnCriar.style.display = 'block'; divSalvar.style.display = 'none'; 
+                document.getElementById('perfAvatar').innerText = usuarioLogado.emoji;
+                document.getElementById('perfAvatar').style.background = usuarioLogado.fundoAvatar;
+                document.getElementById('perfNome').innerText = usuarioLogado.nome;
+                document.getElementById('perfID').innerText = usuarioLogado.id;
+                document.getElementById('perfNivel').innerText = `Nível ${usuarioLogado.nivel}`;
+                let max = 50 + (usuarioLogado.nivel - 1) * 25;
+                document.getElementById('perfXpTexto').innerText = `XP: ${usuarioLogado.xp}/${max}`;
+                document.getElementById('perfXpLimite').innerText = `${usuarioLogado.xpDiario || 0}/25 Diário`;
+                document.getElementById('perfBarraProgresso').style.width = `${(usuarioLogado.xp / max) * 100}%`;
+                
+                if (usuarioLogado.id === "#1122264") {
+                    pAdmin.style.display = "flex";
+                } else {
+                    pAdmin.style.display = "none";
+                }
+            } else {
+                pBox.style.display = 'none'; btnAuth.style.display = 'block'; btnOut.style.display = 'none'; btnCriar.style.display = 'none'; pAdmin.style.display = "none";
             }
+        }
 
-            const coresLgbt = ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"];
+        function abrirModalEdicaoPerfil() { if(!usuarioLogado) return; mudarAbaPerfil('editar'); document.getElementById('modalEdicaoPerfil').style.display = 'flex'; }
+        function fecharModalEdicaoPerfil() { document.getElementById('modalEdicaoPerfil').style.display = 'none'; }
+        
+        function mudarAbaPerfil(aba) {
+            document.getElementById('abaA').classList.toggle('ativa', aba==='editar'); document.getElementById('abaB').classList.toggle('ativa', aba==='amigos');
+            document.getElementById('subPerfilEditar').style.display = aba==='editar' ? 'flex' : 'none';
+            document.getElementById('subPerfilAmigos').style.display = aba==='amigos' ? 'flex' : 'none';
 
-            lista.forEach((d, i) => {
-                ctx.beginPath(); ctx.moveTo(250, 250);
-                ctx.arc(250, 250, 240, i * tamAng, (i + 1) * tamAng);
-                ctx.fillStyle = c1 === "multi" ? coresLgbt[i % 6] : (i % 2 === 0 ? c1 : c2);
-                ctx.fill(); ctx.strokeStyle = bordaC; ctx.stroke();
+            if(aba === 'editar') {
+                document.getElementById('editEmoji').value = usuarioLogado.emoji; document.getElementById('editFundoAvatar').value = usuarioLogado.fundoAvatar;
+                document.getElementById('lblCodigoSala').innerText = usuarioLogado.codigoSala;
+            } else { atualizarListaAmigos(); }
+        }
 
-                ctx.save(); ctx.translate(250, 250); ctx.rotate(i * tamAng + tamAng/2);
-                ctx.textAlign = "right"; ctx.fillStyle = txtC; ctx.font = "bold 13px sans-serif";
-                ctx.fillText(d.texto.substring(0, 14), 210, 5); ctx.restore();
+        const selectEditEmoji = document.getElementById('editEmoji');
+        if(selectEditEmoji) {
+            selectEditEmoji.innerHTML = '';
+            ["𝓐","𝓑","𝓬","𝓓","𝓔","𝓕","𝓖","𝓗","𝓘","𝓙","𝓚","𝓛","𝓜","𝓝","𝓞","𝓟","𝓠","𝓡","𝓢","𝓣","𝓤","𝓥","𝓦","𝓧","𝓨","𝓩"].forEach(em => {
+                selectEditEmoji.innerHTML += `<option value="${em}">${em}</option>`;
             });
         }
 
-        function gridGirarEvent() {
-            if(estaGirando) return; estaGirando = true;
-            let voltas = 6 + Math.floor(Math.random() * 5); anguloAtual += (voltas * 360) + Math.floor(Math.random() * 360);
-            canvas.style.transform = `rotate(${anguloAtual}deg)`;
-            setTimeout(() => {
-                estaGirando = false;
-                let lista = desafios.filter(d => filtrosAtivos[d.dif]);
-                let grFin = (360 - (anguloAtual % 360) + 270) % 360;
-                let idx = Math.floor(grFin / (360 / lista.length)) % lista.length;
-                desafioSorteadoGlobal = lista[idx];
-                document.getElementById('desafioAtualTexto').innerText = `Missão: "${desafioSorteadoGlobal.texto}"`;
-                document.getElementById('painelValidacao').style.display = 'flex';
-            }, 3500);
+        function salvarEdicaoPerfil() {
+            usuarioLogado.emoji = document.getElementById('editEmoji').value; usuarioLogado.fundoAvatar = document.getElementById('editFundoAvatar').value;
+            salvarUsuarioNoBanco(usuarioLogado); atualizarInterfaceLogado(); atualizarJogadores();
         }
 
-        function validarResultado(c) {
-            document.getElementById('painelValidacao').style.display = 'none';
-            document.getElementById('historico').innerText = c ? "Missão cumprida!" : "Não cumpriu.";
-            let total = 1 + jogadoresLocais.length;
-            jugadorAtualIndex = (jugadorAtualIndex + 1) % total; atualizarJogadores();
+        function criarSalaOnline() { salaOnlineCriada = true; atualizarJogadores(); alert(`Sala Online Ativa! Código: ${usuarioLogado.codigoSala}`); }
+        function entrarPorCodigo() {
+            let cod = document.getElementById('codigoConviteInput').value.trim(); if(cod.length !== 6) return;
+            let sala = obterContas().find(c => c.codigoSala === cod); if(!sala) { alert("Não localizada."); return; }
+            jogadoresLocais.push({ nome: sala.nome, avatar: sala.emoji, bg: sala.fundoAvatar, pontos: 0 });
+            localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
+            document.getElementById('codigoConviteInput').value = ''; atualizarJogadores();
         }
 
-        function adicionarJogador() {
-            let inp = document.getElementById('nome-jogador'); if(!inp.value.trim()) return;
-            jogadoresLocais.push({ nome: inp.value.trim(), pontos: 0 }); inp.value = ''; atualizarJogadores();
+        function removerJogadorLocal(index) {
+            jogadoresLocais.splice(index, 1); localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
+            if (jugadorAtualIndex >= obterListaTotalJogadores().length) jugadorAtualIndex = 0;
+            atualizarJogadores();
+        }
+
+        function obterListaTotalJogadores() {
+            let lista = [];
+            if(usuarioLogado) lista.push({ nome: usuarioLogado.nome + (salaOnlineCriada ? " 👑" : " (Você)"), avatar: usuarioLogado.emoji, bg: usuarioLogado.fundoAvatar, pontos: usuarioLogado.pontos || 0, principal: true });
+            jogadoresLocais.forEach((j, idx) => lista.push({ ...j, indexLocal: idx, principal: false }));
+            return lista;
         }
 
         function atualizarJogadores() {
             let container = document.getElementById('listaJogadoresContainer'); container.innerHTML = '';
-            let lista = []; if(usuarioLogado) lista.push({ nome: usuarioLogado.nome, pontos: usuarioLogado.pontos });
-            jogadoresLocais.forEach(j => lista.push(j));
-            lista.forEach((j, idx) => {
-                let ativo = idx === jugadorAtualIndex ? 'style="border-color:var(--primaria); background:rgba(0,242,254,0.1);"' : '';
-                container.innerHTML += `<div class="jogador-item" ${ativo}><div class="jogador-info"><span>${j.nome}</span><span><strong>${j.pontos} pts</strong></span></div></div>`;
+            obterListaTotalJogadores().forEach((j, idx) => {
+                let ativo = idx === jugadorAtualIndex ? 'ativo' : '';
+                let botaoRemover = !j.principal ? `<button onclick="removerJogadorLocal(${j.indexLocal})" style="background:none; border:none; color:#ff2a5f; margin-left:10px; cursor:pointer;">✕</button>` : '';
+                container.innerHTML += `
+                    <div class="jogador-item ${ativo}">
+                        <div class="avatar-preview" style="background:${j.bg || 'rgba(255,255,255,0.1)'}">${j.avatar}</div>
+                        <div class="jogador-info"><span>${j.nome}</span><span><strong>${j.pontos || 0} pts</strong></span></div>
+                        ${botaoRemover}
+                    </div>`;
             });
         }
 
-        function adicionarDesafio() {
-            let txt = document.getElementById('texto-desafio'); if(!txt.value.trim()) return;
-            desafios.push({ texto: txt.value.trim(), dif: document.getElementById('dificuldade-desafio').value });
-            txt.value = ''; atualizarSeletores(); desenharRoleta();
+        function adicionarJogador() {
+            let inp = document.getElementById('nome-jogador'); if(!inp.value.trim()) return;
+            jogadoresLocais.push({ nome: inp.value.trim(), avatar: document.getElementById('emoji-jogador').value, pontos: 0 });
+            inp.value = ''; localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais)); atualizarJogadores();
         }
 
-        function atualizarSeletores() {
-            let s = document.getElementById('seletor-remover'); if(!s) return; s.innerHTML = '';
-            desafios.forEach((d, i) => s.innerHTML += `<option value="${i}">[${d.dif}] ${d.texto}</option>`);
+        function obterDesafiosFiltrados() { 
+            return desafios.filter(d => filtrosAtivos[d.dif] === true); 
         }
 
-        function removerDesafio() {
-            let s = document.getElementById('seletor-remover'); if(!s || s.value==="") return;
-            desafios.splice(parseInt(s.value), 1); atualizarSeletores(); desenharRoleta();
+        function desenharRoleta() {
+            let lista = obterDesafiosFiltrados(); ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(lista.length === 0) {
+                ctx.fillStyle = "#ffffff"; ctx.font = "16px sans-serif"; ctx.textAlign = "center";
+                ctx.fillText("Nenhuma dificuldade ativa", 250, 250);
+                return;
+            }
+
+            let tamAng = (2 * Math.PI) / lista.length;
+            let bodyStyle = getComputedStyle(document.body);
+            
+            let c1 = "#1a1d2d", c2 = "#24293e";
+            let txtC = window.sazonalAtivoDados ? window.sazonalAtivoDados.letras : (bodyStyle.getPropertyValue('--roleta-texto').trim() || "#ffffff");
+            let bordaC = window.sazonalAtivoDados ? window.sazonalAtivoDados.borda : (bodyStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)");
+
+            const coresLgbtFatias = ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"];
+
+            if (window.sazonalAtivoDados) {
+                if (window.sazonalAtivoDados.fatia === "multi") {
+                    c1 = "multi";
+                } else {
+                    c1 = window.sazonalAtivoDados.fatia;
+                    c2 = window.sazonalAtivoDados.fatia;
+                }
+            } else {
+                c1 = bodyStyle.getPropertyValue('--roleta-fundo-1').trim() || "#1a1d2d";
+                c2 = bodyStyle.getPropertyValue('--roleta-fundo-2').trim() || "#24293e";
+            }
+
+            lista.forEach((d, i) => {
+                ctx.beginPath(); ctx.moveTo(250, 250);
+                ctx.arc(250, 250, 240, i * tamAng, (i + 1) * tamAng);
+                
+                if (c1 === "multi") {
+                    ctx.fillStyle = coresLgbtFatias[i % coresLgbtFatias.length];
+                } else {
+                    ctx.fillStyle = (i % 2 === 0) ? c1 : c2;
+                }
+                
+                ctx.fill(); 
+                ctx.strokeStyle = bordaC; ctx.stroke();
+
+                ctx.save(); ctx.translate(250, 250); ctx.rotate(i * tamAng + tamAng/2);
+                ctx.textAlign = "right"; ctx.fillStyle = txtC; ctx.font = "bold 13px sans-serif";
+                
+                let tag = d.dif === 'Fácil' ? '🟢 ' : d.dif === 'Médio' ? '🟡 ' : '🔴 ';
+                ctx.fillText(tag + d.texto.substring(0, 14), 210, 5); ctx.restore();
+            });
         }
 
-        function mudarFiltro(d) { filtrosAtivos[d] = !filtrosAtivos[d]; document.getElementById(`filtro-${d.toLowerCase()}`).classList.toggle('ativo', filtrosAtivos[d]); desenharRoleta(); }
-        function atualizarDisplayTempo() { let t = parseInt(document.getElementById('tempoInput').value) || 30; document.getElementById('cronometro').innerText = `00:${t<10?'0'+t:t}`; }
-        function toggleTemporizadorVisivel() {}
+        function girarRoleta() {
+            if(estaGirando) return;
+            let lista = obterDesafiosFiltrados(); if(lista.length === 0) return;
+            estaGirando = true; clearInterval(cronometroInterval); 
+
+            let voltas = 6 + Math.floor(Math.random() * 5); let graus = Math.floor(Math.random() * 360);
+            anguloAtual += (voltas * 360) + graus; canvas.style.transform = `rotate(${anguloAtual}deg)`;
+
+            setTimeout(() => {
+                estaGirando = false;
+                let grFin = (360 - (anguloAtual % 360) + 270) % 360;
+                let idx = Math.floor(grFin / (360 / lista.length)) % lista.length;
+                desafioSorteadoGlobal = lista[idx];
+
+                if(usuarioLogado && (usuarioLogado.xpDiario || 0) < 25) {
+                    usuarioLogado.xp = (usuarioLogado.xp || 0) + 2; 
+                    usuarioLogado.xpDiario = (usuarioLogado.xpDiario || 0) + 2;
+                    let max = 50 + (usuarioLogado.nivel - 1) * 25;
+                    if(usuarioLogado.xp >= max) { usuarioLogado.xp = usuarioLogado.xp - max; usuarioLogado.nivel += 1; }
+                    salvarUsuarioNoBanco(usuarioLogado); atualizarInterfaceLogado();
+                }
+
+                let ptsValor = desafioSorteadoGlobal.dif === 'Fácil' ? 5 : desafioSorteadoGlobal.dif === 'Médio' ? 10 : 20;
+                document.getElementById('desafioAtualTexto').innerText = `Missão: "${desafioSorteadoGlobal.texto}" valendo ${ptsValor} Pontos!`;
+                document.getElementById('painelValidacao').style.display = 'flex';
+                
+                if(document.getElementById('ativarTempo').checked) {
+                    let modo = document.getElementById('modoTempoSelect').value;
+                    if (modo === 'automatico') {
+                        iniciarCronometroRegressivo();
+                    } else {
+                        atualizarDisplayTempo();
+                    }
+                }
+            }, 3500);
+        }
+
+        function iniciarCronometroRegressivo() {
+            let tempoRestante = parseInt(document.getElementById('tempoInput').value) || 30;
+            document.getElementById('cronometro').innerText = formatarTempo(tempoRestante);
+            cronometroInterval = setInterval(() => {
+                tempoRestante--;
+                if(tempoRestante <= 0) {
+                    clearInterval(cronModificationInterval); document.getElementById('cronometro').innerText = "00:00";
+                    if(document.getElementById('autoGirarCheck').checked) setTimeout(() => validarResultado(false), 1500);
+                } else { document.getElementById('cronometro').innerText = formatarTempo(tempoRestante); }
+            }, 1000);
+        }
+        
+        function formatarTempo(s) { let min = Math.floor(s/60); let seg = s%60; return `${min<10?'0'+min:min}:${seg<10?'0'+seg:seg}`; }
+
+        function toggleTemporizadorVisivel() {
+            let ativo = document.getElementById('ativarTempo').checked;
+            let cronoEl = document.getElementById('cronometro');
+            if(!ativo) {
+                clearInterval(cronometroInterval);
+                cronoEl.style.opacity = "0.3";
+            } else {
+                cronoEl.style.opacity = "1";
+                atualizarDisplayTempo();
+            }
+        }
+
+        function validarResultado(cumpriu) {
+            clearInterval(cronometroInterval); document.getElementById('painelValidacao').style.display = 'none';
+            let listaCompleta = obterListaTotalJogadores(); if(listaCompleta.length === 0 || !desafioSorteadoGlobal) return;
+
+            let j = listaCompleta[jugadorAtualIndex];
+            let ptsGanhar = desafioSorteadoGlobal.dif === 'Fácil' ? 5 : desafioSorteadoGlobal.dif === 'Médio' ? 10 : 20;
+
+            if(cumpriu) {
+                if (usuarioLogado && jugadorAtualIndex === 0) {
+                    usuarioLogado.pontos = (usuarioLogado.pontos || 0) + ptsGanhar; salvarUsuarioNoBanco(usuarioLogado);
+                } else {
+                    let idxLocal = usuarioLogado ? jugadorAtualIndex - 1 : jugadorAtualIndex;
+                    if(jogadoresLocais[idxLocal]) jogadoresLocais[idxLocal].pontos = (jogadoresLocais[idxLocal].pontos || 0) + ptsGanhar;
+                }
+                document.getElementById('historico').innerText = `${j.nome} cumpriu a missão e ganhou +${ptsGanhar} pontos!`;
+            } else {
+                document.getElementById('historico').innerText = `${j.nome} falhou no desafio.`;
+            }
+
+            jugadorAtualIndex = (jugadorAtualIndex + 1) % listaCompleta.length;
+            localStorage.setItem('roleta_jogadores_locais', JSON.stringify(jogadoresLocais));
+            atualizarJogadores(); atualizarDisplayTempo();
+
+            let autoGirar = document.getElementById('autoGirarCheck').checked;
+            let gInput = document.getElementById('girosInput');
+            let girosRestantes = parseInt(gInput.value) || 0;
+
+            if (autoGirar && girosRestantes > 1) { gInput.value = girosRestantes - 1; setTimeout(() => girarRoleta(), 2000); } 
+            else if (autoGirar && girosRestantes <= 1) { document.getElementById('autoGirarCheck').checked = false; gInput.value = 5; }
+        }
+
+        function atualizarDisplayTempo() { 
+            let t = parseInt(document.getElementById('tempoInput').value) || 30; 
+            document.getElementById('cronometro').innerText = formatarTempo(t); 
+        }
+        
+        function mudarFiltro(d) { 
+            filtrosAtivos[d] = !filtrosAtivos[d]; 
+            let btn = document.getElementById(`filtro-${d.toLowerCase()}`);
+            if(btn) {
+                btn.classList.toggle('ativo', filtrosAtivos[d]);
+            }
+            desenharRoleta(); 
+        }
+        
+        function adicionarDesafio() { 
+            let txtInp = document.getElementById('texto-desafio'); if(!txtInp.value.trim()) return;
+            desafios.push({ texto: txtInp.value.trim(), dif: document.getElementById('dificuldade-desafio').value }); 
+            txtInp.value = ''; atualizarSeletores(); desenharRoleta(); 
+        }
+        
+        function atualizarSeletores() { 
+            let s = document.getElementById('seletor-remover'); if(!s) return;
+            s.innerHTML = ''; 
+            desafios.forEach((d, i) => {
+                s.innerHTML += `<option value="${i}">[${d.dif}] ${d.texto}</option>`;
+            }); 
+        }
+        
+        function removerDesafio() { 
+            let seletor = document.getElementById('seletor-remover');
+            if(!seletor || seletor.value === "") return;
+            desafios.splice(parseInt(seletor.value), 1); 
+            atualizarSeletores(); 
+            desenharRoleta(); 
+        }
+        
+        function buscarEAdicionarAmigo() { alert("Simulado local!"); }
+        function atualizarListaAmigos() {}
     </script>
 </body>
 </html>
