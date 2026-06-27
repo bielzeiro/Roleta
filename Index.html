@@ -64,6 +64,8 @@
         
         .btn-header { background: var(--bg-painel); border: 1px solid var(--border-color); color: var(--texto); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
         .btn-header:hover { border-color: var(--primaria); }
+        .btn-desativar-sazonal { border-color: #ff4a4a !important; display: none; }
+        .btn-desativar-sazonal:hover { background: rgba(255, 74, 74, 0.2); }
 
         /* Estilo do Titulo em Degradê Roxo */
         .titulo-roleta-container { width: 100%; text-align: center; padding-top: 20px; position: relative; z-index: 10; }
@@ -162,10 +164,6 @@
         .perfil-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid var(--primaria); }
         .perfil-meta { display: flex; flex-direction: column; }
         .perfil-id { font-size: 11px; opacity: 0.6; font-family: monospace; }
-        .perfil-nivel-tag { background: var(--primaria); color: #121420; padding: 1px 6px; border-radius: 6px; font-size: 10px; font-weight: bold; width: fit-content; margin-top: 2px; }
-        
-        .xp-barra-fundo { background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 5px; }
-        .xp-barra-progresso { background: linear-gradient(90deg, var(--primaria), var(--secundaria)); height: 100%; width: 0%; }
 
         .lista-jogadores { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
         .jogador-item { display: flex; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 10px; border: 1px solid transparent; }
@@ -244,6 +242,7 @@
     <header>
         <div class="header-controles">
             <button class="btn-header" onclick="alternarModo()">🌓 Modo Base</button>
+            <button class="btn-header btn-desativar-sazonal" id="btnDesativarSazonal" onclick="desativarEventosSazonais()">❌ Desativar Evento</button>
         </div>
         <div class="header-controles">
             <button class="btn-header" id="btnAuthHeader" onclick="abrirModalAuth()">👤 Login / Cadastro</button>
@@ -345,12 +344,7 @@
                         <div class="perfil-meta">
                             <span class="perfil-nome" id="perfNome">Dono</span>
                             <span class="perfil-id" id="perfID">#0000000</span>
-                            <span class="perfil-nivel-tag" id="perfNivel">Nível 1</span>
                         </div>
-                    </div>
-                    <div class="xp-wrapper" style="margin-top: 8px;">
-                        <div style="display:flex; justify-content:space-between; font-size: 11px;"><span id="perfXpTexto">XP: 0/50</span><span id="perfXpLimite">0/25 XP Diário</span></div>
-                        <div class="xp-barra-fundo"><div class="xp-barra-progresso" id="perfBarraProgresso"></div></div>
                     </div>
                 </div>
 
@@ -458,11 +452,6 @@
                     <select id="editFundoAvatar" onchange="salvarEdicaoPerfil()"><option value="#4facfe">Azul</option><option value="#ff2a5f">Rosa</option><option value="#39ff14">Néon</option></select>
                 </div>
                 
-                <div style="margin-top:10px; display:none !important;">
-                    <span style="font-size:12px; font-weight:bold; opacity:0.7;">🎨 Seus Estilos Desbloqueados por Nível</span>
-                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:5px;" id="editTemasItens"></div>
-                </div>
-                
                 <div style="margin-top:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; text-align:center;">
                     <span style="font-size:11px; opacity:0.6;">Código Online da sua Sala:</span>
                     <div id="lblCodigoSala" style="font-weight:bold; font-size:18px; color:var(--primaria);">------</div>
@@ -500,6 +489,7 @@
         let eventoForcadoChave = "";
         let idIntervalAnimacaoSazonal = null;
         let subEventoJunhoForcado = "";
+        let sazonalDesativadoManualmente = false;
 
         let desafios = [
             { texto: "Equilibrar num pé só", dif: "Fácil" },
@@ -601,9 +591,6 @@
         function sanitizarContaFaltante(userObj) {
             let alterou = false;
             if(!userObj.id) { userObj.id = "#" + Math.floor(1000000 + Math.random() * 9000000).toString(); alterou = true; }
-            if(userObj.nivel === undefined) { userObj.nivel = 1; alterou = true; }
-            if(userObj.xp === undefined) { userObj.xp = 0; alterou = true; }
-            if(userObj.xpDiario === undefined) { userObj.xpDiario = 0; alterou = true; }
             if(!userObj.codigoSala) { userObj.codigoSala = Math.floor(100000 + Math.random() * 900000).toString(); alterou = true; }
             if(!userObj.amigos) { userObj.amigos = []; alterou = true; }
             if(!userObj.roletasSalvas) { userObj.roletasSalvas = []; alterou = true; }
@@ -611,44 +598,51 @@
             if(alterou) { salvarUsuarioNoBanco(userObj); }
         }
 
+        function desativarEventosSazonais() {
+            sazonalDesativadoManualmente = true;
+            verificarEExecutarEventosSazonais();
+        }
+
         function verificarEExecutarEventosSazonais() {
             clearInterval(idIntervalAnimacaoSazonal);
             document.getElementById('containerEmojisSazonais').innerHTML = "";
             document.getElementById('emojiLgbtCentral').style.display = "none";
             document.getElementById('bgEspecialBrasil').style.display = "none";
+            document.getElementById('btnDesativarSazonal').style.display = "none";
             
             let chaveEvento = "";
 
-            if (eventoForcadoChave !== "") {
-                chaveEvento = eventoForcadoChave;
-            } else {
-                let agora = new Date();
-                let mes = agora.getMonth() + 1;
-                let dia = agora.getDate();
+            if (!sazonalDesativadoManualmente) {
+                if (eventoForcadoChave !== "") {
+                    chaveEvento = eventoForcadoChave;
+                } else {
+                    let agora = new Date();
+                    let mes = agora.getMonth() + 1;
+                    let dia = agora.getDate();
 
-                if (mes === 1 && dia >= 1 && dia <= 15) chaveEvento = "jan_1_15";
-                else if (mes === 1 && dia >= 16 && dia <= 31) chaveEvento = "jan_16_31";
-                else if (mes === 2 && dia >= 1 && dia <= 15) chaveEvento = "fev_1_15";
-                else if (mes === 3 && dia >= 1 && dia <= 5) chaveEvento = "mar_1_5";
-                else if (mes === 3 && dia >= 6 && dia <= 15) chaveEvento = "mar_6_15";
-                else if (mes === 4 && dia >= 1 && dia <= 30) chaveEvento = "abr_1_30";
-                else if (mes === 5 && dia >= 1 && dia <= 20) chaveEvento = "maio_1_20";
-                else if (mes === 6) {
-                    if (subEventoJunhoForcado !== "") {
-                        chaveEvento = subEventoJunhoForcado;
-                    } else {
-                        if (dia >= 1 && dia <= 15) chaveEvento = "jun_namorados";
-                        else if (dia >= 16 && dia <= 30) chaveEvento = "jun_saojoao";
-                        else chaveEvento = "jun_orgulho"; 
+                    if (mes === 1 && dia >= 1 && dia <= 15) chaveEvento = "jan_1_15";
+                    else if (mes === 1 && dia >= 16 && dia <= 31) chaveEvento = "jan_16_31";
+                    else if (mes === 2 && dia >= 1 && dia <= 15) chaveEvento = "fev_1_15";
+                    else if (mes === 3 && dia >= 1 && dia <= 5) chaveEvento = "mar_1_5";
+                    else if (mes === 3 && dia >= 6 && dia <= 15) chaveEvento = "mar_6_15";
+                    else if (mes === 4 && dia >= 1 && dia <= 30) chaveEvento = "abr_1_30";
+                    else if (mes === 5 && dia >= 1 && dia <= 20) chaveEvento = "maio_1_20";
+                    else if (mes === 6) {
+                        if (subEventoJunhoForcado !== "") {
+                            chaveEvento = subEventoJunhoForcado;
+                        } else {
+                            if (dia >= 1 && dia <= 15) chaveEvento = "jun_namorados";
+                            else if (dia >= 16 && dia <= 30) chaveEvento = "jun_saojoao";
+                            else chaveEvento = "jun_orgulho"; 
+                        }
                     }
+                    else if (mes === 8 && dia >= 1 && dia <= 15) chaveEvento = "agosto_pais";
+                    else if (mes === 9 && dia >= 1 && dia <= 30) chaveEvento = "set_1_30";
+                    else if (mes === 10 && dia >= 1 && dia <= 15) chaveEvento = "out_1_15";
+                    else if (mes === 10 && dia >= 16 && dia <= 31) chaveEvento = "out_16_31";
+                    else if (mes === 11 && dia >= 1 && dia <= 30) chaveEvento = "nov_1_30";
+                    else if (mes === 12 && dia >= 1 && dia <= 31) chaveEvento = "dez_1_31";
                 }
-                else if (mes === 8 && dia >= 1 && dia <= 15) chaveEvento = "agosto_pais";
-                // Checagem das novas datas automáticas do sistema
-                else if (mes === 9 && dia >= 1 && dia <= 30) chaveEvento = "set_1_30";
-                else if (mes === 10 && dia >= 1 && dia <= 15) chaveEvento = "out_1_15";
-                else if (mes === 10 && dia >= 16 && dia <= 31) chaveEvento = "out_16_31";
-                else if (mes === 11 && dia >= 1 && dia <= 30) chaveEvento = "nov_1_30";
-                else if (mes === 12 && dia >= 1 && dia <= 31) chaveEvento = "dez_1_31";
             }
 
             const btnFlutuante = document.getElementById('btnSazonalFlutuante');
@@ -676,6 +670,7 @@
                 let conf = configuracoesSazonais[chaveEvento];
 
                 document.body.style.background = conf.bg;
+                document.getElementById('btnDesativarSazonal').style.display = "flex";
                 
                 let corTextoAdaptada = verificarBrilhoCorHex(conf.bg) ? "#1a1d24" : "#f0f2f5";
                 document.body.style.color = corTextoAdaptada;
@@ -749,8 +744,7 @@
             }
         }
 
-        function executarExplosaoConfetesSom() {
-            // Criação de efeito de som via AudioContext Nativo do Navegador
+        function ejecutarExplosaoConfetesSom() {
             try {
                 let ctxSom = new (window.AudioContext || window.webkitAudioContext)();
                 let osc = ctxSom.createOscillator();
@@ -766,7 +760,6 @@
                 osc.stop(ctxSom.currentTime + 0.4);
             } catch(e) { console.log("Som bloqueado pela política do navegador."); }
 
-            // Explosão Visual de Confetes Rápidos na Tela
             const container = document.getElementById('containerEmojisSazonais');
             const coresConfete = ["✨", "🎉", "🍬", "🎈", "🍭"];
             for (let i = 0; i < 30; i++) {
@@ -793,6 +786,7 @@
         }
 
         function forcarSubEventoJunho(subChave) {
+            sazonalDesativadoManualmente = false;
             subEventoJunhoForcado = subChave;
             eventoForcadoChave = subChave;
             verificarEExecutarEventosSazonais();
@@ -842,6 +836,7 @@
         }
 
         function forcarEventoManual(valorChave) {
+            sazonalDesativadoManualmente = false;
             subEventoJunhoForcado = "";
             eventoForcadoChave = valorChave;
             verificarEExecutarEventosSazonais();
@@ -895,7 +890,7 @@
             let novoUser = {
                 id: geradoID, nome: document.getElementById('cadNome').value.trim(), user, email,
                 senha: document.getElementById('cadSenha').value, emoji: emojiSorteado, fundoAvatar: "#39ff14",
-                nivel: 1, xp: 0, xpDiario: 0, temaAtivo: "verde-neon", pontos: 0,
+                temaAtivo: "verde-neon", pontos: 0,
                 codigoSala: Math.floor(100000 + Math.random() * 900000).toString(), amigos: [], roletasSalvas: []
             };
 
@@ -923,6 +918,7 @@
             usuarioLogado = null; localStorage.removeItem('roleta_logado');
             document.body.setAttribute('data-roleta-theme', 'verde-neon'); salaOnlineCriada = false;
             eventoForcadoChave = ""; subEventoJunhoForcado = "";
+            sazonalDesativadoManualmente = false;
             document.getElementById('painelTesteAdmin').style.display = "none";
             document.getElementById('selectForcarEvento').value = "";
             atualizarInterfaceLogado(); atualizarJogadores(); verificarEExecutarEventosSazonais();
@@ -942,11 +938,6 @@
                 document.getElementById('perfAvatar').style.background = usuarioLogado.fundoAvatar;
                 document.getElementById('perfNome').innerText = usuarioLogado.nome;
                 document.getElementById('perfID').innerText = usuarioLogado.id;
-                document.getElementById('perfNivel').innerText = `Nível ${usuarioLogado.nivel}`;
-                let max = 50 + (usuarioLogado.nivel - 1) * 25;
-                document.getElementById('perfXpTexto').innerText = `XP: ${usuarioLogado.xp}/${max}`;
-                document.getElementById('perfXpLimite').innerText = `${usuarioLogado.xpDiario || 0}/25 Diário`;
-                document.getElementById('perfBarraProgresso').style.width = `${(usuarioLogado.xp / max) * 100}%`;
                 
                 if (usuarioLogado.id === "#1122264") {
                     pAdmin.style.display = "flex";
@@ -1044,7 +1035,7 @@
             
             let c1 = "#1a1d2d", c2 = "#24293e";
             let txtC = window.sazonalAtivoDados ? window.sazonalAtivoDados.letras : (bodyStyle.getPropertyValue('--roleta-texto').trim() || "#ffffff");
-            let bordaC = window.sazonalAtivoDados ? window.sazonalAtivoDados.borda : (bodyStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)");
+            let borderC = window.sazonalAtivoDados ? window.sazonalAtivoDados.borda : (bodyStyle.getPropertyValue('--roleta-borda').trim() || "rgba(255, 255, 255, 0.1)");
 
             const coresLgbtFatias = ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"];
 
@@ -1071,7 +1062,7 @@
                 }
                 
                 ctx.fill(); 
-                ctx.strokeStyle = bordaC; ctx.stroke();
+                ctx.strokeStyle = borderC; ctx.stroke();
 
                 ctx.save(); ctx.translate(250, 250); ctx.rotate(i * tamAng + tamAng/2);
                 ctx.textAlign = "right"; ctx.fillStyle = txtC; ctx.font = "bold 13px sans-serif";
@@ -1095,14 +1086,6 @@
                 let idx = Math.floor(grFin / (360 / lista.length)) % lista.length;
                 desafioSorteadoGlobal = lista[idx];
 
-                if(usuarioLogado && (usuarioLogado.xpDiario || 0) < 25) {
-                    usuarioLogado.xp = (usuarioLogado.xp || 0) + 2; 
-                    usuarioLogado.xpDiario = (usuarioLogado.xpDiario || 0) + 2;
-                    let max = 50 + (usuarioLogado.nivel - 1) * 25;
-                    if(usuarioLogado.xp >= max) { usuarioLogado.xp = usuarioLogado.xp - max; usuarioLogado.nivel += 1; }
-                    salvarUsuarioNoBanco(usuarioLogado); atualizarInterfaceLogado();
-                }
-
                 let ptsValor = desafioSorteadoGlobal.dif === 'Fácil' ? 5 : desafioSorteadoGlobal.dif === 'Médio' ? 10 : 20;
                 document.getElementById('desafioAtualTexto').innerText = `Missão: "${desafioSorteadoGlobal.texto}" valendo ${ptsValor} Pontos!`;
                 document.getElementById('painelValidacao').style.display = 'flex';
@@ -1124,7 +1107,7 @@
             cronometroInterval = setInterval(() => {
                 tempoRestante--;
                 if(tempoRestante <= 0) {
-                    clearInterval(cronModificationInterval); document.getElementById('cronometro').innerText = "00:00";
+                    clearInterval(cronometroInterval); document.getElementById('cronometro').innerText = "00:00";
                     if(document.getElementById('autoGirarCheck').checked) setTimeout(() => validarResultado(false), 1500);
                 } else { document.getElementById('cronometro').innerText = formatarTempo(tempoRestante); }
             }, 1000);
